@@ -27,7 +27,7 @@
 # include directories and C++ standard are propagated to our libraries or executables.
 # Note: To ensure compatibility with Cling, targets *must* be compiled using the
 # same C++ standard as ROOT was compiled with.
-   add_library(Event SHARED anavar.C)
+   add_library(Event SHARED anavar.C HadAna.cxx)
    target_link_libraries(Event PUBLIC ${ROOT_LIBRARIES})
    target_compile_options(Event INTERFACE ${CMAKE_REQUIRED_FLAGS})
 # Create the main program using the library.
