@@ -3,12 +3,22 @@
 
 #include "anavar.h"
 
-bool isTrueSelected(const anavar &t, const std::vector<int> & pdglist){
+const unsigned int nCuts = 6;
 
-  for (size_t i = 0; i<pdglist.size(); ++i){
-    if (t.true_beam_PDG == pdglist[i]) return true;
-  }
-  return false;
-}
+const char cutName[nCuts][100] = {"Nocut",
+                                  "PandoraSlice",
+                                  "BeamQuality",
+                                  "APA3",
+                                  "CaloSize",
+                                  "TrunMeandEdx"};
+
+enum cut{
+  kNocut = 0,
+  kPandoraSlice,
+  kBeamQuality,
+  kAPA3,
+  kCaloSize,
+  kTrunMeandEdx
+};
 
 #endif

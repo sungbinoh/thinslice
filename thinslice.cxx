@@ -15,6 +15,7 @@ int main(){
   HadAna ana(chain);
   ana.AddTruePDG(-13);
   ana.AddTruePDG(211);
+  ana.SetPandoraSlicePDG(13);
 
   Long64_t nentries = ana.fChain->GetEntriesFast();
   
@@ -28,7 +29,7 @@ int main(){
     //std::cout<<ana.run<<" "<<ana.event<<" "<<ana.MC<<" "<<ana.reco_beam_true_byE_matched<<" "<<ana.true_beam_PDG<<" "<<(*ana.true_beam_endProcess)<<std::endl;
     //std::cout<<GetParType(ana)<<std::endl;
     if (!ana.isTrueSelectedPart()) continue;
-    int partype = GetParType(ana);
+    int partype = ana.GetParType();
     if (partype<nParTypes){
       ++nevents[partype];
     }

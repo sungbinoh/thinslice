@@ -5,8 +5,24 @@
 
 const unsigned int nParTypes = 13;
 
+const char parTypeName[nParTypes+1][100] = {"all",
+                                            "MisID",
+                                            "PrimMuP",
+                                            "PrimPiPInEl",
+                                            "PrimPiPEl",
+                                            "PrimKaPInEl",
+                                            "PrimKaPEl",
+                                            "PrimProInEl",
+                                            "PrimProEl",
+                                            "PrimMuM",
+                                            "PrimPiMInEl",
+                                            "PrimPiMEl",
+                                            "PrimKaMInEl",
+                                            "Unknown"};
+
 enum parType{
-  kPrimMuP = 0,
+  kMisID = 1,
+  kPrimMuP,
   kPrimPiPInEl,
   kPrimPiPEl,
   kPrimKaPInEl,
@@ -17,35 +33,7 @@ enum parType{
   kPrimPiMInEl,
   kPrimPiMEl,
   kPrimKaMInEl,
-  kMisID,
   kUnknown
 };
-
-int GetParType(const anavar &t){
-
-  if (!t.reco_beam_true_byE_matched){
-    return kMisID;
-  }
-  else if (t.true_beam_PDG == -13){
-    return kPrimMuP;
-  }
-  else if (t.true_beam_PDG == 13){
-    return kPrimMuM;
-  }
-  else if (t.true_beam_PDG == 211){
-    if ((*t.true_beam_endProcess) == "pi+Inelastic"){
-      return kPrimPiPInEl;
-    }
-    else return kPrimPiPEl;
-  }
-  else if (t.true_beam_PDG == 2212){
-    if ((*t.true_beam_endProcess) == "protonInelastic"){
-      return kPrimProInEl;
-    }
-    else return kPrimProEl;
-  }
-  
-  return kUnknown;
-}
 
 #endif
