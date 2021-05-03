@@ -21,6 +21,11 @@
 #   include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 #   ROOT_GENERATE_DICTIONARY(G__Event Event.h LINKDEF EventLinkDef.h)
 
+  SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
+  SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
+  SET(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib)
+
+
 # Create a shared library with a generated dictionary.
 # Passing cmake targets such as `ROOT::RIO` as dependencies (rather than plain
 # library names for example via ${ROOT_LIBRARIES}) ensures that properties such as required
@@ -29,7 +34,10 @@
 # same C++ standard as ROOT was compiled with.
    add_library(Event SHARED anavar.C HadAna.cxx)
    target_link_libraries(Event PUBLIC ${ROOT_LIBRARIES})
-   target_compile_options(Event INTERFACE ${CMAKE_REQUIRED_FLAGS})
+#   target_compile_options(Event INTERFACE ${CMAKE_REQUIRED_FLAGS})
 # Create the main program using the library.
    add_executable(thinslice thinslice.cxx)
    target_link_libraries(thinslice Event)
+
+   install(TARGETS thinslice DESTINATION bin)
+   install(TARGETS Event DESTINATION lib)
