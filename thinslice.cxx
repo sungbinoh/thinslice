@@ -10,12 +10,14 @@ int main(){
 
   TChain *chain = new TChain();
 
-  chain->Add("/data/tjyang/dune/pduneana_Prod4_1GeV_2_9_21.root/pduneana/beamana");
+  chain->Add("/data/tjyang/dune/pduneana_Prod4.1_1GeV_3_26_21.root/pduneana/beamana");
 
   HadAna ana(chain);
   ana.AddTruePDG(-13);
   ana.AddTruePDG(211);
   ana.SetPandoraSlicePDG(13);
+  ana.SetOutputFileName("hadana.root");
+  ana.BookHistograms();
 
   Long64_t nentries = ana.fChain->GetEntriesFast();
   
@@ -30,14 +32,18 @@ int main(){
     //std::cout<<GetParType(ana)<<std::endl;
     if (!ana.isTrueSelectedPart()) continue;
     int partype = ana.GetParType();
-    if (partype<nParTypes){
+    ++nevents[0];
+    if (partype<nParTypes+1){
       ++nevents[partype];
     }
+    ana.FillHistograms(kNocut);
   }
 
   for (int i = 0; i<nParTypes; ++i){
     std::cout<<i<<" "<<nevents[i]<<std::endl;
   }
+
+  ana.SaveHistograms();
 
   return 0;
 

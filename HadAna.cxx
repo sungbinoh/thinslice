@@ -88,8 +88,13 @@ void HadAna::BookHistograms(){
 
   for (int i = 0; i < nCuts; ++i){
     for (int j = 0; j < nParTypes+1; ++j){
-      htrue_beam_endZ[i][j] = new TH1D(Form("htrue_beam_endZ_%d_%d",i,j),Form("true_beam_endZ,%s,%s", cutName[i], parTypeName[j]), 100, -100, 900);
+      htrue_beam_endZ[i][j] = new TH1D(Form("htrue_beam_endZ_%d_%d",i,j),Form("true_beam_endZ, %s, %s", cutName[i], parTypeName[j]), 100, -100, 900);
       htrue_beam_endZ[i][j]->Sumw2();
+      hreco_beam_endZ[i][j] = new TH1D(Form("hreco_beam_endZ_%d_%d",i,j),Form("reco_beam_endZ, %s, %s", cutName[i], parTypeName[j]), 100, -100, 900);
+      hreco_beam_endZ[i][j]->Sumw2();
+      hreco_true_beam_endZ[i][j] = new TH1D(Form("hreco_true_beam_endZ_%d_%d",i,j), Form("reco_true_beam_endZ, %s, %s", cutName[i], parTypeName[j]), 100, -100, 100);
+      hreco_true_beam_endZ[i][j]->Sumw2();
+      hreco_vs_true_beam_endZ[i][j]= new TH2D(Form("hreco_vs_true_beam_endZ_%d_%d",i,j), Form("reco_vs_true_beam_endZ, %s, %s;true_beam_endZ;reco_beam_endZ", cutName[i], parTypeName[j]), 100, -100, 900, 100, -100, 900);
     }
   }
 }
@@ -98,9 +103,21 @@ void HadAna::FillHistograms(int cut){
   
   if (cut>=0 && cut < nCuts){
     htrue_beam_endZ[cut][0]->Fill(true_beam_endZ_SCE);
+    if (!reco_beam_calo_wire->empty()){
+      double reco_beam_endZ_SCE = reco_beam_calo_wire->back()*0.479 + 0.5603500;
+      hreco_beam_endZ[cut][0]->Fill(reco_beam_endZ_SCE);
+      hreco_true_beam_endZ[cut][0]->Fill(reco_beam_endZ_SCE - true_beam_endZ_SCE);
+      hreco_vs_true_beam_endZ[cut][0]->Fill(true_beam_endZ_SCE, reco_beam_endZ_SCE);
+    }
     int partype = GetParType();
     if (partype>=1 && partype < nParTypes+1){
       htrue_beam_endZ[cut][partype]->Fill(true_beam_endZ_SCE);
+      if (!reco_beam_calo_wire->empty()){
+        double reco_beam_endZ_SCE = reco_beam_calo_wire->back()*0.479 + 0.5603500;
+        hreco_beam_endZ[cut][partype]->Fill(reco_beam_endZ_SCE);
+        hreco_true_beam_endZ[cut][partype]->Fill(reco_beam_endZ_SCE - true_beam_endZ_SCE);
+        hreco_vs_true_beam_endZ[cut][partype]->Fill(true_beam_endZ_SCE, reco_beam_endZ_SCE);
+      }
     }
   }
 }
