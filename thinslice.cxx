@@ -38,6 +38,18 @@ int main(){
       ++nevents[partype];
     }
     ana.FillHistograms(kNocut);
+    if (!ana.PassPandoraSliceCut()) continue;
+    ana.FillHistograms(kPandoraSlice);
+    if (!ana.PassBeamQualityCut()) continue;
+    ana.FillHistograms(kBeamQuality);
+    if (!ana.PassAPA3Cut()) continue;
+    ana.FillHistograms(kAPA3);
+    if (!ana.PassCaloSizeCut()) continue;
+    ana.FillHistograms(kCaloSize);
+    if (!ana.PassMichelScoreCut()) continue;
+    ana.FillHistograms(kMichelScore);
+    if (!ana.PassMediandEdxCut()) continue;
+    ana.FillHistograms(kMediandEdx);
   }
 
   for (int i = 0; i<nParTypes; ++i){

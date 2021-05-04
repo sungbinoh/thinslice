@@ -32,13 +32,16 @@ class HadAna : public anavar{
   bool PassBeamQualityCut();
   bool PassAPA3Cut();
   bool PassCaloSizeCut();
+  bool PassMichelScoreCut();
+  bool PassMediandEdxCut();
 
   // Event information
+  void ProcessEvent();
   int partype;
   int reco_sliceID;
   int true_sliceID;
-
-  void ProcessEvent();
+  double median_dEdx;
+  double daughter_michel_score;
 
   TH1D *htrue_beam_endZ[nCuts][nParTypes+1];
   TH1D *hreco_beam_endZ[nCuts][nParTypes+1];
@@ -55,6 +58,10 @@ class HadAna : public anavar{
   TH2D *hreco_interacting_Energy_vs_true_beam_endZ[nCuts][nParTypes+1];
   TH2D *htrue_interacting_Energy_vs_true_beam_endZ[nCuts][nParTypes+1];
   TH2D *hreco_true_interacting_Energy_vs_true_beam_endZ[nCuts][nParTypes+1];
+
+  TH1D *hmediandEdx[nCuts][nParTypes+1];
+
+  TH1D *hdaughter_michel_score[nCuts][nParTypes+1];
 
   TH1D *reco_incE[nslices];
   TH1D *reco_pitch[nslices];

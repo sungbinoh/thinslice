@@ -1,5 +1,6 @@
 #include "HadAna.h"
 #include "TGraphErrors.h"
+#include "TMath.h"
 #include <iostream>
 
 bool HadAna::isTrueSelectedPart(){
@@ -84,6 +85,16 @@ bool HadAna::PassCaloSizeCut(){
   return !(reco_beam_calo_wire->empty());
 }
 
+bool HadAna::PassMichelScoreCut(){
+  
+  return daughter_michel_score < 0.55;
+}
+
+bool HadAna::PassMediandEdxCut(){
+
+  return median_dEdx < 2.4;
+}
+
 void HadAna::BookHistograms(){
 
   outputFile = TFile::Open(fOutputFileName.c_str(), "recreate");
@@ -111,6 +122,13 @@ void HadAna::BookHistograms(){
       hreco_interacting_Energy_vs_true_beam_endZ[i][j]= new TH2D(Form("hreco_interacting_Energy_vs_true_beam_endZ_%d_%d",i,j), Form("hreco_interacting_Energy_vs_true_beam_endZ, %s, %s;true_beam_endZ (cm);reco interacting energy (MeV)", cutName[i], parTypeName[j]), 100, -100, 900, 100, 0, 1000);
       htrue_interacting_Energy_vs_true_beam_endZ[i][j]= new TH2D(Form("htrue_interacting_Energy_vs_true_beam_endZ_%d_%d",i,j), Form("htrue_interacting_Energy_vs_true_beam_endZ, %s, %s;true_beam_endZ (cm);true interacting energy (MeV)", cutName[i], parTypeName[j]), 100, -100, 900, 100, 0, 1000);
       hreco_true_interacting_Energy_vs_true_beam_endZ[i][j] = new TH2D(Form("hreco_true_interacting_Energy_vs_true_beam_endZ_%d_%d",i,j), Form("hreco_true_interacting_Energy_vs_true_beam_endZ, %s, %s;true_beam_endZ (cm); reco - true interacting energy (MeV)", cutName[i], parTypeName[j]), 100, -100, 900, 100, -100, 100);
+
+      hmediandEdx[i][j] = new TH1D(Form("hmediandEdx_%d_%d",i,j), Form("mediandEdx, %s, %s;Median dE/dx (MeV/cm)", cutName[i], parTypeName[j]), 100, 0, 10);
+      hmediandEdx[i][j]->Sumw2();
+
+      hdaughter_michel_score[i][j] = new TH1D(Form("hdaughter_michel_score_%d_%d",i,j), Form("daughter_michel_score, %s, %s;Michel score", cutName[i], parTypeName[j]), 100, 0, 1);
+      hdaughter_michel_score[i][j]->Sumw2();
+
     }
   }
 
@@ -154,7 +172,9 @@ void HadAna::FillHistograms(int cut){
       FillHistVec2D(hreco_true_vs_true_sliceID[cut], true_sliceID, reco_sliceID - true_sliceID);
       FillHistVec2D(hreco_interacting_Energy_vs_true_beam_endZ[cut], true_beam_endZ_SCE, reco_beam_interactingEnergy);
       FillHistVec2D(hreco_true_interacting_Energy_vs_true_beam_endZ[cut], true_beam_endZ_SCE, reco_beam_interactingEnergy - true_beam_interactingEnergy);
-    }
+      FillHistVec1D(hmediandEdx[cut], median_dEdx);
+      FillHistVec1D(hdaughter_michel_score[cut], daughter_michel_score);
+    }      
   }
 
   // Fill reco incE and pitch for each slice
@@ -246,10 +266,21 @@ void HadAna::ProcessEvent(){
   partype = -1;
   reco_sliceID = -100;
   true_sliceID = -100;
+  median_dEdx = -1;
+  daughter_michel_score = -1;
 
   if (!reco_beam_calo_wire->empty()){
     reco_sliceID = reco_beam_calo_wire->back()/nwires_in_slice;
+    median_dEdx = TMath::Median(reco_beam_calibrated_dEdX_SCE->size(), &(*reco_beam_calibrated_dEdX_SCE)[0]);
+    if (!reco_daughter_PFP_michelScore_collection->empty()){
+      daughter_michel_score = TMath::MaxElement(reco_daughter_PFP_michelScore_collection->size(), &(*reco_daughter_PFP_michelScore_collection)[0]);
+      //std::cout<<daughter_michel_score<<std::endl;
+    }
+    else{
+      daughter_michel_score = 0;
+    }
   }
+
 
   if (MC){
     partype = GetParType();
