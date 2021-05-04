@@ -66,6 +66,8 @@ class HadAna : public anavar{
   void SetOutputFileName(std::string name){fOutputFileName = name;};
   void BookHistograms();
   void FillHistograms(int cut);
+  void FillHistVec1D(TH1D *hist[nParTypes+1], const double &value);
+  void FillHistVec2D(TH2D *hist[nParTypes+1], const double &value1, const double &value2);
   void SaveHistograms();
 
   using anavar::anavar;

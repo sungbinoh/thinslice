@@ -122,49 +122,38 @@ void HadAna::BookHistograms(){
    }
 }
 
+void HadAna::FillHistVec1D(TH1D *hist[nParTypes+1], const double &value){
+  hist[0]->Fill(value);
+  if (partype>=1 && partype < nParTypes+1){
+    hist[partype]->Fill(value);
+  }
+}
+
+void HadAna::FillHistVec2D(TH2D *hist[nParTypes+1], const double &value1, const double &value2){
+  hist[0]->Fill(value1, value2);
+  if (partype>=1 && partype < nParTypes+1){
+    hist[partype]->Fill(value1, value2);
+  }
+}
+
 void HadAna::FillHistograms(int cut){
   
   if (cut>=0 && cut < nCuts){
-    htrue_beam_endZ[cut][0]->Fill(true_beam_endZ_SCE);
-    htrue_sliceID[cut][0]->Fill(true_sliceID);
-    htrue_interacting_Energy_vs_true_beam_endZ[cut][0]->Fill(true_beam_endZ_SCE, true_beam_interactingEnergy);
+    FillHistVec1D(htrue_beam_endZ[cut], true_beam_endZ_SCE);
+    FillHistVec1D(htrue_sliceID[cut], true_sliceID);
+    FillHistVec2D(htrue_interacting_Energy_vs_true_beam_endZ[cut], true_beam_interactingEnergy, true_beam_endZ_SCE);
     if (!reco_beam_calo_wire->empty()){
-      //std::cout<<true_beam_incidentEnergies->back()<<" "<<reco_beam_incidentEnergies->back()<<std::endl;
       double reco_beam_endZ_SCE = reco_beam_calo_wire->back()*0.479 + 0.5603500;
-      hreco_beam_endZ[cut][0]->Fill(reco_beam_endZ_SCE);
-      hreco_true_beam_endZ[cut][0]->Fill(reco_beam_endZ_SCE - true_beam_endZ_SCE);
-      hreco_vs_true_beam_endZ[cut][0]->Fill(true_beam_endZ_SCE, reco_beam_endZ_SCE);
-      hreco_true_vs_true_beam_endZ[cut][0]->Fill(true_beam_endZ_SCE, reco_beam_endZ_SCE - true_beam_endZ_SCE);
-
-      hreco_sliceID[cut][0]->Fill(reco_sliceID);
-      hreco_true_sliceID[cut][0]->Fill(reco_sliceID - true_sliceID);
-      hreco_vs_true_sliceID[cut][0]->Fill(true_sliceID, reco_sliceID);
-      hreco_true_vs_true_sliceID[cut][0]->Fill(true_sliceID, reco_sliceID - true_sliceID);
-
-      hreco_interacting_Energy_vs_true_beam_endZ[cut][0]->Fill(true_beam_endZ_SCE, reco_beam_interactingEnergy);
-      hreco_true_interacting_Energy_vs_true_beam_endZ[cut][0]->Fill(true_beam_endZ_SCE, reco_beam_interactingEnergy - true_beam_interactingEnergy);
-      
-    }
-    if (partype>=1 && partype < nParTypes+1){
-      htrue_beam_endZ[cut][partype]->Fill(true_beam_endZ_SCE);
-      htrue_sliceID[cut][partype]->Fill(true_sliceID);
-      htrue_interacting_Energy_vs_true_beam_endZ[cut][partype]->Fill(true_beam_endZ_SCE, true_beam_interactingEnergy);
-      if (!reco_beam_calo_wire->empty()){
-        double reco_beam_endZ_SCE = reco_beam_calo_wire->back()*0.479 + 0.5603500;
-        hreco_beam_endZ[cut][partype]->Fill(reco_beam_endZ_SCE);
-        hreco_true_beam_endZ[cut][partype]->Fill(reco_beam_endZ_SCE - true_beam_endZ_SCE);
-        hreco_vs_true_beam_endZ[cut][partype]->Fill(true_beam_endZ_SCE, reco_beam_endZ_SCE);
-        hreco_true_vs_true_beam_endZ[cut][partype]->Fill(true_beam_endZ_SCE, reco_beam_endZ_SCE - true_beam_endZ_SCE);
-
-        hreco_sliceID[cut][partype]->Fill(reco_sliceID);
-        hreco_true_sliceID[cut][partype]->Fill(reco_sliceID - true_sliceID);
-        hreco_vs_true_sliceID[cut][partype]->Fill(true_sliceID, reco_sliceID);
-        hreco_true_vs_true_sliceID[cut][partype]->Fill(true_sliceID, reco_sliceID - true_sliceID);
-
-        hreco_interacting_Energy_vs_true_beam_endZ[cut][partype]->Fill(true_beam_endZ_SCE, reco_beam_interactingEnergy);
-        hreco_true_interacting_Energy_vs_true_beam_endZ[cut][partype]->Fill(true_beam_endZ_SCE, reco_beam_interactingEnergy - true_beam_interactingEnergy);
-
-      }
+      FillHistVec1D(hreco_beam_endZ[cut], reco_beam_endZ_SCE);
+      FillHistVec1D(hreco_true_beam_endZ[cut], reco_beam_endZ_SCE - true_beam_endZ_SCE);
+      FillHistVec2D(hreco_vs_true_beam_endZ[cut], true_beam_endZ_SCE, reco_beam_endZ_SCE);
+      FillHistVec2D(hreco_true_vs_true_beam_endZ[cut], true_beam_endZ_SCE, reco_beam_endZ_SCE - true_beam_endZ_SCE);
+      FillHistVec1D(hreco_sliceID[cut], reco_sliceID);
+      FillHistVec1D(hreco_true_sliceID[cut], reco_sliceID - true_sliceID);
+      FillHistVec2D(hreco_vs_true_sliceID[cut], true_sliceID, reco_sliceID);
+      FillHistVec2D(hreco_true_vs_true_sliceID[cut], true_sliceID, reco_sliceID - true_sliceID);
+      FillHistVec2D(hreco_interacting_Energy_vs_true_beam_endZ[cut], true_beam_endZ_SCE, reco_beam_interactingEnergy);
+      FillHistVec2D(hreco_true_interacting_Energy_vs_true_beam_endZ[cut], true_beam_endZ_SCE, reco_beam_interactingEnergy - true_beam_interactingEnergy);
     }
   }
 
