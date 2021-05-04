@@ -1,4 +1,5 @@
 #include "HadAna.h"
+#include <iostream>
 
 bool HadAna::isTrueSelectedPart(){
   for (size_t i = 0; i<truepdglist.size(); ++i){
@@ -88,37 +89,168 @@ void HadAna::BookHistograms(){
 
   for (int i = 0; i < nCuts; ++i){
     for (int j = 0; j < nParTypes+1; ++j){
-      htrue_beam_endZ[i][j] = new TH1D(Form("htrue_beam_endZ_%d_%d",i,j),Form("true_beam_endZ, %s, %s", cutName[i], parTypeName[j]), 100, -100, 900);
+      htrue_beam_endZ[i][j] = new TH1D(Form("htrue_beam_endZ_%d_%d",i,j),Form("true_beam_endZ, %s, %s;true_beam_endZ (cm)", cutName[i], parTypeName[j]), 100, -100, 900);
       htrue_beam_endZ[i][j]->Sumw2();
-      hreco_beam_endZ[i][j] = new TH1D(Form("hreco_beam_endZ_%d_%d",i,j),Form("reco_beam_endZ, %s, %s", cutName[i], parTypeName[j]), 100, -100, 900);
+      hreco_beam_endZ[i][j] = new TH1D(Form("hreco_beam_endZ_%d_%d",i,j),Form("reco_beam_endZ, %s, %s;reco_beam_endZ (cm)", cutName[i], parTypeName[j]), 100, -100, 900);
       hreco_beam_endZ[i][j]->Sumw2();
-      hreco_true_beam_endZ[i][j] = new TH1D(Form("hreco_true_beam_endZ_%d_%d",i,j), Form("reco_true_beam_endZ, %s, %s", cutName[i], parTypeName[j]), 100, -100, 100);
+      hreco_true_beam_endZ[i][j] = new TH1D(Form("hreco_true_beam_endZ_%d_%d",i,j), Form("reco_true_beam_endZ, %s, %s;reco_beam_endZ - true_beam_endZ (cm)", cutName[i], parTypeName[j]), 100, -100, 100);
       hreco_true_beam_endZ[i][j]->Sumw2();
-      hreco_vs_true_beam_endZ[i][j]= new TH2D(Form("hreco_vs_true_beam_endZ_%d_%d",i,j), Form("reco_vs_true_beam_endZ, %s, %s;true_beam_endZ;reco_beam_endZ", cutName[i], parTypeName[j]), 100, -100, 900, 100, -100, 900);
+      hreco_vs_true_beam_endZ[i][j]= new TH2D(Form("hreco_vs_true_beam_endZ_%d_%d",i,j), Form("reco_vs_true_beam_endZ, %s, %s;true_beam_endZ (cm);reco_beam_endZ (cm)", cutName[i], parTypeName[j]), 100, -100, 900, 100, -100, 900);
+      hreco_true_vs_true_beam_endZ[i][j]= new TH2D(Form("hreco_true_vs_true_beam_endZ_%d_%d",i,j), Form("reco_true_vs_true_beam_endZ, %s, %s;true_beam_endZ (cm);reco - true_beam_endZ (cm)", cutName[i], parTypeName[j]), 100, -100, 900, 100, -100, 100);
+
+      htrue_sliceID[i][j] = new TH1D(Form("htrue_sliceID_%d_%d",i,j),Form("true_sliceID, %s, %s;true_sliceID (cm)", cutName[i], parTypeName[j]), 50, -1, 49);
+      htrue_sliceID[i][j]->Sumw2();
+      hreco_sliceID[i][j] = new TH1D(Form("hreco_sliceID_%d_%d",i,j),Form("reco_sliceID, %s, %s;reco_sliceID", cutName[i], parTypeName[j]), 50, -1, 49);
+      hreco_sliceID[i][j]->Sumw2();
+      hreco_true_sliceID[i][j] = new TH1D(Form("hreco_true_sliceID_%d_%d",i,j), Form("reco_true_sliceID, %s, %s;reco_sliceID - true_sliceID", cutName[i], parTypeName[j]), 20, -10, 10);
+      hreco_true_sliceID[i][j]->Sumw2();
+      hreco_vs_true_sliceID[i][j]= new TH2D(Form("hreco_vs_true_sliceID_%d_%d",i,j), Form("reco_vs_true_sliceID, %s, %s;true_sliceID;reco_sliceID", cutName[i], parTypeName[j]), 50, -1, 49, 50, -1, 49);
+      hreco_true_vs_true_sliceID[i][j]= new TH2D(Form("hreco_true_vs_true_sliceID_%d_%d",i,j), Form("reco_true_vs_true_sliceID, %s, %s;true_sliceID;reco_sliceID - true_sliceID", cutName[i], parTypeName[j]), 50, -1, 49, 20, -10, 10);
+
+      hreco_interacting_Energy_vs_true_beam_endZ[i][j]= new TH2D(Form("hreco_interacting_Energy_vs_true_beam_endZ_%d_%d",i,j), Form("hreco_interacting_Energy_vs_true_beam_endZ, %s, %s;true_beam_endZ (cm);reco interacting energy (MeV)", cutName[i], parTypeName[j]), 100, -100, 900, 100, 0, 1000);
+      htrue_interacting_Energy_vs_true_beam_endZ[i][j]= new TH2D(Form("htrue_interacting_Energy_vs_true_beam_endZ_%d_%d",i,j), Form("htrue_interacting_Energy_vs_true_beam_endZ, %s, %s;true_beam_endZ (cm);true interacting energy (MeV)", cutName[i], parTypeName[j]), 100, -100, 900, 100, 0, 1000);
+      hreco_true_interacting_Energy_vs_true_beam_endZ[i][j] = new TH2D(Form("hreco_true_interacting_Energy_vs_true_beam_endZ_%d_%d",i,j), Form("hreco_true_interacting_Energy_vs_true_beam_endZ, %s, %s;true_beam_endZ (cm); reco - true interacting energy (MeV)", cutName[i], parTypeName[j]), 100, -100, 900, 100, -100, 100);
     }
   }
+
+   for (int i = 0; i<nslices; ++i){
+     reco_incE[i] = new TH1D(Form("reco_incE_%d",i),Form("Reco incident energy, %d<wire #<%d",i*nwires_in_slice, (i+1)*nwires_in_slice), nbinse, 0, 1200.);
+     true_incE[i] = new TH1D(Form("true_incE_%d",i),Form("True incident energy, %d<wire #<%d",i*nwires_in_slice, (i+1)*nwires_in_slice), nbinse, 0, 1200.);
+     reco_pitch[i] = new TH1D(Form("reco_pitch_%d",i),Form("Slice thickness, %d<wire #<%d",i*nwires_in_slice, (i+1)*nwires_in_slice), nbinsthickness, 0, 20.);
+   }
 }
 
 void HadAna::FillHistograms(int cut){
   
   if (cut>=0 && cut < nCuts){
     htrue_beam_endZ[cut][0]->Fill(true_beam_endZ_SCE);
+    htrue_sliceID[cut][0]->Fill(true_sliceID);
+    htrue_interacting_Energy_vs_true_beam_endZ[cut][0]->Fill(true_beam_endZ_SCE, true_beam_interactingEnergy);
     if (!reco_beam_calo_wire->empty()){
+      //std::cout<<true_beam_incidentEnergies->back()<<" "<<reco_beam_incidentEnergies->back()<<std::endl;
       double reco_beam_endZ_SCE = reco_beam_calo_wire->back()*0.479 + 0.5603500;
       hreco_beam_endZ[cut][0]->Fill(reco_beam_endZ_SCE);
       hreco_true_beam_endZ[cut][0]->Fill(reco_beam_endZ_SCE - true_beam_endZ_SCE);
       hreco_vs_true_beam_endZ[cut][0]->Fill(true_beam_endZ_SCE, reco_beam_endZ_SCE);
+      hreco_true_vs_true_beam_endZ[cut][0]->Fill(true_beam_endZ_SCE, reco_beam_endZ_SCE - true_beam_endZ_SCE);
+
+      hreco_sliceID[cut][0]->Fill(reco_sliceID);
+      hreco_true_sliceID[cut][0]->Fill(reco_sliceID - true_sliceID);
+      hreco_vs_true_sliceID[cut][0]->Fill(true_sliceID, reco_sliceID);
+      hreco_true_vs_true_sliceID[cut][0]->Fill(true_sliceID, reco_sliceID - true_sliceID);
+
+      hreco_interacting_Energy_vs_true_beam_endZ[cut][0]->Fill(true_beam_endZ_SCE, reco_beam_interactingEnergy);
+      hreco_true_interacting_Energy_vs_true_beam_endZ[cut][0]->Fill(true_beam_endZ_SCE, reco_beam_interactingEnergy - true_beam_interactingEnergy);
+      
     }
-    int partype = GetParType();
     if (partype>=1 && partype < nParTypes+1){
       htrue_beam_endZ[cut][partype]->Fill(true_beam_endZ_SCE);
+      htrue_sliceID[cut][partype]->Fill(true_sliceID);
+      htrue_interacting_Energy_vs_true_beam_endZ[cut][partype]->Fill(true_beam_endZ_SCE, true_beam_interactingEnergy);
       if (!reco_beam_calo_wire->empty()){
         double reco_beam_endZ_SCE = reco_beam_calo_wire->back()*0.479 + 0.5603500;
         hreco_beam_endZ[cut][partype]->Fill(reco_beam_endZ_SCE);
         hreco_true_beam_endZ[cut][partype]->Fill(reco_beam_endZ_SCE - true_beam_endZ_SCE);
         hreco_vs_true_beam_endZ[cut][partype]->Fill(true_beam_endZ_SCE, reco_beam_endZ_SCE);
+        hreco_true_vs_true_beam_endZ[cut][partype]->Fill(true_beam_endZ_SCE, reco_beam_endZ_SCE - true_beam_endZ_SCE);
+
+        hreco_sliceID[cut][partype]->Fill(reco_sliceID);
+        hreco_true_sliceID[cut][partype]->Fill(reco_sliceID - true_sliceID);
+        hreco_vs_true_sliceID[cut][partype]->Fill(true_sliceID, reco_sliceID);
+        hreco_true_vs_true_sliceID[cut][partype]->Fill(true_sliceID, reco_sliceID - true_sliceID);
+
+        hreco_interacting_Energy_vs_true_beam_endZ[cut][partype]->Fill(true_beam_endZ_SCE, reco_beam_interactingEnergy);
+        hreco_true_interacting_Energy_vs_true_beam_endZ[cut][partype]->Fill(true_beam_endZ_SCE, reco_beam_interactingEnergy - true_beam_interactingEnergy);
+
       }
     }
+  }
+
+  // Fill reco incE and pitch for each slice
+  if (cut == kNocut && partype == kPrimPiPInEl){
+    // Reco info
+    if (!(reco_beam_calo_wire->empty())){
+      std::vector<std::vector<double>> vpitch(nslices);
+      std::vector<std::vector<double>> vincE(nslices);
+      for (size_t i = 0; i<reco_beam_calo_wire->size(); ++i){
+        int this_wire = (*reco_beam_calo_wire)[i];
+        int this_sliceID = this_wire/nwires_in_slice;
+        //ignore the last slice for pitch and incident energy calculations
+        if (this_sliceID>=reco_sliceID) continue;
+        if (this_sliceID>=nslices) continue;
+        if (this_sliceID<0) continue;
+
+        double this_incE = (*reco_beam_incidentEnergies)[i];
+        double this_pitch = (*reco_beam_TrkPitch_SCE)[i];
+        vpitch[this_sliceID].push_back(this_pitch);
+        vincE[this_sliceID].push_back(this_incE);
+      }
+      for (size_t i = 0; i<vpitch.size(); ++i){
+        if (!vpitch[i].empty()){
+          double sum_pitch = 0;
+          for (size_t j = 0; j<vpitch[i].size(); ++j){
+            //std::cout<<vpitch[i][j]<<std::endl;
+            sum_pitch += vpitch[i][j];
+          }
+          //std::cout<<sum_pitch<<" "<<vpitch[i].size()<<std::endl;
+          reco_pitch[i]->Fill(sum_pitch/vpitch[i].size()*nwires_in_slice);
+        }
+      }
+      for (size_t i = 0; i<vincE.size(); ++i){
+        if (!vincE[i].empty()){
+          double sum_incE = 0;
+          for (size_t j = 0; j<vincE[i].size(); ++j){
+            sum_incE += vincE[i][j];
+          }
+          reco_incE[i]->Fill(sum_incE/vincE[i].size());
+        }
+      }
+    }
+    // True info
+    if (!(true_beam_traj_Z_SCE->empty())){
+      std::vector<std::vector<double>> vincE(nslices);
+      for (size_t i = 0; i<true_beam_traj_Z_SCE->size()-1; ++i){//last point always has KE = 0
+        int this_sliceID = int(((*true_beam_traj_Z_SCE)[i]-0.5603500-0.479/2)/0.479/nwires_in_slice);
+        double this_incE = (*true_beam_traj_KE)[i];
+//        if (run == 17775907 && event == 924){
+//          std::cout<<i<<" "<<this_sliceID<<" "<<(*true_beam_traj_Z_SCE)[i]<<" "<<(*true_beam_traj_KE)[i]<<std::endl;
+//        }
+        if (this_sliceID>=nslices) continue;
+        if (this_sliceID<0) continue;
+
+        vincE[this_sliceID].push_back(this_incE);
+      }
+      for (size_t i = 0; i<vincE.size(); ++i){
+        if (!vincE[i].empty()){
+          double sum_incE = 0;
+          for (size_t j = 0; j<vincE[i].size(); ++j){
+            sum_incE += vincE[i][j];
+          }
+          true_incE[i]->Fill(sum_incE/vincE[i].size());
+//          if (i==9 && sum_incE/vincE[i].size() < 400){
+//            //std::cout<<sum_incE<<" "<<vincE[i].size()<<std::endl;
+//            //std::cout<<run<<" "<<event<<std::endl;
+//          }
+        }
+      }
+    }
+  }
+  
+}
+
+void HadAna::ProcessEvent(){
+
+  partype = -1;
+  reco_sliceID = -100;
+  true_sliceID = -100;
+
+  if (!reco_beam_calo_wire->empty()){
+    reco_sliceID = reco_beam_calo_wire->back()/nwires_in_slice;
+  }
+
+  if (MC){
+    partype = GetParType();
+    true_sliceID = int((true_beam_endZ_SCE-0.5603500-0.479/2)/0.479/nwires_in_slice);
   }
 }
 

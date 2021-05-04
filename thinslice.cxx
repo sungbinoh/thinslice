@@ -31,6 +31,7 @@ int main(){
     //std::cout<<ana.run<<" "<<ana.event<<" "<<ana.MC<<" "<<ana.reco_beam_true_byE_matched<<" "<<ana.true_beam_PDG<<" "<<(*ana.true_beam_endProcess)<<std::endl;
     //std::cout<<GetParType(ana)<<std::endl;
     if (!ana.isTrueSelectedPart()) continue;
+    ana.ProcessEvent();
     int partype = ana.GetParType();
     ++nevents[0];
     if (partype<nParTypes+1){
