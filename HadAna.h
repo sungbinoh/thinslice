@@ -67,6 +67,9 @@ class HadAna : public anavar{
   TH1D *reco_pitch[nslices];
   TH1D *reco_dEdx[nslices];
   TH1D *true_incE[nslices];
+  TH1D *true_X[nslices];
+  TH1D *true_Y[nslices];
+  TH1D *true_Z[nslices];
 
   std::string fOutputFileName;
   TFile *outputFile;
