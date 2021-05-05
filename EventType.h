@@ -18,7 +18,7 @@ const char parTypeName[nParTypes+1][100] = {"all",
                                             "PrimPiMInEl",
                                             "PrimPiMEl",
                                             "PrimKaMInEl",
-                                            "Unknown"};
+                                            "Other"};
 
 enum parType{
   kMisID = 1,
@@ -33,7 +33,7 @@ enum parType{
   kPrimPiMInEl,
   kPrimPiMEl,
   kPrimKaMInEl,
-  kUnknown
+  kOther
 };
 
 #endif

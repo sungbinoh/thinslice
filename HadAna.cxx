@@ -34,7 +34,7 @@ int HadAna::GetParType(){
     else return kPrimProEl;
   }
   
-  return kUnknown;
+  return kOther;
 }
 
 
@@ -123,7 +123,7 @@ void HadAna::BookHistograms(){
       htrue_interacting_Energy_vs_true_beam_endZ[i][j]= new TH2D(Form("htrue_interacting_Energy_vs_true_beam_endZ_%d_%d",i,j), Form("htrue_interacting_Energy_vs_true_beam_endZ, %s, %s;true_beam_endZ (cm);true interacting energy (MeV)", cutName[i], parTypeName[j]), 100, -100, 900, 100, 0, 1000);
       hreco_true_interacting_Energy_vs_true_beam_endZ[i][j] = new TH2D(Form("hreco_true_interacting_Energy_vs_true_beam_endZ_%d_%d",i,j), Form("hreco_true_interacting_Energy_vs_true_beam_endZ, %s, %s;true_beam_endZ (cm); reco - true interacting energy (MeV)", cutName[i], parTypeName[j]), 100, -100, 900, 100, -100, 100);
 
-      hmediandEdx[i][j] = new TH1D(Form("hmediandEdx_%d_%d",i,j), Form("mediandEdx, %s, %s;Median dE/dx (MeV/cm)", cutName[i], parTypeName[j]), 100, 0, 10);
+      hmediandEdx[i][j] = new TH1D(Form("hmediandEdx_%d_%d",i,j), Form("mediandEdx, %s, %s;Median dE/dx (MeV/cm)", cutName[i], parTypeName[j]), 100, 0, 5);
       hmediandEdx[i][j]->Sumw2();
 
       hdaughter_michel_score[i][j] = new TH1D(Form("hdaughter_michel_score_%d_%d",i,j), Form("daughter_michel_score, %s, %s;Michel score", cutName[i], parTypeName[j]), 100, 0, 1);
