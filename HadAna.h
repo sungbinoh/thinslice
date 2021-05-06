@@ -71,6 +71,10 @@ class HadAna : public anavar{
   TH1D *true_Y[nslices];
   TH1D *true_Z[nslices];
 
+  // Energy slices
+  double true_interactions[nslices];
+  double true_incidents[nslices];
+
   std::string fOutputFileName;
   TFile *outputFile;
   void SetOutputFileName(std::string name){fOutputFileName = name;};
@@ -79,6 +83,7 @@ class HadAna : public anavar{
   void FillHistVec1D(TH1D *hist[nParTypes+1], const double &value);
   void FillHistVec2D(TH2D *hist[nParTypes+1], const double &value1, const double &value2);
   void SaveHistograms();
+
 
   using anavar::anavar;
 

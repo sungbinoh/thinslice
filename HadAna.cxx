@@ -141,6 +141,12 @@ void HadAna::BookHistograms(){
      true_Y[i] = new TH1D(Form("true_Y_%d",i),Form("true_Y, %d<=wire #<%d;True y (cm)",i*nwires_in_slice, (i+1)*nwires_in_slice), 100, 0, 600);
      true_Z[i] = new TH1D(Form("true_Z_%d",i),Form("true_Z, %d<=wire #<%d;True z (cm)",i*nwires_in_slice, (i+1)*nwires_in_slice), 100, -100, 500);
    }
+
+   for (int i = 0; i<nslices; ++i){
+     true_interactions[i] = 0;
+     true_incidents[i] = 0;
+   }
+
 }
 
 void HadAna::FillHistVec1D(TH1D *hist[nParTypes+1], const double &value){
@@ -307,10 +313,19 @@ void HadAna::ProcessEvent(){
     }
   }
 
-
   if (MC){
     partype = GetParType();
     true_sliceID = int((true_beam_endZ_SCE-0.5603500-0.479/2)/0.479/nwires_in_slice);
+    if (true_beam_PDG == 211){
+      for (int i = 0; i<=true_sliceID; ++i){
+        if (i<nslices) ++true_incidents[i];
+      }
+    }
+    if ((*true_beam_endProcess) == "pi+Inelastic"){
+      if (true_sliceID < nslices && true_sliceID>=0){
+        ++true_interactions[true_sliceID];
+      }
+    }
   }
 }
 
@@ -327,6 +342,9 @@ void HadAna::SaveHistograms(){
   double avg_trueZ[nslices] = {0};
   double avg_truepitch[nslices] = {0};
   double avg_truedEdx[nslices] = {0};
+  double avg_truedE[nslices] = {0};
+  double truexs_thinslice[nslices] = {0};
+  double truexs_eslice[nslices] = {0};
   double err_recoincE[nslices] = {0};
   double err_recotrueincE[nslices] = {0};
   double err_recopitch[nslices] = {0};
@@ -337,6 +355,8 @@ void HadAna::SaveHistograms(){
   double err_trueZ[nslices] = {0};
   double err_truepitch[nslices] = {0};
   double err_truedEdx[nslices] = {0};
+  double err_truexs_thinslice[nslices] = {0};
+  double err_truexs_eslice[nslices] = {0};
 
   for (int i = 0; i<nslices; ++i){
     slcid[i] = i;
@@ -364,20 +384,38 @@ void HadAna::SaveHistograms(){
       avg_truepitch[i] = sqrt(pow(avg_trueX[i+1]-avg_trueX[i-1],2)+
                               pow(avg_trueY[i+1]-avg_trueY[i-1],2)+
                               pow(avg_trueZ[i+1]-avg_trueZ[i-1],2))/2;
+      avg_truedE[i] = (avg_trueincE[i-1]-avg_trueincE[i+1])/2;
       avg_truedEdx[i] = (avg_trueincE[i-1]-avg_trueincE[i+1])/2/avg_truepitch[i];
     }
     else if (i==0){
       avg_truepitch[i] = sqrt(pow(avg_trueX[i+1]-avg_trueX[i],2)+
                               pow(avg_trueY[i+1]-avg_trueY[i],2)+
                               pow(avg_trueZ[i+1]-avg_trueZ[i],2));
+      avg_truedE[i] = avg_trueincE[i]-avg_trueincE[i+1];
       avg_truedEdx[i] = (avg_trueincE[i]-avg_trueincE[i+1])/avg_truepitch[i];
     }
     else if (i==nslices-1){
       avg_truepitch[i] = sqrt(pow(avg_trueX[i]-avg_trueX[i-1],2)+
                               pow(avg_trueY[i]-avg_trueY[i-1],2)+
                               pow(avg_trueZ[i]-avg_trueZ[i-1],2));
+      avg_truedE[i] = avg_trueincE[i-1]-avg_trueincE[i];
       avg_truedEdx[i] = (avg_trueincE[i-1]-avg_trueincE[i])/avg_truepitch[i];
     }
+  }
+
+  double NA=6.02214076e23;
+  double MAr=39.95; //gmol
+  double Density = 1.39; // g/cm^3
+  for (int i = 0; i<nslices; ++i){
+    if (true_incidents[i] && true_interactions[i] && avg_recopitch[i]){
+      truexs_thinslice[i] = MAr/(Density*NA*avg_recopitch[i])*log(true_incidents[i]/(true_incidents[i]-true_interactions[i]))*1e27;
+      err_truexs_thinslice[i] = MAr/(Density*NA*avg_recopitch[i])*1e27*sqrt(true_interactions[i]+pow(true_interactions[i],2)/true_incidents[i])/true_incidents[i];
+    }
+    if (true_incidents[i] && true_interactions[i]){
+      truexs_eslice[i] = MAr/(Density*NA*avg_truedE[i])*2.3*log(true_incidents[i]/(true_incidents[i]-true_interactions[i]))*1e27;
+      err_truexs_eslice[i] = MAr/(Density*NA*avg_truedE[i])*2.3*1e27*sqrt(true_interactions[i]+pow(true_interactions[i],2)/true_incidents[i])/true_incidents[i];
+    }
+    //std::cout<<i<<" "<<avg_trueincE[i]<<" "<<truexs_thinslice[i]<<" "<<err_truexs_thinslice[i]<<std::endl;
   }
 
   TGraphErrors *gr_recoincE_slc = new TGraphErrors(nslices, &(slcid[0]), &(avg_recoincE[0]), 0, &(err_recoincE[0]));
@@ -390,6 +428,8 @@ void HadAna::SaveHistograms(){
   TGraphErrors *gr_recodEdx_slc = new TGraphErrors(nslices, &(slcid[0]), &(avg_recodEdx[0]), 0, &(err_recodEdx[0]));
   TGraphErrors *gr_truepitch_slc = new TGraphErrors(nslices, &(slcid[0]), &(avg_truepitch[0]), 0, &(err_truepitch[0]));
   TGraphErrors *gr_truedEdx_slc = new TGraphErrors(nslices, &(slcid[0]), &(avg_truedEdx[0]), 0, &(err_truedEdx[0]));
+  TGraphErrors *gr_truexs_thinslice = new TGraphErrors(nslices, &(avg_trueincE[0]), &(truexs_thinslice[0]), 0, &(err_truexs_thinslice[0]));
+  TGraphErrors *gr_truexs_eslice = new TGraphErrors(nslices, &(avg_trueincE[0]), &(truexs_eslice[0]), 0, &(err_truexs_eslice[0]));
 
   outputFile->cd();
   gr_recoincE_slc->Write("gr_recoincE_slc");
@@ -402,6 +442,9 @@ void HadAna::SaveHistograms(){
   gr_trueY_slc->Write("gr_trueY_slc");
   gr_trueZ_slc->Write("gr_trueZ_slc");
   gr_truepitch_slc->Write("gr_truepitch_slc");
+  gr_truexs_thinslice->Write("gr_truexs_thinslice");
+  gr_truexs_eslice->Write("gr_truexs_eslice");
 
   outputFile->Write();
 }
+
