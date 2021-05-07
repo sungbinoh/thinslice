@@ -32,18 +32,18 @@ void plot1d(string name, int cut, string xtitle, string ytitle){
     }
   }
   TCanvas *can = new TCanvas(Form("can_%d",nc), Form("can_%d",nc));
-  THStack *hs = new THStack("hs","");
+  THStack *hs = new THStack(Form("hs_%d",nc),"");
   h[cut][3]->SetFillColor(kRed);
-  h[cut][3]->SetLineColor(kRed);
+  h[cut][3]->SetLineWidth(0);
   hs->Add(h[cut][3]);
   h[cut][2]->SetFillColor(kBlue);
-  h[cut][2]->SetLineColor(kBlue);
+  h[cut][2]->SetLineWidth(0);
   hs->Add(h[cut][2]);
   h[cut][1]->SetFillColor(kGreen);
-  h[cut][1]->SetLineColor(kGreen);
+  h[cut][1]->SetLineWidth(0);
   hs->Add(h[cut][1]);
   h[cut][4]->SetFillColor(6);
-  h[cut][4]->SetLineColor(6);
+  h[cut][4]->SetLineWidth(0);
   hs->Add(h[cut][4]);
   hs->Draw("hist");
   hs->SetTitle(cutName[cut]);
@@ -73,7 +73,7 @@ void plot(){
   for (int i = 0; i<nCuts; ++i){
     plot1d("hmediandEdx", i, "Median dE/dx (MeV/cm)", "Events");
     plot1d("hdaughter_michel_score", i, "Daughter Michel Score", "Events");
-    plot1d("hrecoZsce", i, "Reco track end (cm)", "Events");
+    plot1d("hreco_beam_endZ_SCE", i, "Reco track end (cm)", "Events");
   }
 
   PrintEvents("hdaughter_michel_score");

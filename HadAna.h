@@ -49,6 +49,12 @@ class HadAna : public anavar{
   TH2D *hreco_vs_true_beam_endZ[nCuts][nParTypes+1];
   TH2D *hreco_true_vs_true_beam_endZ[nCuts][nParTypes+1];
 
+  TH1D *htrue_beam_endZ_SCE[nCuts][nParTypes+1];
+  TH1D *hreco_beam_endZ_SCE[nCuts][nParTypes+1];
+  TH1D *hreco_true_beam_endZ_SCE[nCuts][nParTypes+1];
+  TH2D *hreco_vs_true_beam_endZ_SCE[nCuts][nParTypes+1];
+  TH2D *hreco_true_vs_true_beam_endZ_SCE[nCuts][nParTypes+1];
+
   TH1D *htrue_sliceID[nCuts][nParTypes+1];
   TH1D *hreco_sliceID[nCuts][nParTypes+1];
   TH1D *hreco_true_sliceID[nCuts][nParTypes+1];
@@ -62,8 +68,6 @@ class HadAna : public anavar{
   TH1D *hmediandEdx[nCuts][nParTypes+1];
 
   TH1D *hdaughter_michel_score[nCuts][nParTypes+1];
-
-  TH1D *hrecoZsce[nCuts][nParTypes+1];
 
   TH1D *reco_incE[nslices];
   TH1D *reco_pitch[nslices];

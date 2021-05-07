@@ -110,6 +110,16 @@ void HadAna::BookHistograms(){
       hreco_vs_true_beam_endZ[i][j]= new TH2D(Form("hreco_vs_true_beam_endZ_%d_%d",i,j), Form("reco_vs_true_beam_endZ, %s, %s;true_beam_endZ (cm);reco_beam_endZ (cm)", cutName[i], parTypeName[j]), 100, -100, 900, 100, -100, 900);
       hreco_true_vs_true_beam_endZ[i][j]= new TH2D(Form("hreco_true_vs_true_beam_endZ_%d_%d",i,j), Form("reco_true_vs_true_beam_endZ, %s, %s;true_beam_endZ (cm);reco - true_beam_endZ (cm)", cutName[i], parTypeName[j]), 100, -100, 900, 100, -100, 100);
 
+      htrue_beam_endZ_SCE[i][j] = new TH1D(Form("htrue_beam_endZ_SCE_%d_%d",i,j),Form("true_beam_endZ_SCE, %s, %s;true_beam_endZ_SCE (cm)", cutName[i], parTypeName[j]), 100, -100, 900);
+      htrue_beam_endZ_SCE[i][j]->Sumw2();
+      hreco_beam_endZ_SCE[i][j] = new TH1D(Form("hreco_beam_endZ_SCE_%d_%d",i,j),Form("reco_beam_endZ_SCE, %s, %s;reco_beam_endZ_SCE (cm)", cutName[i], parTypeName[j]), 100, -100, 900);
+      hreco_beam_endZ_SCE[i][j]->Sumw2();
+      hreco_true_beam_endZ_SCE[i][j] = new TH1D(Form("hreco_true_beam_endZ_SCE_%d_%d",i,j), Form("reco_true_beam_endZ_SCE, %s, %s;reco_beam_endZ_SCE - true_beam_endZ_SCE (cm)", cutName[i], parTypeName[j]), 100, -100, 100);
+      hreco_true_beam_endZ_SCE[i][j]->Sumw2();
+      hreco_vs_true_beam_endZ_SCE[i][j]= new TH2D(Form("hreco_vs_true_beam_endZ_SCE_%d_%d",i,j), Form("reco_vs_true_beam_endZ_SCE, %s, %s;true_beam_endZ_SCE (cm);reco_beam_endZ_SCE (cm)", cutName[i], parTypeName[j]), 100, -100, 900, 100, -100, 900);
+      hreco_true_vs_true_beam_endZ_SCE[i][j]= new TH2D(Form("hreco_true_vs_true_beam_endZ_SCE_%d_%d",i,j), Form("reco_true_vs_true_beam_endZ_SCE, %s, %s;true_beam_endZ_SCE (cm);reco - true_beam_endZ_SCE (cm)", cutName[i], parTypeName[j]), 100, -100, 900, 100, -100, 100);
+
+
       htrue_sliceID[i][j] = new TH1D(Form("htrue_sliceID_%d_%d",i,j),Form("true_sliceID, %s, %s;true_sliceID (cm)", cutName[i], parTypeName[j]), 50, -1, 49);
       htrue_sliceID[i][j]->Sumw2();
       hreco_sliceID[i][j] = new TH1D(Form("hreco_sliceID_%d_%d",i,j),Form("reco_sliceID, %s, %s;reco_sliceID", cutName[i], parTypeName[j]), 50, -1, 49);
@@ -128,9 +138,6 @@ void HadAna::BookHistograms(){
 
       hdaughter_michel_score[i][j] = new TH1D(Form("hdaughter_michel_score_%d_%d",i,j), Form("daughter_michel_score, %s, %s;Michel score", cutName[i], parTypeName[j]), 100, 0, 1);
       hdaughter_michel_score[i][j]->Sumw2();
-
-      hrecoZsce[i][j] = new TH1D(Form("hrecoZsce_%d_%d",i,j), Form("recoZsce, %s, %s;Reco z (cm)", cutName[i], parTypeName[j]), 100, -100, 900);
-      hrecoZsce[i][j]->Sumw2();
 
     }
   }
@@ -170,14 +177,20 @@ void HadAna::FillHistograms(int cut){
   
   if (cut>=0 && cut < nCuts){
     FillHistVec1D(htrue_beam_endZ[cut], true_beam_endZ_SCE);
+    FillHistVec1D(htrue_beam_endZ_SCE[cut], true_beam_endZ);
     FillHistVec1D(htrue_sliceID[cut], true_sliceID);
     FillHistVec2D(htrue_interacting_Energy_vs_true_beam_endZ[cut], true_beam_interactingEnergy, true_beam_endZ_SCE);
     if (!reco_beam_calo_wire->empty()){
-      double reco_beam_endZ_SCE = reco_beam_calo_wire->back()*0.479 + 0.5603500;
-      FillHistVec1D(hreco_beam_endZ[cut], reco_beam_endZ_SCE);
-      FillHistVec1D(hreco_true_beam_endZ[cut], reco_beam_endZ_SCE - true_beam_endZ_SCE);
-      FillHistVec2D(hreco_vs_true_beam_endZ[cut], true_beam_endZ_SCE, reco_beam_endZ_SCE);
-      FillHistVec2D(hreco_true_vs_true_beam_endZ[cut], true_beam_endZ_SCE, reco_beam_endZ_SCE - true_beam_endZ_SCE);
+      FillHistVec1D(hreco_beam_endZ[cut], reco_beam_endZ);
+      FillHistVec1D(hreco_true_beam_endZ[cut], reco_beam_endZ - true_beam_endZ_SCE);
+      FillHistVec2D(hreco_vs_true_beam_endZ[cut], true_beam_endZ_SCE, reco_beam_endZ);
+      FillHistVec2D(hreco_true_vs_true_beam_endZ[cut], true_beam_endZ_SCE, reco_beam_endZ - true_beam_endZ_SCE);
+
+      FillHistVec1D(hreco_beam_endZ_SCE[cut], reco_beam_calo_endZ);
+      FillHistVec1D(hreco_true_beam_endZ_SCE[cut], reco_beam_calo_endZ - true_beam_endZ);
+      FillHistVec2D(hreco_vs_true_beam_endZ_SCE[cut], true_beam_endZ, reco_beam_calo_endZ);
+      FillHistVec2D(hreco_true_vs_true_beam_endZ_SCE[cut], true_beam_endZ, reco_beam_calo_endZ - true_beam_endZ);
+      
       FillHistVec1D(hreco_sliceID[cut], reco_sliceID);
       FillHistVec1D(hreco_true_sliceID[cut], reco_sliceID - true_sliceID);
       FillHistVec2D(hreco_vs_true_sliceID[cut], true_sliceID, reco_sliceID);
@@ -186,7 +199,6 @@ void HadAna::FillHistograms(int cut){
       FillHistVec2D(hreco_true_interacting_Energy_vs_true_beam_endZ[cut], true_beam_endZ_SCE, reco_beam_interactingEnergy - true_beam_interactingEnergy);
       FillHistVec1D(hmediandEdx[cut], median_dEdx);
       FillHistVec1D(hdaughter_michel_score[cut], daughter_michel_score);
-      FillHistVec1D(hrecoZsce[cut], reco_beam_calo_endZ);
     }      
   }
 
