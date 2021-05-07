@@ -73,6 +73,7 @@ void plot(){
   for (int i = 0; i<nCuts; ++i){
     plot1d("hmediandEdx", i, "Median dE/dx (MeV/cm)", "Events");
     plot1d("hdaughter_michel_score", i, "Daughter Michel Score", "Events");
+    plot1d("hrecoZsce", i, "Reco track end (cm)", "Events");
   }
 
   PrintEvents("hdaughter_michel_score");

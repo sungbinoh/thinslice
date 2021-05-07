@@ -63,6 +63,8 @@ class HadAna : public anavar{
 
   TH1D *hdaughter_michel_score[nCuts][nParTypes+1];
 
+  TH1D *hrecoZsce[nCuts][nParTypes+1];
+
   TH1D *reco_incE[nslices];
   TH1D *reco_pitch[nslices];
   TH1D *reco_dEdx[nslices];

@@ -129,6 +129,9 @@ void HadAna::BookHistograms(){
       hdaughter_michel_score[i][j] = new TH1D(Form("hdaughter_michel_score_%d_%d",i,j), Form("daughter_michel_score, %s, %s;Michel score", cutName[i], parTypeName[j]), 100, 0, 1);
       hdaughter_michel_score[i][j]->Sumw2();
 
+      hrecoZsce[i][j] = new TH1D(Form("hrecoZsce_%d_%d",i,j), Form("recoZsce, %s, %s;Reco z (cm)", cutName[i], parTypeName[j]), 100, -100, 900);
+      hrecoZsce[i][j]->Sumw2();
+
     }
   }
 
@@ -183,6 +186,7 @@ void HadAna::FillHistograms(int cut){
       FillHistVec2D(hreco_true_interacting_Energy_vs_true_beam_endZ[cut], true_beam_endZ_SCE, reco_beam_interactingEnergy - true_beam_interactingEnergy);
       FillHistVec1D(hmediandEdx[cut], median_dEdx);
       FillHistVec1D(hdaughter_michel_score[cut], daughter_michel_score);
+      FillHistVec1D(hrecoZsce[cut], reco_beam_calo_endZ);
     }      
   }
 
