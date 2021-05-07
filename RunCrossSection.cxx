@@ -1,4 +1,4 @@
-#include "HadAna.h"
+#include "ThinSlice.h"
 #include "EventType.h"
 #include "EventSelection.h"
 #include "TChain.h"
@@ -15,9 +15,13 @@ int main(){
   HadAna ana(chain);
   ana.AddTruePDG(-13);
   ana.AddTruePDG(211);
-  ana.SetPandoraSlicePDG(13);
-  ana.SetOutputFileName("hadana.root");
-  ana.BookHistograms();
+//  ana.SetPandoraSlicePDG(13);
+//  ana.SetOutputFileName("hadana.root");
+//  ana.BookHistograms();
+
+  ThinSlice ths;
+  TFile f("hadana.root","recreate");
+  ths.BookHistograms();
 
   Long64_t nentries = ana.fChain->GetEntriesFast();
   
@@ -31,33 +35,39 @@ int main(){
     //std::cout<<ana.run<<" "<<ana.event<<" "<<ana.MC<<" "<<ana.reco_beam_true_byE_matched<<" "<<ana.true_beam_PDG<<" "<<(*ana.true_beam_endProcess)<<std::endl;
     //std::cout<<GetParType(ana)<<std::endl;
     if (!ana.isTrueSelectedPart()) continue;
-    ana.ProcessEvent();
-    int partype = ana.GetParType();
-    ++nevents[0];
-    if (partype<nParTypes+1){
-      ++nevents[partype];
-    }
-    ana.FillHistograms(kNocut);
-    if (!ana.PassPandoraSliceCut()) continue;
-    ana.FillHistograms(kPandoraSlice);
-    if (!ana.PassBeamQualityCut()) continue;
-    ana.FillHistograms(kBeamQuality);
-    if (!ana.PassAPA3Cut()) continue;
-    ana.FillHistograms(kAPA3);
-    if (!ana.PassCaloSizeCut()) continue;
-    ana.FillHistograms(kCaloSize);
-    if (!ana.PassMichelScoreCut()) continue;
-    ana.FillHistograms(kMichelScore);
-    if (!ana.PassMediandEdxCut()) continue;
-    ana.FillHistograms(kMediandEdx);
+
+    ths.ProcessEvent(ana);
+
+//    ana.ProcessEvent();
+//    int partype = ana.GetParType();
+//    ++nevents[0];
+//    if (partype<nParTypes+1){
+//      ++nevents[partype];
+//    }
+//    ana.FillHistograms(kNocut);
+//    if (!ana.PassPandoraSliceCut()) continue;
+//    ana.FillHistograms(kPandoraSlice);
+//    if (!ana.PassBeamQualityCut()) continue;
+//    ana.FillHistograms(kBeamQuality);
+//    if (!ana.PassAPA3Cut()) continue;
+//    ana.FillHistograms(kAPA3);
+//    if (!ana.PassCaloSizeCut()) continue;
+//    ana.FillHistograms(kCaloSize);
+//    if (!ana.PassMichelScoreCut()) continue;
+//    ana.FillHistograms(kMichelScore);
+//    if (!ana.PassMediandEdxCut()) continue;
+//    ana.FillHistograms(kMediandEdx);
   }
 
-  for (int i = 0; i<nParTypes; ++i){
-    std::cout<<i<<" "<<nevents[i]<<std::endl;
-  }
+//  for (int i = 0; i<nParTypes; ++i){
+//    std::cout<<i<<" "<<nevents[i]<<std::endl;
+//  }
+//
+//  ana.SaveHistograms();
 
-  ana.SaveHistograms();
+  ths.CalcXS();
 
+  f.Write();
   return 0;
 
 }

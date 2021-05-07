@@ -19,6 +19,7 @@ class ThinSlice {
 
   void BookHistograms();
   void ProcessEvent(const HadAna & evt);
+  void CalcXS();
 
 };
 

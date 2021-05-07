@@ -1,10 +1,12 @@
 #include "ThinSlice.h"
+#include "TGraphErrors.h"
+#include <iostream>
 
 void ThinSlice::BookHistograms(){
 
    for (int i = 0; i<nthinslices; ++i){
-     reco_incE[i] = new TH1D(Form("reco_incE_%d",i),Form("Reco incident energy, %f<= z <%f (cm)",i*thinslicewidth, (i+1)*thinslicewidth), nbinse, 0, 1200.);
-     true_incE[i] = new TH1D(Form("true_incE_%d",i),Form("True incident energy, %f<= z <%f (cm)",i*thinslicewidth, (i+1)*thinslicewidth), nbinse, 0, 1200.);
+     reco_incE[i] = new TH1D(Form("reco_incE_%d",i),Form("Reco incident energy, %.1f < z < %.1f (cm)",i*thinslicewidth, (i+1)*thinslicewidth), nbinse, 0, 1200.);
+     true_incE[i] = new TH1D(Form("true_incE_%d",i),Form("True incident energy, %.1f < z < %.1f (cm)",i*thinslicewidth, (i+1)*thinslicewidth), nbinse, 0, 1200.);
    }
 
    for (int i = 0; i<nthinslices; ++i){
@@ -27,7 +29,7 @@ void ThinSlice::ProcessEvent(const HadAna & evt){
         ++true_interactions[true_sliceID];
       }
       // Reco info
-      if (!(evt.reco_beam_calo_wire->empty())){
+      if (!(evt.reco_beam_calo_wire->empty()) && evt.reco_beam_true_byE_matched){
         std::vector<std::vector<double>> vincE(nslices);
         for (size_t i = 0; i<evt.reco_beam_calo_wire->size(); ++i){
           int this_sliceID = int((*evt.reco_beam_calo_wire_z)[i]/thinslicewidth);
@@ -71,4 +73,27 @@ void ThinSlice::ProcessEvent(const HadAna & evt){
   }
 }
 
+void ThinSlice::CalcXS(){
+
+  double avg_trueincE[nthinslices] = {0};
+  double truexs[nthinslices] = {0};
+  double err_truexs[nthinslices] = {0};
+
+  double NA=6.02214076e23;
+  double MAr=39.95; //gmol
+  double Density = 1.39; // g/cm^3
+
+  for (int i = 0; i<nthinslices; ++i){
+    
+    avg_trueincE[i] = true_incE[i]->GetMean();
+    //std::cout<<i<<" "<<avg_trueincE[i]<<std::endl;
+    if (true_incidents[i] && true_interactions[i]){
+      truexs[i] = MAr/(Density*NA*thinslicewidth)*log(true_incidents[i]/(true_incidents[i]-true_interactions[i]))*1e27;
+      err_truexs[i] = MAr/(Density*NA*thinslicewidth)*1e27*sqrt(true_interactions[i]+pow(true_interactions[i],2)/true_incidents[i])/true_incidents[i];
+    }
+  }
+
+  TGraphErrors *gr_truexs = new TGraphErrors(nthinslices, &(avg_trueincE[0]), &(truexs[0]), 0, &(err_truexs[0]));
   
+  gr_truexs->Write("gr_truexs");
+}
