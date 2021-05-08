@@ -143,9 +143,9 @@ void ThinSlice::ProcessEvent(const HadAna & evt){
       }
     }
   }
-  if (evt.PassAllCuts() && evt.reco_beam_true_byE_matched){
+  if (evt.PassAllCuts()){
     h_recosliceid_allevts_cuts->Fill(reco_sliceID);
-    if (evt.true_beam_PDG == 211){
+    if (evt.true_beam_PDG == 211 && evt.reco_beam_true_byE_matched){
       h_recosliceid_pion_cuts->Fill(reco_sliceID);
       if ((*evt.true_beam_endProcess) == "pi+Inelastic"){
         h_recosliceid_pioninelastic_cuts->Fill(reco_sliceID);
