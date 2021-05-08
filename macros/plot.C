@@ -74,6 +74,8 @@ void plot(){
     plot1d("hmediandEdx", i, "Median dE/dx (MeV/cm)", "Events");
     plot1d("hdaughter_michel_score", i, "Daughter Michel Score", "Events");
     plot1d("hreco_beam_endZ_SCE", i, "Reco track end (cm)", "Events");
+    plot1d("htrue_sliceID", i, "True Slice ID", "Events");
+    plot1d("hreco_sliceID", i, "Reco Slice ID", "Events");
   }
 
   PrintEvents("hdaughter_michel_score");

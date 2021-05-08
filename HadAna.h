@@ -39,58 +39,8 @@ class HadAna : public anavar{
   // Event information
   void ProcessEvent();
   int partype;
-  int reco_sliceID;
-  int true_sliceID;
   double median_dEdx;
   double daughter_michel_score;
-
-  TH1D *htrue_beam_endZ[nCuts][nParTypes+1];
-  TH1D *hreco_beam_endZ[nCuts][nParTypes+1];
-  TH1D *hreco_true_beam_endZ[nCuts][nParTypes+1];
-  TH2D *hreco_vs_true_beam_endZ[nCuts][nParTypes+1];
-  TH2D *hreco_true_vs_true_beam_endZ[nCuts][nParTypes+1];
-
-  TH1D *htrue_beam_endZ_SCE[nCuts][nParTypes+1];
-  TH1D *hreco_beam_endZ_SCE[nCuts][nParTypes+1];
-  TH1D *hreco_true_beam_endZ_SCE[nCuts][nParTypes+1];
-  TH2D *hreco_vs_true_beam_endZ_SCE[nCuts][nParTypes+1];
-  TH2D *hreco_true_vs_true_beam_endZ_SCE[nCuts][nParTypes+1];
-
-  TH1D *htrue_sliceID[nCuts][nParTypes+1];
-  TH1D *hreco_sliceID[nCuts][nParTypes+1];
-  TH1D *hreco_true_sliceID[nCuts][nParTypes+1];
-  TH2D *hreco_vs_true_sliceID[nCuts][nParTypes+1];
-  TH2D *hreco_true_vs_true_sliceID[nCuts][nParTypes+1];
-
-  TH2D *hreco_interacting_Energy_vs_true_beam_endZ[nCuts][nParTypes+1];
-  TH2D *htrue_interacting_Energy_vs_true_beam_endZ[nCuts][nParTypes+1];
-  TH2D *hreco_true_interacting_Energy_vs_true_beam_endZ[nCuts][nParTypes+1];
-
-  TH1D *hmediandEdx[nCuts][nParTypes+1];
-
-  TH1D *hdaughter_michel_score[nCuts][nParTypes+1];
-
-  TH1D *reco_incE[nslices];
-  TH1D *reco_pitch[nslices];
-  TH1D *reco_dEdx[nslices];
-  TH1D *true_incE[nslices];
-  TH1D *true_X[nslices];
-  TH1D *true_Y[nslices];
-  TH1D *true_Z[nslices];
-
-  // Energy slices
-  double true_interactions[nslices];
-  double true_incidents[nslices];
-
-  std::string fOutputFileName;
-  TFile *outputFile;
-  void SetOutputFileName(std::string name){fOutputFileName = name;};
-  void BookHistograms();
-  void FillHistograms(int cut);
-  void FillHistVec1D(TH1D *hist[nParTypes+1], const double &value);
-  void FillHistVec2D(TH2D *hist[nParTypes+1], const double &value1, const double &value2);
-  void SaveHistograms();
-
 
   using anavar::anavar;
 
