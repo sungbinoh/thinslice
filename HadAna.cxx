@@ -38,11 +38,11 @@ int HadAna::GetParType(){
 }
 
 
-bool HadAna::PassPandoraSliceCut(){
+bool HadAna::PassPandoraSliceCut() const{
   return reco_beam_type == pandora_slice_pdg;
 }
 
-bool HadAna::PassBeamQualityCut(){
+bool HadAna::PassBeamQualityCut() const{
 
   double xlow = -3.,  xhigh = 7.,  ylow = -8.,  yhigh = 7.;
   double zlow = 27.5,  zhigh = 32.5,  coslow = 0.93;
@@ -73,26 +73,35 @@ bool HadAna::PassBeamQualityCut(){
   
 };
 
-bool HadAna::PassAPA3Cut(){
+bool HadAna::PassAPA3Cut() const{
 
   double cutAPA3_Z = 226.;
 
   return reco_beam_endZ < cutAPA3_Z;
 }
 
-bool HadAna::PassCaloSizeCut(){
+bool HadAna::PassCaloSizeCut() const{
   
   return !(reco_beam_calo_wire->empty());
 }
 
-bool HadAna::PassMichelScoreCut(){
+bool HadAna::PassMichelScoreCut() const{
   
   return daughter_michel_score < 0.55;
 }
 
-bool HadAna::PassMediandEdxCut(){
+bool HadAna::PassMediandEdxCut() const{
 
   return median_dEdx < 2.4;
+}
+
+bool HadAna::PassAllCuts() const{
+  return PassPandoraSliceCut()&&
+    PassBeamQualityCut()&&
+    PassAPA3Cut()&&
+    PassCaloSizeCut()&&
+    PassMichelScoreCut()&&
+    PassMediandEdxCut();
 }
 
 void HadAna::BookHistograms(){

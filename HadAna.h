@@ -28,12 +28,13 @@ class HadAna : public anavar{
     pandora_slice_pdg = pdg;
   };
 
-  bool PassPandoraSliceCut();
-  bool PassBeamQualityCut();
-  bool PassAPA3Cut();
-  bool PassCaloSizeCut();
-  bool PassMichelScoreCut();
-  bool PassMediandEdxCut();
+  bool PassPandoraSliceCut() const;
+  bool PassBeamQualityCut() const;
+  bool PassAPA3Cut() const;
+  bool PassCaloSizeCut() const;
+  bool PassMichelScoreCut() const;
+  bool PassMediandEdxCut() const;
+  bool PassAllCuts() const;
 
   // Event information
   void ProcessEvent();

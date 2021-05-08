@@ -15,7 +15,7 @@ int main(){
   HadAna ana(chain);
   ana.AddTruePDG(-13);
   ana.AddTruePDG(211);
-//  ana.SetPandoraSlicePDG(13);
+  ana.SetPandoraSlicePDG(13);
 //  ana.SetOutputFileName("hadana.root");
 //  ana.BookHistograms();
 
@@ -23,7 +23,8 @@ int main(){
   TFile f("hadana.root","recreate");
   ths.BookHistograms();
 
-  Long64_t nentries = ana.fChain->GetEntriesFast();
+  //Long64_t nentries = ana.fChain->GetEntriesFast();
+  Long64_t nentries = ana.fChain->GetEntries();
   
   Long64_t nbytes = 0, nb = 0;
   for (Long64_t jentry=0; jentry<nentries;jentry++) {
@@ -35,10 +36,8 @@ int main(){
     //std::cout<<ana.run<<" "<<ana.event<<" "<<ana.MC<<" "<<ana.reco_beam_true_byE_matched<<" "<<ana.true_beam_PDG<<" "<<(*ana.true_beam_endProcess)<<std::endl;
     //std::cout<<GetParType(ana)<<std::endl;
     if (!ana.isTrueSelectedPart()) continue;
-
+    ana.ProcessEvent();
     ths.ProcessEvent(ana);
-
-//    ana.ProcessEvent();
 //    int partype = ana.GetParType();
 //    ++nevents[0];
 //    if (partype<nParTypes+1){
