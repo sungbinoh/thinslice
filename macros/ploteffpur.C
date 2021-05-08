@@ -42,4 +42,9 @@
   pur_pioninel->SetTitle(";Reco slice ID;Pion inelastic scattering purity");
   pur_pioninel->Draw();
 
+  c1->Print("pioneff.png");
+  c2->Print("pionineleff.png");
+  c3->Print("pionpur.png");
+  c4->Print("pioninelpur.png");
+
 }
