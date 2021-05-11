@@ -4,7 +4,7 @@
 #include "util.h"
 #include <iostream>
 
-bool HadAna::isTrueSelectedPart(){
+bool HadAna::isTrueSelectedPart() const{
   for (size_t i = 0; i<truepdglist.size(); ++i){
     if (true_beam_PDG == truepdglist[i]) return true;
   }

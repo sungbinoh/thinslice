@@ -5,19 +5,21 @@
 
 void ThinSlice::BookHistograms(){
 
-   for (int i = 0; i<nthinslices; ++i){
-     reco_incE[i] = new TH1D(Form("reco_incE_%d",i),Form("Reco incident energy, %.1f < z < %.1f (cm)",i*thinslicewidth, (i+1)*thinslicewidth), nbinse, 0, 1200.);
-     true_incE[i] = new TH1D(Form("true_incE_%d",i),Form("True incident energy, %.1f < z < %.1f (cm)",i*thinslicewidth, (i+1)*thinslicewidth), nbinse, 0, 1200.);
-   }
-
-   h_truesliceid_pion_all = new TH1D("h_truesliceid_pion_all","h_truesliceid_pion_all;True SliceID", nthinslices + 2, -1, nthinslices + 1);
-   h_truesliceid_pion_cuts = new TH1D("h_truesliceid_pion_cuts","h_truesliceid_pion_cuts;True SliceID", nthinslices + 2, -1, nthinslices + 1);
-   h_truesliceid_pioninelastic_all = new TH1D("h_truesliceid_pioninelastic_all","h_truesliceid_pioninelastic_all;True SliceID", nthinslices + 2, -1, nthinslices + 1);
-   h_truesliceid_pioninelastic_cuts = new TH1D("h_truesliceid_pioninelastic_cuts","h_truesliceid_pioninelastic_cuts;True SliceID", nthinslices + 2, -1, nthinslices + 1);
-   h_recosliceid_allevts_cuts = new TH1D("h_recosliceid_allevts_cuts","h_recosliceid_allevts_cuts;Reco SliceID", nthinslices + 2, -1, nthinslices + 1);
-   h_recosliceid_pion_cuts = new TH1D("h_recosliceid_pion_cuts","h_recosliceid_pion_cuts;Reco SliceID", nthinslices + 2, -1, nthinslices + 1);
-   h_recosliceid_pioninelastic_cuts = new TH1D("h_recosliceid_pioninelastic_cuts","h_recosliceid_pioninelastic_cuts;Reco SliceID", nthinslices + 2, -1, nthinslices + 1);
-
+  outputFile = TFile::Open(fOutputFileName.c_str(), "recreate");
+  
+  for (int i = 0; i<nthinslices; ++i){
+    reco_incE[i] = new TH1D(Form("reco_incE_%d",i),Form("Reco incident energy, %.1f < z < %.1f (cm)",i*thinslicewidth, (i+1)*thinslicewidth), nbinse, 0, 1200.);
+    true_incE[i] = new TH1D(Form("true_incE_%d",i),Form("True incident energy, %.1f < z < %.1f (cm)",i*thinslicewidth, (i+1)*thinslicewidth), nbinse, 0, 1200.);
+  }
+  
+  h_truesliceid_pion_all = new TH1D("h_truesliceid_pion_all","h_truesliceid_pion_all;True SliceID", nthinslices + 2, -1, nthinslices + 1);
+  h_truesliceid_pion_cuts = new TH1D("h_truesliceid_pion_cuts","h_truesliceid_pion_cuts;True SliceID", nthinslices + 2, -1, nthinslices + 1);
+  h_truesliceid_pioninelastic_all = new TH1D("h_truesliceid_pioninelastic_all","h_truesliceid_pioninelastic_all;True SliceID", nthinslices + 2, -1, nthinslices + 1);
+  h_truesliceid_pioninelastic_cuts = new TH1D("h_truesliceid_pioninelastic_cuts","h_truesliceid_pioninelastic_cuts;True SliceID", nthinslices + 2, -1, nthinslices + 1);
+  h_recosliceid_allevts_cuts = new TH1D("h_recosliceid_allevts_cuts","h_recosliceid_allevts_cuts;Reco SliceID", nthinslices + 2, -1, nthinslices + 1);
+  h_recosliceid_pion_cuts = new TH1D("h_recosliceid_pion_cuts","h_recosliceid_pion_cuts;Reco SliceID", nthinslices + 2, -1, nthinslices + 1);
+  h_recosliceid_pioninelastic_cuts = new TH1D("h_recosliceid_pioninelastic_cuts","h_recosliceid_pioninelastic_cuts;Reco SliceID", nthinslices + 2, -1, nthinslices + 1);
+  
   for (int i = 0; i < nCuts; ++i){
     for (int j = 0; j < nParTypes+1; ++j){
       htrue_beam_endZ[i][j] = new TH1D(Form("htrue_beam_endZ_%d_%d",i,j),Form("true_beam_endZ, %s, %s;true_beam_endZ (cm)", cutName[i], parTypeName[j]), 100, -100, 900);
@@ -62,12 +64,12 @@ void ThinSlice::BookHistograms(){
      true_incidents[i] = 0;
    }
    
-   response_SliceID_Pion = new RooUnfoldResponse(nthinslices+2, -1, nthinslices+1, "response_SliceID_Pion");
-   response_SliceID_PionInEl = new RooUnfoldResponse(nthinslices+2, -1, nthinslices+1, "response_SliceID_PionInEl");
+   //response_SliceID_Pion = new RooUnfoldResponse(nthinslices+2, -1, nthinslices+1, "response_SliceID_Pion");
+   //response_SliceID_PionInEl = new RooUnfoldResponse(nthinslices+2, -1, nthinslices+1, "response_SliceID_PionInEl");
 
 }
 
-void ThinSlice::ProcessEvent(const HadAna & evt){
+void ThinSlice::ProcessEvent(const HadAna & evt, Unfold & uf){
 
   reco_sliceID = -1;
   true_sliceID = -1;
@@ -139,19 +141,19 @@ void ThinSlice::ProcessEvent(const HadAna & evt){
     h_truesliceid_pion_all->Fill(true_sliceID);
     if (evt.PassAllCuts() && evt.reco_beam_true_byE_matched){
       h_truesliceid_pion_cuts->Fill(true_sliceID);
-      response_SliceID_Pion->Fill(reco_sliceID, true_sliceID);
+      uf.response_SliceID_Inc.Fill(reco_sliceID, true_sliceID);
     }
     else {
-      response_SliceID_Pion->Miss(true_sliceID);
+      uf.response_SliceID_Inc.Miss(true_sliceID);
     }
     if ((*evt.true_beam_endProcess) == "pi+Inelastic"){
       h_truesliceid_pioninelastic_all->Fill(true_sliceID);
       if (evt.PassAllCuts() && evt.reco_beam_true_byE_matched){
         h_truesliceid_pioninelastic_cuts->Fill(true_sliceID);
-        response_SliceID_PionInEl->Fill(reco_sliceID, true_sliceID);
+        uf.response_SliceID_Int.Fill(reco_sliceID, true_sliceID);
       }
       else{
-        response_SliceID_PionInEl->Miss(true_sliceID);
+        uf.response_SliceID_Int.Miss(true_sliceID);
       }
     }
   }
@@ -194,6 +196,13 @@ void ThinSlice::FillHistograms(int cut, const HadAna & evt){
   }
 }
 
+void ThinSlice::SaveHistograms(){
+  outputFile->cd();
+  outputFile->Write();
+  //response_SliceID_Pion->Write("response_SliceID_Pion");
+  //response_SliceID_PionInEl->Write("response_SliceID_PionInEl");
+}
+
 void ThinSlice::CalcXS(){
 
   double avg_trueincE[nthinslices] = {0};
@@ -217,4 +226,48 @@ void ThinSlice::CalcXS(){
   TGraphErrors *gr_truexs = new TGraphErrors(nthinslices, &(avg_trueincE[0]), &(truexs[0]), 0, &(err_truexs[0]));
   
   gr_truexs->Write("gr_truexs");
+}
+
+void ThinSlice::Run(HadAna & evt, Unfold & uf){
+
+  BookHistograms();
+
+  //Long64_t nentries = evt.fChain->GetEntriesFast();
+  Long64_t nentries = evt.fChain->GetEntries();
+  
+  Long64_t nbytes = 0, nb = 0;
+  for (Long64_t jentry=0; jentry<nentries;jentry++) {
+    if (jentry%10000==0) std::cout<<jentry<<"/"<<nentries<<std::endl;
+    Long64_t ientry = evt.LoadTree(jentry);
+    if (ientry < 0) break;
+    nb = evt.fChain->GetEntry(jentry);   nbytes += nb;
+    // if (Cut(ientry) < 0) continue;
+    //std::cout<<evt.run<<" "<<evt.event<<" "<<evt.MC<<" "<<evt.reco_beam_true_byE_matched<<" "<<evt.true_beam_PDG<<" "<<(*evt.true_beam_endProcess)<<std::endl;
+    //std::cout<<GetParType(ana)<<std::endl;
+    if (!evt.isTrueSelectedPart()) continue;
+    evt.ProcessEvent();
+    ProcessEvent(evt, uf);
+    FillHistograms(kNocut, evt);
+    if (evt.PassPandoraSliceCut()){
+      FillHistograms(kPandoraSlice, evt);
+      if (evt.PassBeamQualityCut()){
+        FillHistograms(kBeamQuality, evt);
+        if (evt.PassAPA3Cut()){
+          FillHistograms(kAPA3, evt);
+          if (evt.PassCaloSizeCut()){
+            FillHistograms(kCaloSize, evt);
+            if (evt.PassMichelScoreCut()){
+              FillHistograms(kMichelScore, evt);
+              if (evt.PassMediandEdxCut()){
+                FillHistograms(kMediandEdx, evt);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  
+  CalcXS();
+  SaveHistograms();
 }

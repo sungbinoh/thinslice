@@ -15,7 +15,7 @@ class HadAna : public anavar{
   };
 
   //Check is the current particle is selected
-  bool isTrueSelectedPart();
+  bool isTrueSelectedPart() const;
 
   int GetParType();
 

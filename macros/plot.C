@@ -68,7 +68,7 @@ void plot(){
 
   gStyle->SetOptStat(0);
 
-  f = TFile::Open("../install/bin/hadana.root");
+  f = TFile::Open("../install/bin/mc.root");
 
   for (int i = 0; i<nCuts; ++i){
     plot1d("hmediandEdx", i, "Median dE/dx (MeV/cm)", "Events");

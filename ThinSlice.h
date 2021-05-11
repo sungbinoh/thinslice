@@ -1,10 +1,10 @@
 #ifndef THINSLICE_H
 #define THINSLICE_H
 
+#include "TFile.h"
 #include "SliceParams.h"
 #include "HadAna.h"
-#include "RooUnfoldResponse.h"
-#include "RooUnfoldBayes.h"
+#include "Unfold.h"
 
 class ThinSlice {
 
@@ -48,13 +48,17 @@ class ThinSlice {
   TH1D *hmediandEdx[nCuts][nParTypes+1];
   TH1D *hdaughter_michel_score[nCuts][nParTypes+1];
 
-  RooUnfoldResponse *response_SliceID_Pion;
-  RooUnfoldResponse *response_SliceID_PionInEl;
-
+  std::string fOutputFileName;
+  TFile *outputFile;
+  void SetOutputFileName(std::string name){fOutputFileName = name;};
   void BookHistograms();
   void FillHistograms(int cut, const HadAna & evt);
-  void ProcessEvent(const HadAna & evt);
+  void SaveHistograms();
+
+  void ProcessEvent(const HadAna & evt, Unfold & uf);
   void CalcXS();
+
+  void Run(HadAna & evt, Unfold & uf);
 
 };
 
