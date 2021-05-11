@@ -17,8 +17,10 @@ class ThinSlice {
   TH1D *true_incE[nthinslices];
 
   TH1D *h_truesliceid_pion_all;
+  TH1D *h_truesliceid_pion_uf;
   TH1D *h_truesliceid_pion_cuts;
   TH1D *h_truesliceid_pioninelastic_all;
+  TH1D *h_truesliceid_pioninelastic_uf;
   TH1D *h_truesliceid_pioninelastic_cuts;
   TH1D *h_recosliceid_allevts_cuts;
   TH1D *h_recosliceid_pion_cuts;
@@ -56,7 +58,7 @@ class ThinSlice {
   void SaveHistograms();
 
   void ProcessEvent(const HadAna & evt, Unfold & uf);
-  void CalcXS();
+  void CalcXS(const Unfold & uf);
 
   void Run(HadAna & evt, Unfold & uf);
 

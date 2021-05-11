@@ -1,6 +1,8 @@
 #include "ThinSlice.h"
 #include "TGraphErrors.h"
+#include "RooUnfoldBayes.h"
 #include "util.h"
+
 #include <iostream>
 
 void ThinSlice::BookHistograms(){
@@ -137,32 +139,71 @@ void ThinSlice::ProcessEvent(const HadAna & evt, Unfold & uf){
     if (reco_sliceID >= nthinslices) reco_sliceID = nthinslices;
   }
 
+  bool isTestSample = true;
+  if (evt.MC && evt.event%2 == 0) isTestSample = false;
+
   if (evt.true_beam_PDG == 211){
-    h_truesliceid_pion_all->Fill(true_sliceID);
+    if (isTestSample){
+      h_truesliceid_pion_all->Fill(true_sliceID);
+    }
+    else{
+      uf.eff_den_Inc->Fill(true_sliceID);
+    }
     if (evt.PassAllCuts() && evt.reco_beam_true_byE_matched){
-      h_truesliceid_pion_cuts->Fill(true_sliceID);
-      uf.response_SliceID_Inc.Fill(reco_sliceID, true_sliceID);
-    }
-    else {
-      uf.response_SliceID_Inc.Miss(true_sliceID);
-    }
-    if ((*evt.true_beam_endProcess) == "pi+Inelastic"){
-      h_truesliceid_pioninelastic_all->Fill(true_sliceID);
-      if (evt.PassAllCuts() && evt.reco_beam_true_byE_matched){
-        h_truesliceid_pioninelastic_cuts->Fill(true_sliceID);
-        uf.response_SliceID_Int.Fill(reco_sliceID, true_sliceID);
+      if (isTestSample){
+        h_truesliceid_pion_cuts->Fill(true_sliceID);
       }
       else{
-        uf.response_SliceID_Int.Miss(true_sliceID);
+        uf.eff_num_Inc->Fill(true_sliceID);
+        uf.response_SliceID_Inc.Fill(reco_sliceID, true_sliceID);
+      }
+    }
+    else {
+      if (!isTestSample) uf.response_SliceID_Inc.Miss(true_sliceID);
+    }
+
+    if ((*evt.true_beam_endProcess) == "pi+Inelastic"){
+      if (isTestSample){
+        h_truesliceid_pioninelastic_all->Fill(true_sliceID);
+      }
+      else{
+        uf.eff_den_Int->Fill(true_sliceID);
+      }
+      if (evt.PassAllCuts() && evt.reco_beam_true_byE_matched){
+        if (isTestSample){
+          h_truesliceid_pioninelastic_cuts->Fill(true_sliceID);
+        }
+        else{
+          uf.eff_num_Int->Fill(true_sliceID);
+          uf.response_SliceID_Int.Fill(reco_sliceID, true_sliceID);
+        }
+      }
+      else{
+        if (!isTestSample) uf.response_SliceID_Int.Miss(true_sliceID);
       }
     }
   }
   if (evt.PassAllCuts()){
-    h_recosliceid_allevts_cuts->Fill(reco_sliceID);
+    if (isTestSample){
+      h_recosliceid_allevts_cuts->Fill(reco_sliceID);
+    }
+    else {
+      uf.pur_den->Fill(reco_sliceID);
+    }
     if (evt.true_beam_PDG == 211 && evt.reco_beam_true_byE_matched){
-      h_recosliceid_pion_cuts->Fill(reco_sliceID);
+      if (isTestSample){
+        h_recosliceid_pion_cuts->Fill(reco_sliceID);
+      }
+      else{
+        uf.pur_num_Inc->Fill(reco_sliceID);
+      }
       if ((*evt.true_beam_endProcess) == "pi+Inelastic"){
-        h_recosliceid_pioninelastic_cuts->Fill(reco_sliceID);
+        if (isTestSample){
+          h_recosliceid_pioninelastic_cuts->Fill(reco_sliceID);
+        }
+        else{
+          uf.pur_num_Int->Fill(reco_sliceID);
+        }
       }
     }
   }
@@ -199,11 +240,13 @@ void ThinSlice::FillHistograms(int cut, const HadAna & evt){
 void ThinSlice::SaveHistograms(){
   outputFile->cd();
   outputFile->Write();
+  h_truesliceid_pion_uf->Write("h_truesliceid_pion_uf");
+  h_truesliceid_pioninelastic_uf->Write("h_truesliceid_pioninelastic_uf");
   //response_SliceID_Pion->Write("response_SliceID_Pion");
   //response_SliceID_PionInEl->Write("response_SliceID_PionInEl");
 }
 
-void ThinSlice::CalcXS(){
+void ThinSlice::CalcXS(const Unfold & uf){
 
   double avg_trueincE[nthinslices] = {0};
   double truexs[nthinslices] = {0};
@@ -226,6 +269,13 @@ void ThinSlice::CalcXS(){
   TGraphErrors *gr_truexs = new TGraphErrors(nthinslices, &(avg_trueincE[0]), &(truexs[0]), 0, &(err_truexs[0]));
   
   gr_truexs->Write("gr_truexs");
+
+  RooUnfoldBayes   unfold_Inc (&uf.response_SliceID_Inc, h_recosliceid_pion_cuts, 4);
+  RooUnfoldBayes   unfold_Int (&uf.response_SliceID_Int, h_recosliceid_pioninelastic_cuts, 4);
+
+  h_truesliceid_pion_uf = (TH1D*) unfold_Inc.Hreco();
+  h_truesliceid_pioninelastic_uf = (TH1D*) unfold_Int.Hreco();
+
 }
 
 void ThinSlice::Run(HadAna & evt, Unfold & uf){
@@ -268,6 +318,6 @@ void ThinSlice::Run(HadAna & evt, Unfold & uf){
     }
   }
   
-  CalcXS();
+  CalcXS(uf);
   SaveHistograms();
 }
