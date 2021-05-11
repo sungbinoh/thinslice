@@ -3,6 +3,8 @@
 
 #include "SliceParams.h"
 #include "HadAna.h"
+#include "RooUnfoldResponse.h"
+#include "RooUnfoldBayes.h"
 
 class ThinSlice {
 
@@ -11,8 +13,8 @@ class ThinSlice {
   int reco_sliceID;
   int true_sliceID;
 
-  TH1D *reco_incE[nslices];
-  TH1D *true_incE[nslices];
+  TH1D *reco_incE[nthinslices];
+  TH1D *true_incE[nthinslices];
 
   TH1D *h_truesliceid_pion_all;
   TH1D *h_truesliceid_pion_cuts;
@@ -45,6 +47,8 @@ class ThinSlice {
 
   TH1D *hmediandEdx[nCuts][nParTypes+1];
   TH1D *hdaughter_michel_score[nCuts][nParTypes+1];
+
+  RooUnfoldResponse *response;
 
   void BookHistograms();
   void FillHistograms(int cut, const HadAna & evt);

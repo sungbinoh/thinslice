@@ -18,6 +18,7 @@
   set (CMAKE_CXX_STANDARD 17)
 
   include_directories(${ROOT_INCLUDE_DIRS})
+  include_directories(/data/tjyang/dune/RooUnfold/src/)
 #   include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 #   ROOT_GENERATE_DICTIONARY(G__Event Event.h LINKDEF EventLinkDef.h)
 
@@ -33,7 +34,7 @@
 # Note: To ensure compatibility with Cling, targets *must* be compiled using the
 # same C++ standard as ROOT was compiled with.
    add_library(Event SHARED anavar.C HadAna.cxx ThinSlice.cxx util.cxx)
-   target_link_libraries(Event PUBLIC ${ROOT_LIBRARIES})
+   target_link_libraries(Event PUBLIC ${ROOT_LIBRARIES} /data/tjyang/dune/RooUnfold/libRooUnfold.so)
 #   target_compile_options(Event INTERFACE ${CMAKE_REQUIRED_FLAGS})
 # Create the main program using the library.
    add_executable(RunCrossSection RunCrossSection.cxx)

@@ -1,5 +1,7 @@
 # thinslice
 
+source /cvmfs/dune.opensciencegrid.org/products/dune/setup_dune.sh
+
 setup root v6_22_06a -q e19:p383b:prof
 
 setup cmake v3_19_6
@@ -16,6 +18,5 @@ cd build
 
 cmake .. -DCMAKE_INSTALL_PREFIX=../install
 
-make
+make install -j4
 
-make install

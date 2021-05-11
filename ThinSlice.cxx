@@ -61,6 +61,9 @@ void ThinSlice::BookHistograms(){
      true_interactions[i] = 0;
      true_incidents[i] = 0;
    }
+   
+   response = new RooUnfoldResponse(nthinslices+1, 0, nthinslices+1);
+
 }
 
 void ThinSlice::ProcessEvent(const HadAna & evt){
