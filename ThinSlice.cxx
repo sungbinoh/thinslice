@@ -62,7 +62,8 @@ void ThinSlice::BookHistograms(){
      true_incidents[i] = 0;
    }
    
-   response = new RooUnfoldResponse(nthinslices+1, 0, nthinslices+1);
+   response_SliceID_Pion = new RooUnfoldResponse(nthinslices+1, 0, nthinslices+1, "response_SliceID_Pion");
+   response_SliceID_PionInEl = new RooUnfoldResponse(nthinslices+1, 0, nthinslices+1, "response_SliceID_PionInEl");
 
 }
 

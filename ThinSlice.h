@@ -48,7 +48,8 @@ class ThinSlice {
   TH1D *hmediandEdx[nCuts][nParTypes+1];
   TH1D *hdaughter_michel_score[nCuts][nParTypes+1];
 
-  RooUnfoldResponse *response;
+  RooUnfoldResponse *response_SliceID_Pion;
+  RooUnfoldResponse *response_SliceID_PionInEl;
 
   void BookHistograms();
   void FillHistograms(int cut, const HadAna & evt);
