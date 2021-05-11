@@ -1,8 +1,8 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Sun May  2 23:33:07 2021 by ROOT version 6.22/06
+// Tue May 11 18:04:34 2021 by ROOT version 6.22/06
 // from TTree beamana/beam analysis tree
-// found on file: ../pduneana_Prod4.1_1GeV_3_26_21.root
+// found on file: ../pduneana_Prod4.1_5_11_21.root
 //////////////////////////////////////////////////////////
 
 #ifndef anavar_h
@@ -19,7 +19,6 @@
 #include "vector"
 #include "vector"
 #include "string"
-#include "vector"
 
 using namespace std;
 
@@ -67,6 +66,9 @@ public :
    Int_t           reco_beam_trackID;
    vector<double>  *reco_beam_dQdX_SCE;
    vector<double>  *reco_beam_EField_SCE;
+   vector<double>  *reco_beam_calo_X;
+   vector<double>  *reco_beam_calo_Y;
+   vector<double>  *reco_beam_calo_Z;
    vector<double>  *reco_beam_dQ;
    vector<double>  *reco_beam_dEdX_SCE;
    vector<double>  *reco_beam_calibrated_dEdX_SCE;
@@ -154,11 +156,17 @@ public :
    vector<double>  *reco_daughter_PFP_true_byE_purity;
    vector<int>     *reco_daughter_allTrack_ID;
    vector<vector<double> > *reco_daughter_allTrack_dQdX_SCE;
+   vector<vector<double> > *reco_daughter_allTrack_calibrated_dQdX_SCE;
+   vector<vector<double> > *reco_daughter_allTrack_EField_SCE;
    vector<vector<double> > *reco_daughter_allTrack_dEdX_SCE;
    vector<vector<double> > *reco_daughter_allTrack_resRange_SCE;
    vector<vector<double> > *reco_daughter_allTrack_calibrated_dEdX_SCE;
    vector<double>  *reco_daughter_allTrack_Chi2_proton;
+   vector<double>  *reco_daughter_allTrack_Chi2_pion;
+   vector<double>  *reco_daughter_allTrack_Chi2_muon;
    vector<int>     *reco_daughter_allTrack_Chi2_ndof;
+   vector<int>     *reco_daughter_allTrack_Chi2_ndof_pion;
+   vector<int>     *reco_daughter_allTrack_Chi2_ndof_muon;
    vector<double>  *reco_daughter_allTrack_Chi2_proton_plane0;
    vector<double>  *reco_daughter_allTrack_Chi2_proton_plane1;
    vector<int>     *reco_daughter_allTrack_Chi2_ndof_plane0;
@@ -178,6 +186,9 @@ public :
    vector<double>  *reco_daughter_allTrack_endY;
    vector<double>  *reco_daughter_allTrack_endZ;
    vector<double>  *reco_daughter_allTrack_dR;
+   vector<vector<double> > *reco_daughter_allTrack_calo_X;
+   vector<vector<double> > *reco_daughter_allTrack_calo_Y;
+   vector<vector<double> > *reco_daughter_allTrack_calo_Z;
    vector<double>  *reco_daughter_allTrack_to_vertex;
    vector<double>  *reco_daughter_allTrack_vertex_michel_score;
    vector<int>     *reco_daughter_allTrack_vertex_nHits;
@@ -396,6 +407,13 @@ public :
    vector<double>  *g4rw_alt_primary_minus_sigma_weight;
    vector<double>  *g4rw_full_primary_plus_sigma_weight;
    vector<double>  *g4rw_full_primary_minus_sigma_weight;
+   vector<vector<double> > *g4rw_full_grid_weights;
+   vector<vector<double> > *g4rw_full_grid_piplus_weights;
+   vector<vector<double> > *g4rw_full_grid_piplus_weights_fake_data;
+   vector<vector<double> > *g4rw_full_grid_piminus_weights;
+   vector<vector<double> > *g4rw_full_grid_proton_weights;
+   vector<vector<double> > *g4rw_primary_grid_weights;
+   vector<double>  *g4rw_primary_grid_pair_weights;
 
    // List of branches
    TBranch        *b_run;   //!
@@ -434,6 +452,9 @@ public :
    TBranch        *b_reco_beam_trackID;   //!
    TBranch        *b_reco_beam_dQdX_SCE;   //!
    TBranch        *b_reco_beam_EField_SCE;   //!
+   TBranch        *b_reco_beam_calo_X;   //!
+   TBranch        *b_reco_beam_calo_Y;   //!
+   TBranch        *b_reco_beam_calo_Z;   //!
    TBranch        *b_reco_beam_dQ;   //!
    TBranch        *b_reco_beam_dEdX_SCE;   //!
    TBranch        *b_reco_beam_calibrated_dEdX_SCE;   //!
@@ -521,11 +542,17 @@ public :
    TBranch        *b_reco_daughter_PFP_true_byE_purity;   //!
    TBranch        *b_reco_daughter_allTrack_ID;   //!
    TBranch        *b_reco_daughter_allTrack_dQdX_SCE;   //!
+   TBranch        *b_reco_daughter_allTrack_calibrated_dQdX_SCE;   //!
+   TBranch        *b_reco_daughter_allTrack_EField_SCE;   //!
    TBranch        *b_reco_daughter_allTrack_dEdX_SCE;   //!
    TBranch        *b_reco_daughter_allTrack_resRange_SCE;   //!
    TBranch        *b_reco_daughter_allTrack_calibrated_dEdX_SCE;   //!
    TBranch        *b_reco_daughter_allTrack_Chi2_proton;   //!
+   TBranch        *b_reco_daughter_allTrack_Chi2_pion;   //!
+   TBranch        *b_reco_daughter_allTrack_Chi2_muon;   //!
    TBranch        *b_reco_daughter_allTrack_Chi2_ndof;   //!
+   TBranch        *b_reco_daughter_allTrack_Chi2_ndof_pion;   //!
+   TBranch        *b_reco_daughter_allTrack_Chi2_ndof_muon;   //!
    TBranch        *b_reco_daughter_allTrack_Chi2_proton_plane0;   //!
    TBranch        *b_reco_daughter_allTrack_Chi2_proton_plane1;   //!
    TBranch        *b_reco_daughter_allTrack_Chi2_ndof_plane0;   //!
@@ -545,6 +572,9 @@ public :
    TBranch        *b_reco_daughter_allTrack_endY;   //!
    TBranch        *b_reco_daughter_allTrack_endZ;   //!
    TBranch        *b_reco_daughter_allTrack_dR;   //!
+   TBranch        *b_reco_daughter_allTrack_calo_X;   //!
+   TBranch        *b_reco_daughter_allTrack_calo_Y;   //!
+   TBranch        *b_reco_daughter_allTrack_calo_Z;   //!
    TBranch        *b_reco_daughter_allTrack_to_vertex;   //!
    TBranch        *b_reco_daughter_allTrack_vertex_michel_score;   //!
    TBranch        *b_reco_daughter_allTrack_vertex_nHits;   //!
@@ -763,6 +793,13 @@ public :
    TBranch        *b_g4rw_alt_primary_minus_sigma_weight;   //!
    TBranch        *b_g4rw_full_primary_plus_sigma_weight;   //!
    TBranch        *b_g4rw_full_primary_minus_sigma_weight;   //!
+   TBranch        *b_g4rw_full_grid_weights;   //!
+   TBranch        *b_g4rw_full_grid_piplus_weights;   //!
+   TBranch        *b_g4rw_full_grid_piplus_weights_fake_data;   //!
+   TBranch        *b_g4rw_full_grid_piminus_weights;   //!
+   TBranch        *b_g4rw_full_grid_proton_weights;   //!
+   TBranch        *b_g4rw_primary_grid_weights;   //!
+   TBranch        *b_g4rw_primary_grid_pair_weights;   //!
 
    anavar(TTree *tree=0);
    virtual ~anavar();
@@ -783,11 +820,11 @@ anavar::anavar(TTree *tree) : fChain(0)
 // if parameter tree is not specified (or zero), connect the file
 // used to generate this class and read the Tree.
    if (tree == 0) {
-      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("../pduneana_Prod4.1_1GeV_3_26_21.root");
+      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("../pduneana_Prod4.1_5_11_21.root");
       if (!f || !f->IsOpen()) {
-         f = new TFile("../pduneana_Prod4.1_1GeV_3_26_21.root");
+         f = new TFile("../pduneana_Prod4.1_5_11_21.root");
       }
-      TDirectory * dir = (TDirectory*)f->Get("../pduneana_Prod4.1_1GeV_3_26_21.root:/pduneana");
+      TDirectory * dir = (TDirectory*)f->Get("../pduneana_Prod4.1_5_11_21.root:/pduneana");
       dir->GetObject("beamana",tree);
 
    }
@@ -838,6 +875,9 @@ void anavar::Init(TTree *tree)
    reco_beam_calo_endDirZ = 0;
    reco_beam_dQdX_SCE = 0;
    reco_beam_EField_SCE = 0;
+   reco_beam_calo_X = 0;
+   reco_beam_calo_Y = 0;
+   reco_beam_calo_Z = 0;
    reco_beam_dQ = 0;
    reco_beam_dEdX_SCE = 0;
    reco_beam_calibrated_dEdX_SCE = 0;
@@ -897,11 +937,17 @@ void anavar::Init(TTree *tree)
    reco_daughter_PFP_true_byE_purity = 0;
    reco_daughter_allTrack_ID = 0;
    reco_daughter_allTrack_dQdX_SCE = 0;
+   reco_daughter_allTrack_calibrated_dQdX_SCE = 0;
+   reco_daughter_allTrack_EField_SCE = 0;
    reco_daughter_allTrack_dEdX_SCE = 0;
    reco_daughter_allTrack_resRange_SCE = 0;
    reco_daughter_allTrack_calibrated_dEdX_SCE = 0;
    reco_daughter_allTrack_Chi2_proton = 0;
+   reco_daughter_allTrack_Chi2_pion = 0;
+   reco_daughter_allTrack_Chi2_muon = 0;
    reco_daughter_allTrack_Chi2_ndof = 0;
+   reco_daughter_allTrack_Chi2_ndof_pion = 0;
+   reco_daughter_allTrack_Chi2_ndof_muon = 0;
    reco_daughter_allTrack_Chi2_proton_plane0 = 0;
    reco_daughter_allTrack_Chi2_proton_plane1 = 0;
    reco_daughter_allTrack_Chi2_ndof_plane0 = 0;
@@ -921,6 +967,9 @@ void anavar::Init(TTree *tree)
    reco_daughter_allTrack_endY = 0;
    reco_daughter_allTrack_endZ = 0;
    reco_daughter_allTrack_dR = 0;
+   reco_daughter_allTrack_calo_X = 0;
+   reco_daughter_allTrack_calo_Y = 0;
+   reco_daughter_allTrack_calo_Z = 0;
    reco_daughter_allTrack_to_vertex = 0;
    reco_daughter_allTrack_vertex_michel_score = 0;
    reco_daughter_allTrack_vertex_nHits = 0;
@@ -1053,6 +1102,13 @@ void anavar::Init(TTree *tree)
    g4rw_alt_primary_minus_sigma_weight = 0;
    g4rw_full_primary_plus_sigma_weight = 0;
    g4rw_full_primary_minus_sigma_weight = 0;
+   g4rw_full_grid_weights = 0;
+   g4rw_full_grid_piplus_weights = 0;
+   g4rw_full_grid_piplus_weights_fake_data = 0;
+   g4rw_full_grid_piminus_weights = 0;
+   g4rw_full_grid_proton_weights = 0;
+   g4rw_primary_grid_weights = 0;
+   g4rw_primary_grid_pair_weights = 0;
    // Set branch addresses and branch pointers
    if (!tree) return;
    fChain = tree;
@@ -1095,6 +1151,9 @@ void anavar::Init(TTree *tree)
    fChain->SetBranchAddress("reco_beam_trackID", &reco_beam_trackID, &b_reco_beam_trackID);
    fChain->SetBranchAddress("reco_beam_dQdX_SCE", &reco_beam_dQdX_SCE, &b_reco_beam_dQdX_SCE);
    fChain->SetBranchAddress("reco_beam_EField_SCE", &reco_beam_EField_SCE, &b_reco_beam_EField_SCE);
+   fChain->SetBranchAddress("reco_beam_calo_X", &reco_beam_calo_X, &b_reco_beam_calo_X);
+   fChain->SetBranchAddress("reco_beam_calo_Y", &reco_beam_calo_Y, &b_reco_beam_calo_Y);
+   fChain->SetBranchAddress("reco_beam_calo_Z", &reco_beam_calo_Z, &b_reco_beam_calo_Z);
    fChain->SetBranchAddress("reco_beam_dQ", &reco_beam_dQ, &b_reco_beam_dQ);
    fChain->SetBranchAddress("reco_beam_dEdX_SCE", &reco_beam_dEdX_SCE, &b_reco_beam_dEdX_SCE);
    fChain->SetBranchAddress("reco_beam_calibrated_dEdX_SCE", &reco_beam_calibrated_dEdX_SCE, &b_reco_beam_calibrated_dEdX_SCE);
@@ -1182,11 +1241,17 @@ void anavar::Init(TTree *tree)
    fChain->SetBranchAddress("reco_daughter_PFP_true_byE_purity", &reco_daughter_PFP_true_byE_purity, &b_reco_daughter_PFP_true_byE_purity);
    fChain->SetBranchAddress("reco_daughter_allTrack_ID", &reco_daughter_allTrack_ID, &b_reco_daughter_allTrack_ID);
    fChain->SetBranchAddress("reco_daughter_allTrack_dQdX_SCE", &reco_daughter_allTrack_dQdX_SCE, &b_reco_daughter_allTrack_dQdX_SCE);
+   fChain->SetBranchAddress("reco_daughter_allTrack_calibrated_dQdX_SCE", &reco_daughter_allTrack_calibrated_dQdX_SCE, &b_reco_daughter_allTrack_calibrated_dQdX_SCE);
+   fChain->SetBranchAddress("reco_daughter_allTrack_EField_SCE", &reco_daughter_allTrack_EField_SCE, &b_reco_daughter_allTrack_EField_SCE);
    fChain->SetBranchAddress("reco_daughter_allTrack_dEdX_SCE", &reco_daughter_allTrack_dEdX_SCE, &b_reco_daughter_allTrack_dEdX_SCE);
    fChain->SetBranchAddress("reco_daughter_allTrack_resRange_SCE", &reco_daughter_allTrack_resRange_SCE, &b_reco_daughter_allTrack_resRange_SCE);
    fChain->SetBranchAddress("reco_daughter_allTrack_calibrated_dEdX_SCE", &reco_daughter_allTrack_calibrated_dEdX_SCE, &b_reco_daughter_allTrack_calibrated_dEdX_SCE);
    fChain->SetBranchAddress("reco_daughter_allTrack_Chi2_proton", &reco_daughter_allTrack_Chi2_proton, &b_reco_daughter_allTrack_Chi2_proton);
+   fChain->SetBranchAddress("reco_daughter_allTrack_Chi2_pion", &reco_daughter_allTrack_Chi2_pion, &b_reco_daughter_allTrack_Chi2_pion);
+   fChain->SetBranchAddress("reco_daughter_allTrack_Chi2_muon", &reco_daughter_allTrack_Chi2_muon, &b_reco_daughter_allTrack_Chi2_muon);
    fChain->SetBranchAddress("reco_daughter_allTrack_Chi2_ndof", &reco_daughter_allTrack_Chi2_ndof, &b_reco_daughter_allTrack_Chi2_ndof);
+   fChain->SetBranchAddress("reco_daughter_allTrack_Chi2_ndof_pion", &reco_daughter_allTrack_Chi2_ndof_pion, &b_reco_daughter_allTrack_Chi2_ndof_pion);
+   fChain->SetBranchAddress("reco_daughter_allTrack_Chi2_ndof_muon", &reco_daughter_allTrack_Chi2_ndof_muon, &b_reco_daughter_allTrack_Chi2_ndof_muon);
    fChain->SetBranchAddress("reco_daughter_allTrack_Chi2_proton_plane0", &reco_daughter_allTrack_Chi2_proton_plane0, &b_reco_daughter_allTrack_Chi2_proton_plane0);
    fChain->SetBranchAddress("reco_daughter_allTrack_Chi2_proton_plane1", &reco_daughter_allTrack_Chi2_proton_plane1, &b_reco_daughter_allTrack_Chi2_proton_plane1);
    fChain->SetBranchAddress("reco_daughter_allTrack_Chi2_ndof_plane0", &reco_daughter_allTrack_Chi2_ndof_plane0, &b_reco_daughter_allTrack_Chi2_ndof_plane0);
@@ -1206,6 +1271,9 @@ void anavar::Init(TTree *tree)
    fChain->SetBranchAddress("reco_daughter_allTrack_endY", &reco_daughter_allTrack_endY, &b_reco_daughter_allTrack_endY);
    fChain->SetBranchAddress("reco_daughter_allTrack_endZ", &reco_daughter_allTrack_endZ, &b_reco_daughter_allTrack_endZ);
    fChain->SetBranchAddress("reco_daughter_allTrack_dR", &reco_daughter_allTrack_dR, &b_reco_daughter_allTrack_dR);
+   fChain->SetBranchAddress("reco_daughter_allTrack_calo_X", &reco_daughter_allTrack_calo_X, &b_reco_daughter_allTrack_calo_X);
+   fChain->SetBranchAddress("reco_daughter_allTrack_calo_Y", &reco_daughter_allTrack_calo_Y, &b_reco_daughter_allTrack_calo_Y);
+   fChain->SetBranchAddress("reco_daughter_allTrack_calo_Z", &reco_daughter_allTrack_calo_Z, &b_reco_daughter_allTrack_calo_Z);
    fChain->SetBranchAddress("reco_daughter_allTrack_to_vertex", &reco_daughter_allTrack_to_vertex, &b_reco_daughter_allTrack_to_vertex);
    fChain->SetBranchAddress("reco_daughter_allTrack_vertex_michel_score", &reco_daughter_allTrack_vertex_michel_score, &b_reco_daughter_allTrack_vertex_michel_score);
    fChain->SetBranchAddress("reco_daughter_allTrack_vertex_nHits", &reco_daughter_allTrack_vertex_nHits, &b_reco_daughter_allTrack_vertex_nHits);
@@ -1424,6 +1492,13 @@ void anavar::Init(TTree *tree)
    fChain->SetBranchAddress("g4rw_alt_primary_minus_sigma_weight", &g4rw_alt_primary_minus_sigma_weight, &b_g4rw_alt_primary_minus_sigma_weight);
    fChain->SetBranchAddress("g4rw_full_primary_plus_sigma_weight", &g4rw_full_primary_plus_sigma_weight, &b_g4rw_full_primary_plus_sigma_weight);
    fChain->SetBranchAddress("g4rw_full_primary_minus_sigma_weight", &g4rw_full_primary_minus_sigma_weight, &b_g4rw_full_primary_minus_sigma_weight);
+   fChain->SetBranchAddress("g4rw_full_grid_weights", &g4rw_full_grid_weights, &b_g4rw_full_grid_weights);
+   fChain->SetBranchAddress("g4rw_full_grid_piplus_weights", &g4rw_full_grid_piplus_weights, &b_g4rw_full_grid_piplus_weights);
+   fChain->SetBranchAddress("g4rw_full_grid_piplus_weights_fake_data", &g4rw_full_grid_piplus_weights_fake_data, &b_g4rw_full_grid_piplus_weights_fake_data);
+   fChain->SetBranchAddress("g4rw_full_grid_piminus_weights", &g4rw_full_grid_piminus_weights, &b_g4rw_full_grid_piminus_weights);
+   fChain->SetBranchAddress("g4rw_full_grid_proton_weights", &g4rw_full_grid_proton_weights, &b_g4rw_full_grid_proton_weights);
+   fChain->SetBranchAddress("g4rw_primary_grid_weights", &g4rw_primary_grid_weights, &b_g4rw_primary_grid_weights);
+   fChain->SetBranchAddress("g4rw_primary_grid_pair_weights", &g4rw_primary_grid_pair_weights, &b_g4rw_primary_grid_pair_weights);
    Notify();
 }
 

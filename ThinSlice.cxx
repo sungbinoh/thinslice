@@ -93,7 +93,7 @@ void ThinSlice::ProcessEvent(const HadAna & evt, Unfold & uf){
       if (!(evt.reco_beam_calo_wire->empty()) && evt.reco_beam_true_byE_matched){
         std::vector<std::vector<double>> vincE(nthinslices);
         for (size_t i = 0; i<evt.reco_beam_calo_wire->size(); ++i){
-          int this_sliceID = int((*evt.reco_beam_calo_wire_z)[i]/thinslicewidth);
+          int this_sliceID = int((*evt.reco_beam_calo_Z)[i]/thinslicewidth);
           if (this_sliceID>=nthinslices) continue;
           if (this_sliceID<0) continue;
           double this_incE = (*evt.reco_beam_incidentEnergies)[i];
@@ -248,7 +248,13 @@ void ThinSlice::SaveHistograms(){
 
 void ThinSlice::CalcXS(const Unfold & uf){
 
+  double slcid[nthinslices] = {0};
   double avg_trueincE[nthinslices] = {0};
+  double avg_recoincE[nthinslices] = {0};
+  double err_trueincE[nthinslices] = {0};
+  double err_recoincE[nthinslices] = {0};
+  double reco_trueincE[nthinslices] = {0};
+  double err_reco_trueincE[nthinslices] = {0};
   double truexs[nthinslices] = {0};
   double err_truexs[nthinslices] = {0};
 
@@ -258,13 +264,27 @@ void ThinSlice::CalcXS(const Unfold & uf){
 
   for (int i = 0; i<nthinslices; ++i){
     
+    slcid[i] = i;
     avg_trueincE[i] = true_incE[i]->GetMean();
+    err_trueincE[i] = true_incE[i]->GetMeanError();
+    avg_recoincE[i] = reco_incE[i]->GetMean();
+    err_recoincE[i] = reco_incE[i]->GetMeanError();
+    reco_trueincE[i] = avg_recoincE[i] - avg_trueincE[i];
+    err_reco_trueincE[i] = sqrt(pow(err_trueincE[i],2)+pow(err_recoincE[i],2));
     //std::cout<<i<<" "<<avg_trueincE[i]<<std::endl;
     if (true_incidents[i] && true_interactions[i]){
       truexs[i] = MAr/(Density*NA*thinslicewidth)*log(true_incidents[i]/(true_incidents[i]-true_interactions[i]))*1e27;
       err_truexs[i] = MAr/(Density*NA*thinslicewidth)*1e27*sqrt(true_interactions[i]+pow(true_interactions[i],2)/true_incidents[i])/true_incidents[i];
     }
   }
+
+  TGraphErrors *gr_trueincE = new TGraphErrors(nthinslices, &(slcid[0]), &(avg_trueincE[0]), 0, &(err_trueincE[0]));
+  TGraphErrors *gr_recoincE = new TGraphErrors(nthinslices, &(slcid[0]), &(avg_recoincE[0]), 0, &(err_recoincE[0]));
+  TGraphErrors *gr_reco_trueincE = new TGraphErrors(nthinslices, &(slcid[0]), &(reco_trueincE[0]), 0, &(err_reco_trueincE[0]));
+
+  gr_trueincE->Write("gr_trueincE");
+  gr_recoincE->Write("gr_recoincE");
+  gr_reco_trueincE->Write("gr_reco_trueincE");
 
   TGraphErrors *gr_truexs = new TGraphErrors(nthinslices, &(avg_trueincE[0]), &(truexs[0]), 0, &(err_truexs[0]));
   
