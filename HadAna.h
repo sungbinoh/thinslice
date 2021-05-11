@@ -1,9 +1,6 @@
 #ifndef HADANA_H
 #define HADANA_H
 
-#include "TH1D.h"
-#include "TH2D.h"
-#include "TFile.h"
 #include "EventType.h"
 #include "EventSelection.h"
 #include "SliceParams.h"
