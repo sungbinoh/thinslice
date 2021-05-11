@@ -62,8 +62,8 @@ void ThinSlice::BookHistograms(){
      true_incidents[i] = 0;
    }
    
-   response_SliceID_Pion = new RooUnfoldResponse(nthinslices+1, 0, nthinslices+1, "response_SliceID_Pion");
-   response_SliceID_PionInEl = new RooUnfoldResponse(nthinslices+1, 0, nthinslices+1, "response_SliceID_PionInEl");
+   response_SliceID_Pion = new RooUnfoldResponse(nthinslices+2, -1, nthinslices+1, "response_SliceID_Pion");
+   response_SliceID_PionInEl = new RooUnfoldResponse(nthinslices+2, -1, nthinslices+1, "response_SliceID_PionInEl");
 
 }
 
@@ -139,11 +139,19 @@ void ThinSlice::ProcessEvent(const HadAna & evt){
     h_truesliceid_pion_all->Fill(true_sliceID);
     if (evt.PassAllCuts() && evt.reco_beam_true_byE_matched){
       h_truesliceid_pion_cuts->Fill(true_sliceID);
+      response_SliceID_Pion->Fill(reco_sliceID, true_sliceID);
+    }
+    else {
+      response_SliceID_Pion->Miss(true_sliceID);
     }
     if ((*evt.true_beam_endProcess) == "pi+Inelastic"){
       h_truesliceid_pioninelastic_all->Fill(true_sliceID);
       if (evt.PassAllCuts() && evt.reco_beam_true_byE_matched){
         h_truesliceid_pioninelastic_cuts->Fill(true_sliceID);
+        response_SliceID_PionInEl->Fill(reco_sliceID, true_sliceID);
+      }
+      else{
+        response_SliceID_PionInEl->Miss(true_sliceID);
       }
     }
   }
