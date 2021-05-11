@@ -340,4 +340,5 @@ void ThinSlice::Run(HadAna & evt, Unfold & uf){
   
   CalcXS(uf);
   SaveHistograms();
+  uf.SaveHistograms();
 }
