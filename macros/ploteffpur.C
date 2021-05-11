@@ -1,6 +1,6 @@
 {
 
-  TFile *file = TFile::Open("../install/bin/hadana.root");
+  TFile *file = TFile::Open("../install/bin/mc.root");
 
   TH1D *h_truesliceid_pion_all = (TH1D*)file->Get("h_truesliceid_pion_all");
   TH1D *h_truesliceid_pion_cuts = (TH1D*)file->Get("h_truesliceid_pion_cuts");
