@@ -56,11 +56,11 @@ void plot1d(string name, int cut, string xtitle, string ytitle){
   leg->AddEntry(h[cut][2],"#mu^{+}","f");
   leg->AddEntry(h[cut][1],"Misidentified","f");
   leg->Draw();
-  can->Print(Form("can_%s_%s.png",name.c_str(), cutName[cut]));
-  can->Print(Form("can_%s_%s.pdf",name.c_str(), cutName[cut]));
+  can->Print(Form("plots/can_%s_%s.png",name.c_str(), cutName[cut]));
+  can->Print(Form("plots/can_%s_%s.pdf",name.c_str(), cutName[cut]));
   gPad->SetLogy();
-  can->Print(Form("canlog_%s_%s.png",name.c_str(), cutName[cut]));
-  can->Print(Form("canlog_%s_%s.pdf",name.c_str(), cutName[cut]));
+  can->Print(Form("plots/canlog_%s_%s.png",name.c_str(), cutName[cut]));
+  can->Print(Form("plots/canlog_%s_%s.pdf",name.c_str(), cutName[cut]));
   ++nc;
 }
 

@@ -12,6 +12,8 @@ void ThinSlice::BookHistograms(){
   for (int i = 0; i<nthinslices; ++i){
     reco_incE[i] = new TH1D(Form("reco_incE_%d",i),Form("Reco incident energy, %.1f < z < %.1f (cm)",i*thinslicewidth, (i+1)*thinslicewidth), nbinse, 0, 1200.);
     true_incE[i] = new TH1D(Form("true_incE_%d",i),Form("True incident energy, %.1f < z < %.1f (cm)",i*thinslicewidth, (i+1)*thinslicewidth), nbinse, 0, 1200.);
+    reco_incE[i]->Sumw2();
+    true_incE[i]->Sumw2();
   }
   
   h_truesliceid_pion_all = new TH1D("h_truesliceid_pion_all","h_truesliceid_pion_all;True SliceID", nthinslices + 2, -1, nthinslices + 1);
@@ -21,7 +23,15 @@ void ThinSlice::BookHistograms(){
   h_recosliceid_allevts_cuts = new TH1D("h_recosliceid_allevts_cuts","h_recosliceid_allevts_cuts;Reco SliceID", nthinslices + 2, -1, nthinslices + 1);
   h_recosliceid_pion_cuts = new TH1D("h_recosliceid_pion_cuts","h_recosliceid_pion_cuts;Reco SliceID", nthinslices + 2, -1, nthinslices + 1);
   h_recosliceid_pioninelastic_cuts = new TH1D("h_recosliceid_pioninelastic_cuts","h_recosliceid_pioninelastic_cuts;Reco SliceID", nthinslices + 2, -1, nthinslices + 1);
-  
+
+  h_truesliceid_pion_all->Sumw2();
+  h_truesliceid_pion_cuts->Sumw2();
+  h_truesliceid_pioninelastic_all->Sumw2();
+  h_truesliceid_pioninelastic_cuts->Sumw2();
+  h_recosliceid_allevts_cuts->Sumw2();
+  h_recosliceid_pion_cuts->Sumw2();
+  h_recosliceid_pioninelastic_cuts->Sumw2();
+
   for (int i = 0; i < nCuts; ++i){
     for (int j = 0; j < nParTypes+1; ++j){
       htrue_beam_endZ[i][j] = new TH1D(Form("htrue_beam_endZ_%d_%d",i,j),Form("true_beam_endZ, %s, %s;true_beam_endZ (cm)", cutName[i], parTypeName[j]), 100, -100, 900);

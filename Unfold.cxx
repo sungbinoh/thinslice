@@ -16,6 +16,14 @@ Unfold::Unfold(int nb, double xlo, double xhi){
   pur_num_Inc = new TH1D("pur_num_Inc", "pur_num_Inc", nb, xlo, xhi);
   pur_den     = new TH1D("pur_den",     "pur_den",     nb, xlo, xhi);
 
+  eff_num_Int->Sumw2();
+  eff_den_Int->Sumw2();
+  eff_num_Inc->Sumw2();
+  eff_den_Inc->Sumw2();
+  pur_num_Int->Sumw2();
+  pur_num_Inc->Sumw2();
+  pur_den->Sumw2();
+
 }  
 
 void Unfold::SaveHistograms(){
