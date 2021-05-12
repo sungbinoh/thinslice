@@ -1,7 +1,7 @@
 {
   gStyle->SetOptStat(0);
 
-  TFile *file = TFile::Open("../install/bin/mc.root");
+  TFile *file = TFile::Open("../install/bin/mcprod4.root");
 
   TH1D *eff_num_Int = (TH1D*)file->Get("eff_num_Int");
   TH1D *eff_den_Int = (TH1D*)file->Get("eff_den_Int");

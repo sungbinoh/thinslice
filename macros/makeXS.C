@@ -4,7 +4,7 @@
 
   gStyle->SetOptStat(0);
 
-  TFile *file = TFile::Open("../install/bin/mc.root");
+  TFile *file = TFile::Open("../install/bin/mcprod4.root");
 
   TH1D *eff_num_Int = (TH1D*)file->Get("eff_num_Int");
   TH1D *eff_den_Int = (TH1D*)file->Get("eff_den_Int");
@@ -119,7 +119,7 @@
     for (int j = i; j<=nthinslices; ++j){
       Ninc[i] += h_truesliceid_pion_uf->GetBinContent(j+2);
       err_inc[i] += pow(h_truesliceid_pion_uf->GetBinError(j+2),2);
-      cout<<i<<" "<<j<<" "<<h_truesliceid_pion_uf->GetBinContent(j+2)<<" "<<Ninc[i]<<endl;
+      //cout<<i<<" "<<j<<" "<<h_truesliceid_pion_uf->GetBinContent(j+2)<<" "<<Ninc[i]<<endl;
     }
     err_inc[i] = sqrt(err_inc[i]);
   }
@@ -139,7 +139,7 @@
     //err_xs[i] = MAr/(Density*NA*thinslicewidth)*1e27*sqrt(N_int[i]+pow(N_int[i],2)/N_inc[i])/N_incidents[i];
     err_xs[i] = MAr/(Density*NA*thinslicewidth)*1e27*sqrt(pow(Nint[i]*err_inc[i]/Ninc[i]/(Ninc[i]-Nint[i]),2)+pow(err_int[i]/(Ninc[i]-Nint[i]),2));
     incE[i] = gr_trueincE->GetPointY(i);
-    std::cout<<i<<" "<<Ninc[i]<<" "<<Nint[i]<<" "<<xs[i]<<" "<<incE[i]<<std::endl;
+    //std::cout<<i<<" "<<Ninc[i]<<" "<<Nint[i]<<" "<<xs[i]<<" "<<incE[i]<<std::endl;
   }
 
   TFile f2("../files/exclusive_xsec.root");

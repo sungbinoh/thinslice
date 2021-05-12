@@ -34,23 +34,23 @@ void ThinSlice::BookHistograms(){
 
   for (int i = 0; i < nCuts; ++i){
     for (int j = 0; j < nParTypes+1; ++j){
-      htrue_beam_endZ[i][j] = new TH1D(Form("htrue_beam_endZ_%d_%d",i,j),Form("true_beam_endZ, %s, %s;true_beam_endZ (cm)", cutName[i], parTypeName[j]), 100, -100, 900);
+      htrue_beam_endZ[i][j] = new TH1D(Form("htrue_beam_endZ_%d_%d",i,j),Form("true_beam_endZ, %s, %s;true_beam_endZ (cm)", cutName[i], parTypeName[j]), 70, -100, 600);
       htrue_beam_endZ[i][j]->Sumw2();
-      hreco_beam_endZ[i][j] = new TH1D(Form("hreco_beam_endZ_%d_%d",i,j),Form("reco_beam_endZ, %s, %s;reco_beam_endZ (cm)", cutName[i], parTypeName[j]), 100, -100, 900);
+      hreco_beam_endZ[i][j] = new TH1D(Form("hreco_beam_endZ_%d_%d",i,j),Form("reco_beam_endZ, %s, %s;reco_beam_endZ (cm)", cutName[i], parTypeName[j]), 70, -100, 600);
       hreco_beam_endZ[i][j]->Sumw2();
       hreco_true_beam_endZ[i][j] = new TH1D(Form("hreco_true_beam_endZ_%d_%d",i,j), Form("reco_true_beam_endZ, %s, %s;reco_beam_endZ - true_beam_endZ (cm)", cutName[i], parTypeName[j]), 100, -100, 100);
       hreco_true_beam_endZ[i][j]->Sumw2();
-      hreco_vs_true_beam_endZ[i][j]= new TH2D(Form("hreco_vs_true_beam_endZ_%d_%d",i,j), Form("reco_vs_true_beam_endZ, %s, %s;true_beam_endZ (cm);reco_beam_endZ (cm)", cutName[i], parTypeName[j]), 100, -100, 900, 100, -100, 900);
-      hreco_true_vs_true_beam_endZ[i][j]= new TH2D(Form("hreco_true_vs_true_beam_endZ_%d_%d",i,j), Form("reco_true_vs_true_beam_endZ, %s, %s;true_beam_endZ (cm);reco - true_beam_endZ (cm)", cutName[i], parTypeName[j]), 100, -100, 900, 100, -100, 100);
+      hreco_vs_true_beam_endZ[i][j]= new TH2D(Form("hreco_vs_true_beam_endZ_%d_%d",i,j), Form("reco_vs_true_beam_endZ, %s, %s;true_beam_endZ (cm);reco_beam_endZ (cm)", cutName[i], parTypeName[j]), 70, -100, 600, 70, -100, 600);
+      hreco_true_vs_true_beam_endZ[i][j]= new TH2D(Form("hreco_true_vs_true_beam_endZ_%d_%d",i,j), Form("reco_true_vs_true_beam_endZ, %s, %s;true_beam_endZ (cm);reco - true_beam_endZ (cm)", cutName[i], parTypeName[j]), 70, -100, 600, 100, -100, 100);
 
-      htrue_beam_endZ_SCE[i][j] = new TH1D(Form("htrue_beam_endZ_SCE_%d_%d",i,j),Form("true_beam_endZ_SCE, %s, %s;true_beam_endZ_SCE (cm)", cutName[i], parTypeName[j]), 100, -100, 900);
+      htrue_beam_endZ_SCE[i][j] = new TH1D(Form("htrue_beam_endZ_SCE_%d_%d",i,j),Form("true_beam_endZ_SCE, %s, %s;true_beam_endZ_SCE (cm)", cutName[i], parTypeName[j]), 70, -100, 600);
       htrue_beam_endZ_SCE[i][j]->Sumw2();
-      hreco_beam_endZ_SCE[i][j] = new TH1D(Form("hreco_beam_endZ_SCE_%d_%d",i,j),Form("reco_beam_endZ_SCE, %s, %s;reco_beam_endZ_SCE (cm)", cutName[i], parTypeName[j]), 100, -100, 900);
+      hreco_beam_endZ_SCE[i][j] = new TH1D(Form("hreco_beam_endZ_SCE_%d_%d",i,j),Form("reco_beam_endZ_SCE, %s, %s;reco_beam_endZ_SCE (cm)", cutName[i], parTypeName[j]), 70, -100, 600);
       hreco_beam_endZ_SCE[i][j]->Sumw2();
       hreco_true_beam_endZ_SCE[i][j] = new TH1D(Form("hreco_true_beam_endZ_SCE_%d_%d",i,j), Form("reco_true_beam_endZ_SCE, %s, %s;reco_beam_endZ_SCE - true_beam_endZ_SCE (cm)", cutName[i], parTypeName[j]), 100, -100, 100);
       hreco_true_beam_endZ_SCE[i][j]->Sumw2();
-      hreco_vs_true_beam_endZ_SCE[i][j]= new TH2D(Form("hreco_vs_true_beam_endZ_SCE_%d_%d",i,j), Form("reco_vs_true_beam_endZ_SCE, %s, %s;true_beam_endZ_SCE (cm);reco_beam_endZ_SCE (cm)", cutName[i], parTypeName[j]), 100, -100, 900, 100, -100, 900);
-      hreco_true_vs_true_beam_endZ_SCE[i][j]= new TH2D(Form("hreco_true_vs_true_beam_endZ_SCE_%d_%d",i,j), Form("reco_true_vs_true_beam_endZ_SCE, %s, %s;true_beam_endZ_SCE (cm);reco - true_beam_endZ_SCE (cm)", cutName[i], parTypeName[j]), 100, -100, 900, 100, -100, 100);
+      hreco_vs_true_beam_endZ_SCE[i][j]= new TH2D(Form("hreco_vs_true_beam_endZ_SCE_%d_%d",i,j), Form("reco_vs_true_beam_endZ_SCE, %s, %s;true_beam_endZ_SCE (cm);reco_beam_endZ_SCE (cm)", cutName[i], parTypeName[j]), 70, -100, 600, 70, -100, 600);
+      hreco_true_vs_true_beam_endZ_SCE[i][j]= new TH2D(Form("hreco_true_vs_true_beam_endZ_SCE_%d_%d",i,j), Form("reco_true_vs_true_beam_endZ_SCE, %s, %s;true_beam_endZ_SCE (cm);reco - true_beam_endZ_SCE (cm)", cutName[i], parTypeName[j]), 70, -100, 600, 100, -100, 100);
 
 
       htrue_sliceID[i][j] = new TH1D(Form("htrue_sliceID_%d_%d",i,j),Form("true_sliceID, %s, %s;true_sliceID (cm)", cutName[i], parTypeName[j]), 50, -1, 49);
@@ -161,10 +161,12 @@ void ThinSlice::ProcessEvent(const HadAna & evt, Unfold & uf){
     }
     if (evt.PassAllCuts() && evt.reco_beam_true_byE_matched){
       if (isTestSample){
+        h_recosliceid_pion_cuts->Fill(reco_sliceID);
         h_truesliceid_pion_cuts->Fill(true_sliceID);
       }
       else{
         uf.eff_num_Inc->Fill(true_sliceID);
+        uf.pur_num_Inc->Fill(reco_sliceID);
         uf.response_SliceID_Inc.Fill(reco_sliceID, true_sliceID);
       }
     }
@@ -181,10 +183,12 @@ void ThinSlice::ProcessEvent(const HadAna & evt, Unfold & uf){
       }
       if (evt.PassAllCuts() && evt.reco_beam_true_byE_matched){
         if (isTestSample){
+          h_recosliceid_pioninelastic_cuts->Fill(reco_sliceID);
           h_truesliceid_pioninelastic_cuts->Fill(true_sliceID);
         }
         else{
           uf.eff_num_Int->Fill(true_sliceID);
+          uf.pur_num_Int->Fill(reco_sliceID);
           uf.response_SliceID_Int.Fill(reco_sliceID, true_sliceID);
         }
       }
@@ -199,22 +203,6 @@ void ThinSlice::ProcessEvent(const HadAna & evt, Unfold & uf){
     }
     else {
       uf.pur_den->Fill(reco_sliceID);
-    }
-    if (evt.true_beam_PDG == 211 && evt.reco_beam_true_byE_matched){
-      if (isTestSample){
-        h_recosliceid_pion_cuts->Fill(reco_sliceID);
-      }
-      else{
-        uf.pur_num_Inc->Fill(reco_sliceID);
-      }
-      if ((*evt.true_beam_endProcess) == "pi+Inelastic"){
-        if (isTestSample){
-          h_recosliceid_pioninelastic_cuts->Fill(reco_sliceID);
-        }
-        else{
-          uf.pur_num_Int->Fill(reco_sliceID);
-        }
-      }
     }
   }
 }
