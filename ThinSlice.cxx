@@ -300,8 +300,13 @@ void ThinSlice::CalcXS(const Unfold & uf){
   
   gr_truexs->Write("gr_truexs");
 
-  RooUnfoldBayes   unfold_Inc (&uf.response_SliceID_Inc, h_recosliceid_pion_cuts, 4);
-  RooUnfoldBayes   unfold_Int (&uf.response_SliceID_Int, h_recosliceid_pioninelastic_cuts, 4);
+  TH1D *hinc = (TH1D*)h_recosliceid_allevts_cuts->Clone("hinc");
+  TH1D *hint = (TH1D*)h_recosliceid_allevts_cuts->Clone("hint");
+  hinc->Multiply(uf.pur_Inc);
+  hint->Multiply(uf.pur_Int);
+
+  RooUnfoldBayes   unfold_Inc (&uf.response_SliceID_Inc, hinc, 4);
+  RooUnfoldBayes   unfold_Int (&uf.response_SliceID_Int, hint, 4);
 
   h_truesliceid_pion_uf = (TH1D*) unfold_Inc.Hreco();
   h_truesliceid_pioninelastic_uf = (TH1D*) unfold_Int.Hreco();
@@ -348,7 +353,7 @@ void ThinSlice::Run(HadAna & evt, Unfold & uf){
     }
   }
   
+  uf.SaveHistograms();
   CalcXS(uf);
   SaveHistograms();
-  uf.SaveHistograms();
 }

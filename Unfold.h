@@ -24,6 +24,11 @@ class Unfold {
   TH1D *pur_num_Inc; //Incident purity numerator
   TH1D *pur_den;     //Interaction/incident purity denominator
 
+  TH1D *eff_Int;
+  TH1D *eff_Inc;
+  TH1D *pur_Int;
+  TH1D *pur_Inc;
+
   void SaveHistograms();
 
 };

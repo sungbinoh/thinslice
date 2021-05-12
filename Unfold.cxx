@@ -36,6 +36,22 @@ void Unfold::SaveHistograms(){
   pur_num_Inc->Write("pur_num_Inc");
   pur_den->Write("pur_den");
 
+  eff_Int = (TH1D*)eff_num_Int->Clone("eff_Int");
+  eff_Int->Divide(eff_den_Int);
+  eff_Int->Write("eff_Int");
+
+  eff_Inc = (TH1D*)eff_num_Inc->Clone("eff_Inc");
+  eff_Inc->Divide(eff_den_Inc);
+  eff_Inc->Write("eff_Inc");
+
+  pur_Int = (TH1D*)pur_num_Int->Clone("pur_Int");
+  pur_Int->Divide(pur_den);
+  pur_Int->Write("pur_Int");
+
+  pur_Inc = (TH1D*)pur_num_Inc->Clone("pur_Inc");
+  pur_Inc->Divide(pur_den);
+  pur_Inc->Write("pur_Inc");
+
   TH2D *hint = (TH2D*)response_SliceID_Int.Hresponse();
   hint->SetTitle("Pion Inelastic Scatterings;Reco Slice ID;True Slice ID");
   hint->Write("response_SliceID_Int");
