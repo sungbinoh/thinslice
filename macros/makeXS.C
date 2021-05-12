@@ -116,9 +116,10 @@
   for (int i = 0; i<nthinslices; ++i){
     Nint[i] = h_truesliceid_pioninelastic_uf->GetBinContent(i+2);
     err_int[i] = h_truesliceid_pioninelastic_uf->GetBinError(i+2);
-    for (int j = i; j<=nthinslices+2; ++j){
+    for (int j = i; j<=nthinslices; ++j){
       Ninc[i] += h_truesliceid_pion_uf->GetBinContent(j+2);
       err_inc[i] += pow(h_truesliceid_pion_uf->GetBinError(j+2),2);
+      cout<<i<<" "<<j<<" "<<h_truesliceid_pion_uf->GetBinContent(j+2)<<" "<<Ninc[i]<<endl;
     }
     err_inc[i] = sqrt(err_inc[i]);
   }
@@ -132,17 +133,38 @@
   double incE[nthinslices] = {0};
 
   TGraphErrors *gr_trueincE = (TGraphErrors*)file->Get("gr_trueincE");
-
+  TGraphErrors *gr_truexs = (TGraphErrors*)file->Get("gr_truexs");
   for (int i = 0; i<nthinslices; ++i){
     xs[i] = MAr/(Density*NA*thinslicewidth)*log(Ninc[i]/(Ninc[i]-Nint[i]))*1e27;
     //err_xs[i] = MAr/(Density*NA*thinslicewidth)*1e27*sqrt(N_int[i]+pow(N_int[i],2)/N_inc[i])/N_incidents[i];
+    err_xs[i] = MAr/(Density*NA*thinslicewidth)*1e27*sqrt(pow(Nint[i]*err_inc[i]/Ninc[i]/(Ninc[i]-Nint[i]),2)+pow(err_int[i]/(Ninc[i]-Nint[i]),2));
     incE[i] = gr_trueincE->GetPointY(i);
     std::cout<<i<<" "<<Ninc[i]<<" "<<Nint[i]<<" "<<xs[i]<<" "<<incE[i]<<std::endl;
   }
 
-  TGraphErrors *gr_xs = new TGraphErrors(nthinslices, incE, xs, 0, err_xs);
-  TCanvas *c5 = new TCanvas("c5");
-  gr_xs->Draw();
+  TFile f2("../files/exclusive_xsec.root");
+  TGraph *total_inel_KE = (TGraph*)f2.Get("total_inel_KE");
+//  TGraph *abs_KE = (TGraph*)f2.Get("abs_KE");
+//  TGraph *cex_KE = (TGraph*)f2.Get("cex_KE");
 
+  TGraphErrors *gr_recoxs = new TGraphErrors(nthinslices, incE, xs, 0, err_xs);
+  TCanvas *c5 = new TCanvas("c5");
+  gr_recoxs->SetTitle("Pion Inelastic Cross Section");
+  gr_recoxs->GetXaxis()->SetTitle("Pion Kinetic Energy (MeV)");
+  gr_recoxs->GetYaxis()->SetTitle("#sigma_{inelastic} (mb)");
+  gr_recoxs->Draw("ape");
+  gr_truexs->SetMarkerColor(3);
+  gr_truexs->SetLineColor(3);
+  gr_truexs->Draw("pe");
+  total_inel_KE->SetLineColor(2);
+  total_inel_KE->Draw("c");
+  TLegend *leg5 = new TLegend(0.3,0.6,0.8,0.9);
+  leg5->SetFillStyle(0);
+  leg5->AddEntry(gr_recoxs, "MC with reco information", "pe");
+  leg5->AddEntry(gr_truexs, "MC with truth information", "pe");
+  leg5->AddEntry(total_inel_KE, "Geant4 v4_10_6_p01c", "l");
+  leg5->Draw();
+
+  c5->Print("pi+inel.png");
 }
   
