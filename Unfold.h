@@ -3,6 +3,7 @@
 
 #include "RooUnfoldResponse.h"
 #include "RooUnfoldBayes.h"
+#include "TH2D.h"
 
 class Unfold {
   
