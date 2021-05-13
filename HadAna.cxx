@@ -40,7 +40,8 @@ int HadAna::GetParType(){
 
 
 bool HadAna::PassPandoraSliceCut() const{
-  return reco_beam_type == pandora_slice_pdg;
+
+  return (reco_beam_type == pandora_slice_pdg);
 }
 
 bool HadAna::PassBeamQualityCut() const{

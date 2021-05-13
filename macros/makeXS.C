@@ -45,7 +45,7 @@
   h_recosliceid_allevts_cuts->SetLineColor(3);
   h_recosliceid_allevts_cuts->SetMarkerColor(3);
   h_recosliceid_allevts_cuts->SetTitle("All Pions;Reco SliceID;Events");
-  h_recosliceid_allevts_cuts->Draw();
+  h_recosliceid_allevts_cuts->DrawCopy();
   hinc->DrawCopy("same");
   h_recosliceid_pion_cuts->SetLineColor(2);
   h_recosliceid_pion_cuts->Draw("same hist");
@@ -112,8 +112,10 @@
   double Nint[nthinslices] = {0};
   double err_inc[nthinslices] = {0};
   double err_int[nthinslices] = {0};
+  double SliceID[nthinslices] = {0};
 
   for (int i = 0; i<nthinslices; ++i){
+    SliceID[i] = i;
     Nint[i] = h_truesliceid_pioninelastic_uf->GetBinContent(i+2);
     err_int[i] = h_truesliceid_pioninelastic_uf->GetBinError(i+2);
     for (int j = i; j<=nthinslices; ++j){
@@ -123,6 +125,28 @@
     }
     err_inc[i] = sqrt(err_inc[i]);
   }
+
+  TGraphErrors *gr_inc = new TGraphErrors(nthinslices, SliceID, Ninc, 0, err_inc);
+  TGraphErrors *gr_int = new TGraphErrors(nthinslices, SliceID, Nint, 0, err_int);
+  TCanvas *c6 = new TCanvas("c6","c6");
+  gr_inc->SetTitle("");
+  gr_inc->SetLineWidth(2);
+  gr_inc->SetLineColor(4);
+  gr_inc->SetMarkerColor(4);
+  gr_inc->GetXaxis()->SetTitle("Slice ID");
+  gr_inc->GetYaxis()->SetTitle("N_{Inc}");
+  gr_inc->GetXaxis()->SetRangeUser(-1, 23);
+  gr_inc->Draw("ape");
+
+  TCanvas *c7 = new TCanvas("c7","c7");
+  gr_int->SetTitle("");
+  gr_int->SetLineWidth(2);
+  gr_int->SetLineColor(4);
+  gr_int->SetMarkerColor(4);
+  gr_int->GetXaxis()->SetTitle("Slice ID");
+  gr_int->GetYaxis()->SetTitle("N_{Int}");
+  gr_int->GetXaxis()->SetRangeUser(-1, 23);
+  gr_int->Draw("ape");
 
   double NA=6.02214076e23;
   double MAr=39.95; //gmol
@@ -148,10 +172,11 @@
 //  TGraph *cex_KE = (TGraph*)f2.Get("cex_KE");
 
   TGraphErrors *gr_recoxs = new TGraphErrors(nthinslices, incE, xs, 0, err_xs);
-  TCanvas *c5 = new TCanvas("c5");
+  TCanvas *c5 = new TCanvas("c5", "c5");
   gr_recoxs->SetTitle("Pion Inelastic Cross Section");
   gr_recoxs->GetXaxis()->SetTitle("Pion Kinetic Energy (MeV)");
   gr_recoxs->GetYaxis()->SetTitle("#sigma_{inelastic} (mb)");
+  gr_recoxs->SetLineWidth(2);
   gr_recoxs->Draw("ape");
   gr_truexs->SetMarkerColor(3);
   gr_truexs->SetLineColor(3);
@@ -165,6 +190,12 @@
   leg5->AddEntry(total_inel_KE, "Geant4 v4_10_6_p01c", "l");
   leg5->Draw();
 
-  c5->Print("pi+inel.png");
+  c1->Print("plots/xs_sliceidinc_reco.pdf");
+  c2->Print("plots/xs_sliceidinc_true.pdf");
+  c3->Print("plots/xs_sliceidint_reco.pdf");
+  c4->Print("plots/xs_sliceidint_true.pdf");
+  c5->Print("plots/xs_pi+inel.pdf");
+  c6->Print("plots/xs_Ninc.pdf");
+  c7->Print("plots/xs_Nint.pdf");
 }
   

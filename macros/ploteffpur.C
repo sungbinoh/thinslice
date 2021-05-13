@@ -58,4 +58,11 @@
   c5->Print("plots/pionres.png");
   c6->Print("plots/pioninelres.png");
 
+  c1->Print("plots/pioneff.pdf");
+  c2->Print("plots/pionineleff.pdf");
+  c3->Print("plots/pionpur.pdf");
+  c4->Print("plots/pioninelpur.pdf");
+  c5->Print("plots/pionres.pdf");
+  c6->Print("plots/pioninelres.pdf");
+
 }

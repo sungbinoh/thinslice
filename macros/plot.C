@@ -64,6 +64,22 @@ void plot1d(string name, int cut, string xtitle, string ytitle){
   ++nc;
 }
 
+void plot2d(string name, int cut){
+
+  TH2D *h[nCuts][nParTypes+1];
+  for (int i = 0; i < nCuts; ++i){
+    for (int j = 0; j < nParTypes+1; ++j){
+      h[i][j] = (TH2D*)f->Get(Form("%s_%d_%d",name.c_str(),i,j));
+    }
+  }
+  for (int i = 1; i<=4; ++i){
+    TCanvas *can = new TCanvas(Form("can_%d",nc), Form("can_%d",nc));
+    h[cut][i]->Draw("colz");
+    can->Print(Form("plots/can_%s_%s_%s.png",name.c_str(), cutName[cut], parTypeName[i]));
+    can->Print(Form("plots/can_%s_%s_%s.pdf",name.c_str(), cutName[cut], parTypeName[i]));
+    ++nc;
+  }
+}
 void plot(){
 
   gStyle->SetOptStat(0);
@@ -77,9 +93,10 @@ void plot(){
     plot1d("htrue_beam_endZ_SCE", i, "True pion/muon end Z (cm)", "Events");
     plot1d("htrue_sliceID", i, "True Slice ID", "Events");
     plot1d("hreco_sliceID", i, "Reco Slice ID", "Events");
-    plot1d("hreco_true_beam_endZ_SCE", i, "Reco - True End Z (cm)", "Events");
+    plot1d("hreco_true_beam_endZ_SCE", i, "Reco - True End Z SCE (cm)", "Events");
+    plot2d("hreco_vs_true_beam_endZ_SCE",i);
   }
 
-  PrintEvents("hdaughter_michel_score");
+  PrintEvents("htrue_beam_endZ_SCE");
 
 }
