@@ -64,6 +64,9 @@
   //hinc->SetLineColor(3);
   //hinc->SetMarkerColor(3);
   hinc->DrawCopy("same");
+//  eff_den_Inc->SetLineColor(2);
+//  eff_den_Inc->SetMarkerColor(2);
+//  eff_den_Inc->Draw("same hist");
   h_truesliceid_pion_all->SetLineColor(2);
   h_truesliceid_pion_all->SetMarkerColor(2);
   h_truesliceid_pion_all->Draw("same hist");

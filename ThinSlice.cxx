@@ -1,6 +1,7 @@
 #include "ThinSlice.h"
 #include "TGraphErrors.h"
 #include "RooUnfoldBayes.h"
+#include "RooUnfoldSvd.h"
 #include "util.h"
 
 #include <iostream>
@@ -159,7 +160,8 @@ void ThinSlice::ProcessEvent(const HadAna & evt, Unfold & uf){
     else{
       uf.eff_den_Inc->Fill(true_sliceID);
     }
-    if (evt.PassAllCuts() && evt.reco_beam_true_byE_matched){
+    //if (evt.PassAllCuts() && evt.reco_beam_true_byE_matched){
+    if (evt.PassAllCuts()){
       if (isTestSample){
         h_recosliceid_pion_cuts->Fill(reco_sliceID);
         h_truesliceid_pion_cuts->Fill(true_sliceID);
@@ -171,7 +173,10 @@ void ThinSlice::ProcessEvent(const HadAna & evt, Unfold & uf){
       }
     }
     else {
-      if (!isTestSample) uf.response_SliceID_Inc.Miss(true_sliceID);
+      if (!isTestSample){
+        uf.response_SliceID_Inc.Miss(true_sliceID);
+        //std::cout<<true_sliceID<<std::endl;
+      }
     }
 
     if ((*evt.true_beam_endProcess) == "pi+Inelastic"){
@@ -181,7 +186,8 @@ void ThinSlice::ProcessEvent(const HadAna & evt, Unfold & uf){
       else{
         uf.eff_den_Int->Fill(true_sliceID);
       }
-      if (evt.PassAllCuts() && evt.reco_beam_true_byE_matched){
+      //if (evt.PassAllCuts() && evt.reco_beam_true_byE_matched){
+      if (evt.PassAllCuts()){
         if (isTestSample){
           h_recosliceid_pioninelastic_cuts->Fill(reco_sliceID);
           h_truesliceid_pioninelastic_cuts->Fill(true_sliceID);
@@ -293,8 +299,17 @@ void ThinSlice::CalcXS(const Unfold & uf){
   hinc->Multiply(uf.pur_Inc);
   hint->Multiply(uf.pur_Int);
 
-  RooUnfoldBayes   unfold_Inc (&uf.response_SliceID_Inc, hinc, 4);
-  RooUnfoldBayes   unfold_Int (&uf.response_SliceID_Int, hint, 4);
+  RooUnfoldBayes   unfold_Inc (&uf.response_SliceID_Inc, uf.pur_num_Inc, 4);
+  RooUnfoldBayes   unfold_Int (&uf.response_SliceID_Int, uf.pur_num_Int, 4);
+
+//  RooUnfoldBayes   unfold_Inc (&uf.response_SliceID_Inc, hinc, 10);
+//  RooUnfoldBayes   unfold_Int (&uf.response_SliceID_Int, hint, 10);
+
+//  RooUnfoldSvd     unfold_Inc (&uf.response_SliceID_Inc, hinc, 20);   // OR
+//  RooUnfoldSvd     unfold_Int (&uf.response_SliceID_Int, hint, 20);   // OR
+
+//  RooUnfoldSvd     unfold_Inc (&uf.response_SliceID_Inc, uf.pur_num_Inc, 20);   // OR
+//  RooUnfoldSvd     unfold_Int (&uf.response_SliceID_Int, uf.pur_num_Int, 20);   // OR
 
   h_truesliceid_pion_uf = (TH1D*) unfold_Inc.Hreco();
   h_truesliceid_pioninelastic_uf = (TH1D*) unfold_Int.Hreco();

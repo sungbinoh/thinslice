@@ -1,12 +1,12 @@
 #include "Unfold.h"
 
-Unfold::Unfold(int nb, double xlo, double xhi){
+Unfold::Unfold(int nb, double xlo, double xhi)
+  : response_SliceID_Int(nb, xlo, xhi)
+  , response_SliceID_Inc(nb, xlo, xhi)
+{
 
-  response_SliceID_Int.Reset();
-  response_SliceID_Int.Setup(nb, xlo, xhi);
-
-  response_SliceID_Inc.Reset();
-  response_SliceID_Inc.Setup(nb, xlo, xhi);
+  response_SliceID_Int.UseOverflow(false);
+  response_SliceID_Inc.UseOverflow(false);
 
   eff_num_Int = new TH1D("eff_num_Int", "eff_num_Int", nb, xlo, xhi);
   eff_den_Int = new TH1D("eff_den_Int", "eff_den_Int", nb, xlo, xhi);
