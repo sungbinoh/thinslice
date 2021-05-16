@@ -11,8 +11,10 @@ int main(){
 
   TChain *chain = new TChain();
 
-  chain->Add("/data/tjyang/dune/pduneana_Prod4.1_5_11_21.root/pduneana/beamana");
+  //chain->Add("/data/tjyang/dune/pduneana_Prod4.1_5_11_21.root/pduneana/beamana");
   //chain->Add("/data/tjyang/dune/pduneana_Prod4_1GeV_5_8_21.root/pduneana/beamana");
+
+  chain->Add("/data/tjyang/dune/pduneana_Prod4a_1GeV_5_14_21.root/pduneana/beamana");
 
   Unfold uf(nthinslices+2, -1, nthinslices+1);
 

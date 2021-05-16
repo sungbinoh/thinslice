@@ -299,11 +299,11 @@ void ThinSlice::CalcXS(const Unfold & uf){
   hinc->Multiply(uf.pur_Inc);
   hint->Multiply(uf.pur_Int);
 
-  RooUnfoldBayes   unfold_Inc (&uf.response_SliceID_Inc, uf.pur_num_Inc, 4);
-  RooUnfoldBayes   unfold_Int (&uf.response_SliceID_Int, uf.pur_num_Int, 4);
+//  RooUnfoldBayes   unfold_Inc (&uf.response_SliceID_Inc, uf.pur_num_Inc, 4);
+//  RooUnfoldBayes   unfold_Int (&uf.response_SliceID_Int, uf.pur_num_Int, 4);
 
-//  RooUnfoldBayes   unfold_Inc (&uf.response_SliceID_Inc, hinc, 10);
-//  RooUnfoldBayes   unfold_Int (&uf.response_SliceID_Int, hint, 10);
+  RooUnfoldBayes   unfold_Inc (&uf.response_SliceID_Inc, hinc, 4);
+  RooUnfoldBayes   unfold_Int (&uf.response_SliceID_Int, hint, 4);
 
 //  RooUnfoldSvd     unfold_Inc (&uf.response_SliceID_Inc, hinc, 20);   // OR
 //  RooUnfoldSvd     unfold_Int (&uf.response_SliceID_Int, hint, 20);   // OR
