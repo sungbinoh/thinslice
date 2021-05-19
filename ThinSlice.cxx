@@ -14,14 +14,15 @@ void ThinSlice::BookHistograms(){
   for (int i = 0; i<nthinslices; ++i){
     reco_incE[i] = new TH1D(Form("reco_incE_%d",i),Form("Reco incident energy, %.1f < z < %.1f (cm)",i*thinslicewidth, (i+1)*thinslicewidth), nbinse, 0, 1200.);
     true_incE[i] = new TH1D(Form("true_incE_%d",i),Form("True incident energy, %.1f < z < %.1f (cm)",i*thinslicewidth, (i+1)*thinslicewidth), nbinse, 0, 1200.);
-    reco_AngCorr[i] = new TH1D(Form("reco_AngCorr_%d",i),Form("Reco angle correction, %.1f < z < %.1f (cm)",i*thinslicewidth, (i+1)*thinslicewidth), 100, 0, 1.);
-    true_AngCorr[i] = new TH1D(Form("true_AngCorr_%d",i),Form("True angle correction, %.1f < z < %.1f (cm)",i*thinslicewidth, (i+1)*thinslicewidth), 100, 0, 1.);
     reco_incE[i]->Sumw2();
     true_incE[i]->Sumw2();
-    reco_AngCorr[i]->Sumw2();
-    true_AngCorr[i]->Sumw2();
   }
-  
+
+  reco_AngCorr = new TH1D("reco_AngCorr","Reco angle correction", 100, 0, 1.);
+  true_AngCorr = new TH1D("true_AngCorr","true angle correction", 100, 0, 1.);
+  reco_AngCorr->Sumw2();
+  true_AngCorr->Sumw2();
+
   h_truesliceid_pion_all = new TH1D("h_truesliceid_pion_all","h_truesliceid_pion_all;True SliceID", nthinslices + 2, -1, nthinslices + 1);
   h_truesliceid_pion_cuts = new TH1D("h_truesliceid_pion_cuts","h_truesliceid_pion_cuts;True SliceID", nthinslices + 2, -1, nthinslices + 1);
   h_truesliceid_pioninelastic_all = new TH1D("h_truesliceid_pioninelastic_all","h_truesliceid_pioninelastic_all;True SliceID", nthinslices + 2, -1, nthinslices + 1);
@@ -124,44 +125,15 @@ void ThinSlice::ProcessEvent(const HadAna & evt, Unfold & uf){
             reco_incE[i]->Fill(sum_incE/vincE[i].size());
           }
         }
-
-        std::vector<std::vector<double>> vAngCorr(nthinslices);
-        if (evt.reco_beam_calo_wire->size()>=2){
-          for (size_t i = 0; i<evt.reco_beam_calo_wire->size(); ++i){
-            int this_sliceID = int((*evt.reco_beam_calo_Z)[i]/thinslicewidth);
-            if (this_sliceID>=nthinslices) continue;
-            if (this_sliceID<0) continue;
-            TVector3 pt0, pt1;
-            if (i !=  evt.reco_beam_calo_wire->size()-2){
-              pt0 = TVector3((*evt.reco_beam_calo_X)[i],
-                             (*evt.reco_beam_calo_Y)[i],
-                             (*evt.reco_beam_calo_Z)[i]);
-              pt1 = TVector3((*evt.reco_beam_calo_X)[i+1],
-                             (*evt.reco_beam_calo_Y)[i+1],
-                             (*evt.reco_beam_calo_Z)[i+1]);
-            }
-            else{
-              pt0 = TVector3((*evt.reco_beam_calo_X)[i],
-                             (*evt.reco_beam_calo_Y)[i],
-                             (*evt.reco_beam_calo_Z)[i]);
-              pt1 = TVector3((*evt.reco_beam_calo_X)[i-1],
-                             (*evt.reco_beam_calo_Y)[i-1],
-                             (*evt.reco_beam_calo_Z)[i-1]);
-            }
-            TVector3 dir = pt1 - pt0;
-            dir = dir.Unit();
-            vAngCorr[this_sliceID].push_back(dir.Z());
-          }
-          for (size_t i = 0; i<vAngCorr.size(); ++i){
-            if (!vAngCorr[i].empty()){
-              double sum_AngCorr = 0;
-              for (size_t j = 0; j<vAngCorr[i].size(); ++j){
-                sum_AngCorr += vAngCorr[i][j];
-              }
-              reco_AngCorr[i]->Fill(sum_AngCorr/vAngCorr[i].size());
-            }
-          }
-        }
+        TVector3 pt0(evt.reco_beam_calo_startX,
+                     evt.reco_beam_calo_startY,
+                     evt.reco_beam_calo_startZ);
+        TVector3 pt1(evt.reco_beam_calo_endX,
+                     evt.reco_beam_calo_endY,
+                     evt.reco_beam_calo_endZ);
+        TVector3 dir = pt1 - pt0;
+        dir = dir.Unit();
+        reco_AngCorr->Fill(dir.Z());
       }
 
       // True info
@@ -183,44 +155,15 @@ void ThinSlice::ProcessEvent(const HadAna & evt, Unfold & uf){
             true_incE[i]->Fill(sum_incE/vincE[i].size());
           }
         }
-
-        std::vector<std::vector<double>> vAngCorr(nthinslices);
-        if (evt.true_beam_traj_Z->size()>=2){
-          for (size_t i = 0; i<evt.true_beam_traj_Z->size(); ++i){
-            int this_sliceID = int((*evt.true_beam_traj_Z)[i]/thinslicewidth);
-            if (this_sliceID>=nthinslices) continue;
-            if (this_sliceID<0) continue;
-            TVector3 pt0, pt1;
-            if (i !=  evt.true_beam_traj_Z->size()-2){
-              pt0 = TVector3((*evt.true_beam_traj_X)[i],
-                             (*evt.true_beam_traj_Y)[i],
-                             (*evt.true_beam_traj_Z)[i]);
-              pt1 = TVector3((*evt.true_beam_traj_X)[i+1],
-                             (*evt.true_beam_traj_Y)[i+1],
-                             (*evt.true_beam_traj_Z)[i+1]);
-            }
-            else{
-              pt0 = TVector3((*evt.true_beam_traj_X)[i],
-                             (*evt.true_beam_traj_Y)[i],
-                             (*evt.true_beam_traj_Z)[i]);
-              pt1 = TVector3((*evt.true_beam_traj_X)[i-1],
-                             (*evt.true_beam_traj_Y)[i-1],
-                             (*evt.true_beam_traj_Z)[i-1]);
-            }
-            TVector3 dir = pt1 - pt0;
-            dir = dir.Unit();
-            vAngCorr[this_sliceID].push_back(dir.Z());
-          }
-          for (size_t i = 0; i<vAngCorr.size(); ++i){
-            if (!vAngCorr[i].empty()){
-              double sum_AngCorr = 0;
-              for (size_t j = 0; j<vAngCorr[i].size(); ++j){
-                sum_AngCorr += vAngCorr[i][j];
-              }
-              true_AngCorr[i]->Fill(sum_AngCorr/vAngCorr[i].size());
-            }
-          }
-        }
+        TVector3 pt0(evt.true_beam_startX,
+                     evt.true_beam_startY,
+                     evt.true_beam_startZ);
+        TVector3 pt1(evt.true_beam_endX,
+                     evt.true_beam_endY,
+                     evt.true_beam_endZ);
+        TVector3 dir = pt1 - pt0;
+        dir = dir.Unit();
+        true_AngCorr->Fill(dir.Z());
       }
     }
   }
@@ -340,18 +283,12 @@ void ThinSlice::CalcXS(const Unfold & uf){
   double err_recoincE[nthinslices] = {0};
   double reco_trueincE[nthinslices] = {0};
   double err_reco_trueincE[nthinslices] = {0};
-  double avg_trueAngCorr[nthinslices] = {0};
-  double avg_recoAngCorr[nthinslices] = {0};
-  double err_trueAngCorr[nthinslices] = {0};
-  double err_recoAngCorr[nthinslices] = {0};
-  double reco_trueAngCorr[nthinslices] = {0};
-  double err_reco_trueAngCorr[nthinslices] = {0};
   double truexs[nthinslices] = {0};
   double err_truexs[nthinslices] = {0};
 
   double NA=6.02214076e23;
   double MAr=39.95; //gmol
-  double Density = 1.39; // g/cm^3
+  double Density = 1.4; // g/cm^3
 
   for (int i = 0; i<nthinslices; ++i){
     
@@ -362,16 +299,10 @@ void ThinSlice::CalcXS(const Unfold & uf){
     err_recoincE[i] = reco_incE[i]->GetMeanError();
     reco_trueincE[i] = avg_recoincE[i] - avg_trueincE[i];
     err_reco_trueincE[i] = sqrt(pow(err_trueincE[i],2)+pow(err_recoincE[i],2));
-    avg_trueAngCorr[i] = true_AngCorr[i]->GetMean();
-    err_trueAngCorr[i] = true_AngCorr[i]->GetMeanError();
-    avg_recoAngCorr[i] = reco_AngCorr[i]->GetMean();
-    err_recoAngCorr[i] = reco_AngCorr[i]->GetMeanError();
-    reco_trueAngCorr[i] = avg_recoAngCorr[i] - avg_trueAngCorr[i];
-    err_reco_trueAngCorr[i] = sqrt(pow(err_trueAngCorr[i],2)+pow(err_recoAngCorr[i],2));
     //std::cout<<i<<" "<<avg_trueincE[i]<<std::endl;
     if (true_incidents[i] && true_interactions[i]){
-      truexs[i] = MAr/(Density*NA*thinslicewidth/avg_trueAngCorr[i])*log(true_incidents[i]/(true_incidents[i]-true_interactions[i]))*1e27;
-      err_truexs[i] = MAr/(Density*NA*thinslicewidth/avg_trueAngCorr[i])*1e27*sqrt(true_interactions[i]+pow(true_interactions[i],2)/true_incidents[i])/true_incidents[i];
+      truexs[i] = MAr/(Density*NA*thinslicewidth/true_AngCorr->GetMean())*log(true_incidents[i]/(true_incidents[i]-true_interactions[i]))*1e27;
+      err_truexs[i] = MAr/(Density*NA*thinslicewidth/true_AngCorr->GetMean())*1e27*sqrt(true_interactions[i]+pow(true_interactions[i],2)/true_incidents[i])/true_incidents[i];
     }
   }
 
@@ -379,17 +310,9 @@ void ThinSlice::CalcXS(const Unfold & uf){
   TGraphErrors *gr_recoincE = new TGraphErrors(nthinslices, &(slcid[0]), &(avg_recoincE[0]), 0, &(err_recoincE[0]));
   TGraphErrors *gr_reco_trueincE = new TGraphErrors(nthinslices, &(slcid[0]), &(reco_trueincE[0]), 0, &(err_reco_trueincE[0]));
 
-  TGraphErrors *gr_trueAngCorr = new TGraphErrors(nthinslices, &(slcid[0]), &(avg_trueAngCorr[0]), 0, &(err_trueAngCorr[0]));
-  TGraphErrors *gr_recoAngCorr = new TGraphErrors(nthinslices, &(slcid[0]), &(avg_recoAngCorr[0]), 0, &(err_recoAngCorr[0]));
-  TGraphErrors *gr_reco_trueAngCorr = new TGraphErrors(nthinslices, &(slcid[0]), &(reco_trueAngCorr[0]), 0, &(err_reco_trueAngCorr[0]));
-
   gr_trueincE->Write("gr_trueincE");
   gr_recoincE->Write("gr_recoincE");
   gr_reco_trueincE->Write("gr_reco_trueincE");
-
-  gr_trueAngCorr->Write("gr_trueAngCorr");
-  gr_recoAngCorr->Write("gr_recoAngCorr");
-  gr_reco_trueAngCorr->Write("gr_reco_trueAngCorr");
 
   TGraphErrors *gr_truexs = new TGraphErrors(nthinslices, &(avg_trueincE[0]), &(truexs[0]), 0, &(err_truexs[0]));
   

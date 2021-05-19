@@ -15,8 +15,8 @@ class ThinSlice {
 
   TH1D *reco_incE[nthinslices];
   TH1D *true_incE[nthinslices];
-  TH1D *reco_AngCorr[nthinslices];
-  TH1D *true_AngCorr[nthinslices];
+  TH1D *reco_AngCorr;
+  TH1D *true_AngCorr;
 
   TH1D *h_truesliceid_pion_all;
   TH1D *h_truesliceid_pion_uf;

@@ -14,6 +14,9 @@
   TH1D *pur_num_Inc = (TH1D*)file->Get("pur_num_Inc");
   TH1D *pur_den = (TH1D*)file->Get("pur_den");
 
+  TH1D *reco_AngCorr = (TH1D*)file->Get("reco_AngCorr");
+  TH1D *true_AngCorr = (TH1D*)file->Get("true_AngCorr");
+
   TH1D *h_truesliceid_pion_uf = (TH1D*)file->Get("h_truesliceid_pion_uf");
   TH1D *h_truesliceid_pioninelastic_uf = (TH1D*)file->Get("h_truesliceid_pioninelastic_uf");
 
@@ -153,7 +156,7 @@
 
   double NA=6.02214076e23;
   double MAr=39.95; //gmol
-  double Density = 1.39; // g/cm^3
+  double Density = 1.4; // g/cm^3
 
   double xs[nthinslices] = {0};
   double err_xs[nthinslices] = {0};
@@ -162,9 +165,9 @@
   TGraphErrors *gr_trueincE = (TGraphErrors*)file->Get("gr_trueincE");
   TGraphErrors *gr_truexs = (TGraphErrors*)file->Get("gr_truexs");
   for (int i = 0; i<nthinslices; ++i){
-    xs[i] = MAr/(Density*NA*thinslicewidth)*log(Ninc[i]/(Ninc[i]-Nint[i]))*1e27;
+    xs[i] = MAr/(Density*NA*thinslicewidth/true_AngCorr->GetMean())*log(Ninc[i]/(Ninc[i]-Nint[i]))*1e27;
     //err_xs[i] = MAr/(Density*NA*thinslicewidth)*1e27*sqrt(N_int[i]+pow(N_int[i],2)/N_inc[i])/N_incidents[i];
-    err_xs[i] = MAr/(Density*NA*thinslicewidth)*1e27*sqrt(pow(Nint[i]*err_inc[i]/Ninc[i]/(Ninc[i]-Nint[i]),2)+pow(err_int[i]/(Ninc[i]-Nint[i]),2));
+    err_xs[i] = MAr/(Density*NA*thinslicewidth/true_AngCorr->GetMean())*1e27*sqrt(pow(Nint[i]*err_inc[i]/Ninc[i]/(Ninc[i]-Nint[i]),2)+pow(err_int[i]/(Ninc[i]-Nint[i]),2));
     incE[i] = gr_trueincE->GetPointY(i);
     //std::cout<<i<<" "<<Ninc[i]<<" "<<Nint[i]<<" "<<xs[i]<<" "<<incE[i]<<std::endl;
   }
