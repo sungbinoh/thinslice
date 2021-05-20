@@ -96,6 +96,7 @@ void ThinSlice::ProcessEvent(const HadAna & evt, Unfold & uf){
   if (evt.MC){
     true_sliceID = int(evt.true_beam_endZ/thinslicewidth);
     if (true_sliceID < 0) true_sliceID = -1;
+    if (evt.true_beam_endZ < 0) true_sliceID = -1;
     if (true_sliceID >= nthinslices) true_sliceID = nthinslices;
     if (evt.true_beam_PDG == 211){
       for (int i = 0; i<=true_sliceID; ++i){
@@ -171,6 +172,7 @@ void ThinSlice::ProcessEvent(const HadAna & evt, Unfold & uf){
   if (!evt.reco_beam_calo_wire->empty()){
     reco_sliceID = int(evt.reco_beam_calo_endZ/thinslicewidth);
     if (reco_sliceID < 0) reco_sliceID = -1;
+    if (evt.reco_beam_calo_endZ < 0) reco_sliceID = -1;
     if (reco_sliceID >= nthinslices) reco_sliceID = nthinslices;
   }
 

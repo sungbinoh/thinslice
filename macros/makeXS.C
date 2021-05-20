@@ -203,5 +203,14 @@
   c5->Print("plots/xs_pi+inel.pdf");
   c6->Print("plots/xs_Ninc.pdf");
   c7->Print("plots/xs_Nint.pdf");
+
+  c1->Print("plots/xs_sliceidinc_reco.png");
+  c2->Print("plots/xs_sliceidinc_true.png");
+  c3->Print("plots/xs_sliceidint_reco.png");
+  c4->Print("plots/xs_sliceidint_true.png");
+  c5->Print("plots/xs_pi+inel.png");
+  c6->Print("plots/xs_Ninc.png");
+  c7->Print("plots/xs_Nint.png");
+
 }
   
