@@ -182,6 +182,7 @@
   gr_recoxs->SetTitle("Pion Inelastic Cross Section");
   gr_recoxs->GetXaxis()->SetTitle("Pion Kinetic Energy (MeV)");
   gr_recoxs->GetYaxis()->SetTitle("#sigma_{inelastic} (mb)");
+  gr_recoxs->GetYaxis()->SetRangeUser(400, 900);
   gr_recoxs->SetLineWidth(2);
   gr_recoxs->Draw("ape");
   gr_truexs->SetMarkerColor(3);
@@ -189,7 +190,7 @@
   gr_truexs->Draw("pe");
   total_inel_KE->SetLineColor(2);
   total_inel_KE->Draw("c");
-  TLegend *leg5 = new TLegend(0.3,0.6,0.8,0.9);
+  TLegend *leg5 = new TLegend(0.3,0.65,0.8,0.9);
   leg5->SetFillStyle(0);
   leg5->AddEntry(gr_recoxs, "MC with reco information", "pe");
   leg5->AddEntry(gr_truexs, "MC with truth information", "pe");
