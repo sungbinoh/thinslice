@@ -364,12 +364,22 @@ void ThinSlice::Run(HadAna & evt, Unfold & uf){
     FillHistograms(kNocut, evt);
     if (evt.PassPandoraSliceCut()){
       FillHistograms(kPandoraSlice, evt);
-      if (evt.PassBeamQualityCut()){
-        FillHistograms(kBeamQuality, evt);
-        if (evt.PassAPA3Cut()){
-          FillHistograms(kAPA3, evt);
-          if (evt.PassCaloSizeCut()){
-            FillHistograms(kCaloSize, evt);
+      if (evt.PassCaloSizeCut()){
+        FillHistograms(kCaloSize, evt);
+        if (evt.PassBeamQualityCut()){
+          FillHistograms(kBeamQuality, evt);
+          if (evt.PassAPA3Cut()){
+            FillHistograms(kAPA3, evt);
+            /*
+            if (evt.GetParType() == kPiInel && evt.daughter_michel_score > 0.99){
+              std::cout<<evt.run<<" "<<evt.subrun<<" "<<evt.event<<std::endl;
+              if (!evt.reco_daughter_PFP_michelScore_collection->empty()){
+                for (size_t i = 0; i<evt.reco_daughter_PFP_michelScore_collection->size(); ++i){
+                  std::cout<<i<<" "<<(*evt.reco_daughter_PFP_michelScore_collection)[i]<<" "<<(*evt.reco_daughter_PFP_nHits_collection)[i]<<std::endl;
+                }
+              }
+            }
+            */
             if (evt.PassMichelScoreCut()){
               FillHistograms(kMichelScore, evt);
               if (evt.PassMediandEdxCut()){

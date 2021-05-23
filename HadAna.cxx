@@ -121,19 +121,18 @@ void HadAna::ProcessEvent(){
   partype = -1;
 
   median_dEdx = -1;
-  daughter_michel_score = -1;
+  daughter_michel_score = 0;
   if (!reco_beam_calo_wire->empty()){
 
     median_dEdx = TMath::Median(reco_beam_calibrated_dEdX_SCE->size(), &(*reco_beam_calibrated_dEdX_SCE)[0]);
-    if (!reco_daughter_PFP_michelScore_collection->empty()){
-      daughter_michel_score = TMath::MaxElement(reco_daughter_PFP_michelScore_collection->size(), &(*reco_daughter_PFP_michelScore_collection)[0]);
-      //std::cout<<daughter_michel_score<<std::endl;
+    int nhits = 0;
+    for (size_t i = 0; i<reco_daughter_PFP_michelScore_collection->size(); ++i){
+      nhits += (*reco_daughter_PFP_nHits_collection)[i];
+      daughter_michel_score += (*reco_daughter_PFP_michelScore_collection)[0] * (*reco_daughter_PFP_nHits_collection)[i];
     }
-    else{
-      daughter_michel_score = 0;
-    }
+    if (nhits) daughter_michel_score/=nhits;
   }
-
+  
   if (MC){
     partype = GetParType();
   }

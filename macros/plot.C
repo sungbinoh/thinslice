@@ -16,7 +16,7 @@ void PrintEvents(string name){
   }
 
   for (int i = 0; i<nCuts; ++i){
-    cout<<cutName[i]<<endl;
+    cout<<"=========="<<cutName[i]<<"=========="<<endl;
     for (int j =0; j<nParTypes+1; ++j){
       cout<<parTypeName[j]<<" "<<h[i][j]->GetEntries()<<endl;
     }
