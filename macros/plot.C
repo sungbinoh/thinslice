@@ -17,7 +17,7 @@ void PrintEvents(string name){
 
   for (int i = 0; i<nCuts; ++i){
     cout<<cutName[i]<<endl;
-    for (int j =0; j<5; ++j){
+    for (int j =0; j<nParTypes+1; ++j){
       cout<<parTypeName[j]<<" "<<h[i][j]->GetEntries()<<endl;
     }
   }
@@ -33,28 +33,36 @@ void plot1d(string name, int cut, string xtitle, string ytitle){
   }
   TCanvas *can = new TCanvas(Form("can_%d",nc), Form("can_%d",nc));
   THStack *hs = new THStack(Form("hs_%d",nc),"");
-  h[cut][3]->SetFillColor(kRed);
-  h[cut][3]->SetLineWidth(0);
-  hs->Add(h[cut][3]);
-  h[cut][2]->SetFillColor(kBlue);
-  h[cut][2]->SetLineWidth(0);
-  hs->Add(h[cut][2]);
-  h[cut][1]->SetFillColor(kGreen);
-  h[cut][1]->SetLineWidth(0);
-  hs->Add(h[cut][1]);
-  h[cut][4]->SetFillColor(6);
-  h[cut][4]->SetLineWidth(0);
-  hs->Add(h[cut][4]);
+  for (int i = 0; i<nParTypes; ++i){
+    h[cut][i+1]->SetFillColor(i!=8?i+2:i+3);
+    h[cut][i+1]->SetLineWidth(0);
+    hs->Add(h[cut][i+1]);
+  }
+//  h[cut][3]->SetFillColor(kRed);
+//  h[cut][3]->SetLineWidth(0);
+//  hs->Add(h[cut][3]);
+//  h[cut][2]->SetFillColor(kBlue);
+//  h[cut][2]->SetLineWidth(0);
+//  hs->Add(h[cut][2]);
+//  h[cut][1]->SetFillColor(kGreen);
+//  h[cut][1]->SetLineWidth(0);
+//  hs->Add(h[cut][1]);
+//  h[cut][4]->SetFillColor(6);
+//  h[cut][4]->SetLineWidth(0);
+//  hs->Add(h[cut][4]);
   hs->Draw("hist");
   hs->SetTitle(cutName[cut]);
   hs->GetXaxis()->SetTitle(xtitle.c_str());
   hs->GetYaxis()->SetTitle(ytitle.c_str());
-  TLegend *leg = new TLegend(0.6,0.6,0.9,0.9);
+  TLegend *leg = new TLegend(0.6,0.4,0.9,0.9);
   leg->SetFillStyle(0);
-  leg->AddEntry(h[cut][3],"#pi^{+} inelastic","f");
-  leg->AddEntry(h[cut][4],"#pi^{+} elastic","f");
-  leg->AddEntry(h[cut][2],"#mu^{+}","f");
-  leg->AddEntry(h[cut][1],"Misidentified","f");
+  for (int i = 0; i<nParTypes; ++i){
+    leg->AddEntry(h[cut][i+1], parTypeName[i+1],"f");
+  }
+//  leg->AddEntry(h[cut][3],"#pi^{+} inelastic","f");
+//  leg->AddEntry(h[cut][4],"#pi^{+} elastic","f");
+//  leg->AddEntry(h[cut][2],"#mu^{+}","f");
+//  leg->AddEntry(h[cut][1],"Misidentified","f");
   leg->Draw();
   can->Print(Form("plots/can_%s_%s.png",name.c_str(), cutName[cut]));
   can->Print(Form("plots/can_%s_%s.pdf",name.c_str(), cutName[cut]));

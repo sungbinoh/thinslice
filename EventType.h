@@ -3,37 +3,31 @@
 
 #include "anavar.h"
 
-const unsigned int nParTypes = 13;
+const unsigned int nParTypes = 9;
 
 const char parTypeName[nParTypes+1][100] = {"all",
-                                            "MisID",
-                                            "PrimMuP",
-                                            "PrimPiPInEl",
-                                            "PrimPiPEl",
-                                            "PrimKaPInEl",
-                                            "PrimKaPEl",
-                                            "PrimProInEl",
-                                            "PrimProEl",
-                                            "PrimMuM",
-                                            "PrimPiMInEl",
-                                            "PrimPiMEl",
-                                            "PrimKaMInEl",
-                                            "Other"};
+                                            "PiInel",
+                                            "PiElas",
+                                            "Muon",
+                                            "misID:cosmic",
+                                            "misID:p",
+                                            "misID:pi",
+                                            "misID:mu",
+                                            "misID:e/g",
+                                            "misID:other"};
+
+
 
 enum parType{
-  kMisID = 1,
-  kPrimMuP,
-  kPrimPiPInEl,
-  kPrimPiPEl,
-  kPrimKaPInEl,
-  kPrimKaPEl,
-  kPrimProInEl,
-  kPrimProEl,
-  kPrimMuM,
-  kPrimPiMInEl,
-  kPrimPiMEl,
-  kPrimKaMInEl,
-  kOther
+  kPiInel = 1,
+  kPiElas,
+  kMuon,
+  kMIDcosmic,
+  kMIDp,
+  kMIDpi,
+  kMIDmu,
+  kMIDeg,
+  kMIDother
 };
 
 #endif

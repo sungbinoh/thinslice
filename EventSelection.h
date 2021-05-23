@@ -7,18 +7,18 @@ const unsigned int nCuts = 7;
 
 const char cutName[nCuts][100] = {"Nocut",
                                   "PandoraSlice",
+                                  "CaloSize",
                                   "BeamQuality",
                                   "APA3",
-                                  "CaloSize",
                                   "MichelScore",
                                   "MediandEdx"};
 
 enum cut{
   kNocut = 0,
   kPandoraSlice,
+  kCaloSize,
   kBeamQuality,
   kAPA3,
-  kCaloSize,
   kMichelScore,
   kMediandEdx
 };

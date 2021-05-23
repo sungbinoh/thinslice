@@ -14,28 +14,38 @@ bool HadAna::isTrueSelectedPart() const{
 int HadAna::GetParType(){
 
   if (!reco_beam_true_byE_matched){
-    return kMisID;
+    if (reco_beam_true_byE_origin == 2) {
+      return kMIDcosmic;
+    }
+    else if (std::abs(reco_beam_true_byE_PDG) == 211){
+      return kMIDpi;
+    }
+    else if (reco_beam_true_byE_PDG == 2212){
+      return kMIDp;
+    }
+    else if (std::abs(reco_beam_true_byE_PDG) == 13){
+      return kMIDmu;
+    }
+    else if (std::abs(reco_beam_true_byE_PDG) == 11 ||
+             reco_beam_true_byE_PDG == 22){
+      return kMIDeg;
+    }
+    else {
+      //std::cout<<reco_beam_true_byE_PDG<<std::endl;
+      return kMIDother;
+    }
   }
   else if (true_beam_PDG == -13){
-    return kPrimMuP;
-  }
-  else if (true_beam_PDG == 13){
-    return kPrimMuM;
+    return kMuon;
   }
   else if (true_beam_PDG == 211){
     if ((*true_beam_endProcess) == "pi+Inelastic"){
-      return kPrimPiPInEl;
+      return kPiInel;
     }
-    else return kPrimPiPEl;
-  }
-  else if (true_beam_PDG == 2212){
-    if ((*true_beam_endProcess) == "protonInelastic"){
-      return kPrimProInEl;
-    }
-    else return kPrimProEl;
+    else return kPiElas;
   }
   
-  return kOther;
+  return kMIDother;
 }
 
 
@@ -99,9 +109,9 @@ bool HadAna::PassMediandEdxCut() const{
 
 bool HadAna::PassAllCuts() const{
   return PassPandoraSliceCut()&&
+    PassCaloSizeCut()&&
     PassBeamQualityCut()&&
     PassAPA3Cut()&&
-    PassCaloSizeCut()&&
     PassMichelScoreCut()&&
     PassMediandEdxCut();
 }
