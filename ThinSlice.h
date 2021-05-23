@@ -52,6 +52,11 @@ class ThinSlice {
   TH1D *hmediandEdx[nCuts][nParTypes+1];
   TH1D *hdaughter_michel_score[nCuts][nParTypes+1];
 
+  TH1D *hdeltax[nCuts][nParTypes+1];
+  TH1D *hdeltay[nCuts][nParTypes+1];
+  TH1D *hdeltaz[nCuts][nParTypes+1];
+  TH1D *hcostheta[nCuts][nParTypes+1];
+
   std::string fOutputFileName;
   TFile *outputFile;
   void SetOutputFileName(std::string name){fOutputFileName = name;};

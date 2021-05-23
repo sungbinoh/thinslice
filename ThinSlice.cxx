@@ -75,6 +75,18 @@ void ThinSlice::BookHistograms(){
       hdaughter_michel_score[i][j] = new TH1D(Form("hdaughter_michel_score_%d_%d",i,j), Form("daughter_michel_score, %s, %s;Michel score", cutName[i], parTypeName[j]), 100, 0, 1);
       hdaughter_michel_score[i][j]->Sumw2();
 
+      hdeltax[i][j] = new TH1D(Form("hdeltax_%d_%d",i,j), Form("deltax, %s, %s;#Delta x (cm)", cutName[i], parTypeName[j]), 100, -10, 10);
+      hdeltax[i][j]->Sumw2();
+
+      hdeltay[i][j] = new TH1D(Form("hdeltay_%d_%d",i,j), Form("deltay, %s, %s;#Delta y (cm)", cutName[i], parTypeName[j]), 100, -10, 10);
+      hdeltay[i][j]->Sumw2();
+
+      hdeltaz[i][j] = new TH1D(Form("hdeltaz_%d_%d",i,j), Form("deltaz, %s, %s;#Delta z (cm)", cutName[i], parTypeName[j]), 100, -10, 10);
+      hdeltaz[i][j]->Sumw2();
+
+      hcostheta[i][j] = new TH1D(Form("hcostheta_%d_%d",i,j), Form("costheta, %s, %s;cos#theta", cutName[i], parTypeName[j]), 100, 0, 1);
+      hcostheta[i][j]->Sumw2();
+
     }
   }
 
@@ -263,6 +275,14 @@ void ThinSlice::FillHistograms(int cut, const HadAna & evt){
 
       FillHistVec1D(hmediandEdx[cut], evt.median_dEdx, evt.partype);
       FillHistVec1D(hdaughter_michel_score[cut], evt.daughter_michel_score, evt.partype);
+
+      FillHistVec1D(hdeltax[cut], evt.reco_beam_startX, evt.partype);
+      FillHistVec1D(hdeltay[cut], evt.reco_beam_startY, evt.partype);
+      FillHistVec1D(hdeltaz[cut], evt.reco_beam_startZ, evt.partype);
+
+      double cos = evt.true_beam_startDirX*evt.reco_beam_trackDirX + evt.true_beam_startDirY*evt.reco_beam_trackDirY + evt.true_beam_startDirZ*evt.reco_beam_trackDirZ;
+      FillHistVec1D(hcostheta[cut], cos, evt.partype);
+
     }      
   }
 }
