@@ -54,7 +54,13 @@ void plot1d(string name, int cut, string xtitle, string ytitle){
   hs->SetTitle(cutName[cut]);
   hs->GetXaxis()->SetTitle(xtitle.c_str());
   hs->GetYaxis()->SetTitle(ytitle.c_str());
-  TLegend *leg = new TLegend(0.6,0.4,0.9,0.9);
+  TLegend *leg;
+  if (h[cut][0]->GetMaximumBin() < h[cut][0]->GetNbinsX()/2){
+    leg = new TLegend(0.6,0.4,0.9,0.9);
+  }
+  else{
+    leg = new TLegend(0.2,0.4,0.5,0.9);
+  }
   leg->SetFillStyle(0);
   for (int i = 0; i<nParTypes; ++i){
     leg->AddEntry(h[cut][i+1], parTypeName[i+1],"f");
@@ -103,6 +109,10 @@ void plot(){
     plot1d("hreco_sliceID", i, "Reco Slice ID", "Events");
     plot1d("hreco_true_beam_endZ_SCE", i, "Reco - True End Z SCE (cm)", "Events");
     plot2d("hreco_vs_true_beam_endZ_SCE",i);
+    plot1d("hdeltax", i, "#Delta x (cm)", "Events");
+    plot1d("hdeltay", i, "#Delta y (cm)", "Events");
+    plot1d("hdeltaz", i, "#Delta z (cm)", "Events");
+    plot1d("hcostheta", i, "cos#theta", "Events");
   }
 
   PrintEvents("htrue_beam_endZ_SCE");
