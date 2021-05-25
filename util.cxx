@@ -3,7 +3,10 @@
 void FillHistVec1D(TH1D *hist[nParTypes+1], const double &value, const int &partype){
   //hist[0]->Fill(value);
   if (partype>=0 && partype < nParTypes+1){
-    if (value<hist[partype]->GetXaxis()->GetXmax()){
+    if (value<hist[partype]->GetXaxis()->GetXmin()){
+      hist[partype]->Fill(hist[partype]->GetXaxis()->GetXmin());
+    }
+    else if (value<hist[partype]->GetXaxis()->GetXmax()){
       hist[partype]->Fill(value);
     }
     else{
@@ -18,3 +21,16 @@ void FillHistVec2D(TH2D *hist[nParTypes+1], const double &value1, const double &
     hist[partype]->Fill(value1, value2);
   }
 }
+
+void FillHist1D(TH1D *hist, const double &value, const double &wei){
+  if (value<hist->GetXaxis()->GetXmin()){
+    hist->Fill(hist->GetXaxis()->GetXmin(), wei);
+  }
+  else if (value<hist->GetXaxis()->GetXmax()){
+    hist->Fill(value, wei);
+  }
+  else{
+    hist->Fill(hist->GetXaxis()->GetXmax()-0.000001, wei);
+  }
+}
+

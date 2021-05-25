@@ -9,4 +9,6 @@ void FillHistVec1D(TH1D *hist[nParTypes+1], const double &value, const int &part
 
 void FillHistVec2D(TH2D *hist[nParTypes+1], const double &value1, const double &value2, const int &partype);
 
+void FillHist1D(TH1D *hist, const double &value, const double &wei);
+
 #endif

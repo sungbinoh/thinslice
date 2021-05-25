@@ -88,6 +88,13 @@ void ThinSlice::BookHistograms(){
       hcostheta[i][j]->Sumw2();
 
     }
+    for (int j = 0; j<100; ++j){
+      hmediandEdx_wei[i][j] = new TH1D(Form("hmediandEdx_wei_%d_%d",i,j), Form("mediandEdx, %s, i=%d;Median dE/dx (MeV/cm)", cutName[i], j), 100, 0, 5);
+      hmediandEdx_wei[i][j]->Sumw2();
+
+      hdaughter_michel_score_wei[i][j] = new TH1D(Form("hdaughter_michel_score_wei_%d_%d",i,j), Form("daughter_michel_score, %s, i=%d;Michel score", cutName[i], j), 100, 0, 1);
+      hdaughter_michel_score_wei[i][j]->Sumw2();
+    }
   }
 
    for (int i = 0; i<nthinslices; ++i){
@@ -153,7 +160,7 @@ void ThinSlice::ProcessEvent(const HadAna & evt, Unfold & uf){
       }
 
       // True info
-      if (!(evt.true_beam_traj_Z_SCE->empty())){
+      if (!(evt.true_beam_traj_Z->empty())){
         std::vector<std::vector<double>> vincE(nthinslices);
         for (size_t i = 0; i<evt.true_beam_traj_Z->size()-1; ++i){//last point always has KE = 0
           int this_sliceID = int((*evt.true_beam_traj_Z)[i]/thinslicewidth);
@@ -286,6 +293,21 @@ void ThinSlice::FillHistograms(int cut, const HadAna & evt){
       FillHistVec1D(hdeltaz[cut], evt.reco_beam_startZ, evt.partype);
       FillHistVec1D(hcostheta[cut], cos, evt.partype);
 
+      if (evt.partype == 0 && evt.MC){
+        for (int i = 0; i<100; ++i){
+          double wei = 1;
+          if (evt.true_beam_PDG == -13){
+            wei = 0.5+i*0.01;
+          }
+          FillHist1D(hdaughter_michel_score_wei[cut][i], evt.daughter_michel_score, wei);
+          
+          wei = 1;
+          if ((*evt.true_beam_endProcess) == "pi+Inelastic" && evt.true_beam_endZ<0){
+            wei = 0.5+i*0.01;
+          }
+          FillHist1D(hmediandEdx_wei[cut][i], evt.median_dEdx, wei);
+        }
+      }
     }      
   }
 }
