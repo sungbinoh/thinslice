@@ -105,6 +105,9 @@ void ThinSlice::ProcessEvent(const HadAna & evt, Unfold & uf){
   reco_sliceID = -1;
   true_sliceID = -1;
 
+  isTestSample = (evt.partype == kData);
+  //if (evt.MC && evt.event%2 == 0) isTestSample = false;
+
   if (evt.MC){
     true_sliceID = int(evt.true_beam_endZ/thinslicewidth);
     if (true_sliceID < 0) true_sliceID = -1;
@@ -188,65 +191,64 @@ void ThinSlice::ProcessEvent(const HadAna & evt, Unfold & uf){
     if (reco_sliceID >= nthinslices) reco_sliceID = nthinslices;
   }
 
-  bool isTestSample = true;
-  if (evt.MC && evt.event%2 == 0) isTestSample = false;
-
-  if (evt.true_beam_PDG == 211){
-    if (isTestSample){
-      h_truesliceid_pion_all->Fill(true_sliceID);
-    }
-    else{
-      uf.eff_den_Inc->Fill(true_sliceID);
-    }
-    //if (evt.PassAllCuts() && evt.reco_beam_true_byE_matched){
-    if (evt.PassAllCuts()){
+  if (evt.MC){
+    if (evt.true_beam_PDG == 211){
       if (isTestSample){
-        h_recosliceid_pion_cuts->Fill(reco_sliceID);
-        h_truesliceid_pion_cuts->Fill(true_sliceID);
+        h_truesliceid_pion_all->Fill(true_sliceID);
       }
       else{
-        uf.eff_num_Inc->Fill(true_sliceID);
-        uf.pur_num_Inc->Fill(reco_sliceID);
-        uf.response_SliceID_Inc.Fill(reco_sliceID, true_sliceID);
+        uf.eff_den_Inc->Fill(true_sliceID);
       }
-    }
-    else {
-      if (!isTestSample){
-        uf.response_SliceID_Inc.Miss(true_sliceID);
-        //std::cout<<true_sliceID<<std::endl;
-      }
-    }
-
-    if ((*evt.true_beam_endProcess) == "pi+Inelastic"){
-      if (isTestSample){
-        h_truesliceid_pioninelastic_all->Fill(true_sliceID);
-      }
-      else{
-        uf.eff_den_Int->Fill(true_sliceID);
-      }
-      //if (evt.PassAllCuts() && evt.reco_beam_true_byE_matched){
-      if (evt.PassAllCuts()){
+      if (evt.PassAllCuts() && evt.reco_beam_true_byE_matched){
+        //if (evt.PassAllCuts()){
         if (isTestSample){
-          h_recosliceid_pioninelastic_cuts->Fill(reco_sliceID);
-          h_truesliceid_pioninelastic_cuts->Fill(true_sliceID);
+          h_recosliceid_pion_cuts->Fill(reco_sliceID);
+          h_truesliceid_pion_cuts->Fill(true_sliceID);
         }
         else{
-          uf.eff_num_Int->Fill(true_sliceID);
-          uf.pur_num_Int->Fill(reco_sliceID);
-          uf.response_SliceID_Int.Fill(reco_sliceID, true_sliceID);
+          uf.eff_num_Inc->Fill(true_sliceID);
+          uf.pur_num_Inc->Fill(reco_sliceID);
+          uf.response_SliceID_Inc.Fill(reco_sliceID, true_sliceID);
         }
       }
-      else{
-        if (!isTestSample) uf.response_SliceID_Int.Miss(true_sliceID);
+      else {
+        if (!isTestSample){
+          uf.response_SliceID_Inc.Miss(true_sliceID);
+          //std::cout<<true_sliceID<<std::endl;
+        }
+      }
+      
+      if ((*evt.true_beam_endProcess) == "pi+Inelastic"){
+        if (isTestSample){
+          h_truesliceid_pioninelastic_all->Fill(true_sliceID);
+        }
+        else{
+          uf.eff_den_Int->Fill(true_sliceID);
+        }
+        if (evt.PassAllCuts() && evt.reco_beam_true_byE_matched){
+          //if (evt.PassAllCuts()){
+          if (isTestSample){
+            h_recosliceid_pioninelastic_cuts->Fill(reco_sliceID);
+            h_truesliceid_pioninelastic_cuts->Fill(true_sliceID);
+          }
+          else{
+            uf.eff_num_Int->Fill(true_sliceID);
+            uf.pur_num_Int->Fill(reco_sliceID);
+            uf.response_SliceID_Int.Fill(reco_sliceID, true_sliceID);
+          }
+        }
+        else{
+          if (!isTestSample) uf.response_SliceID_Int.Miss(true_sliceID);
+        }
       }
     }
-  }
-  if (evt.PassAllCuts()){
-    if (isTestSample){
-      h_recosliceid_allevts_cuts->Fill(reco_sliceID);
-    }
-    else {
-      uf.pur_den->Fill(reco_sliceID);
+    if (evt.PassAllCuts()){
+      if (isTestSample){
+        h_recosliceid_allevts_cuts->Fill(reco_sliceID);
+      }
+      else {
+        uf.pur_den->Fill(reco_sliceID);
+      }
     }
   }
 }

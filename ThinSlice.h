@@ -13,6 +13,8 @@ class ThinSlice {
   int reco_sliceID;
   int true_sliceID;
 
+  bool isTestSample;
+
   TH1D *reco_incE[nthinslices];
   TH1D *true_incE[nthinslices];
   TH1D *reco_AngCorr;

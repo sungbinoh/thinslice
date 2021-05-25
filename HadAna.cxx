@@ -13,7 +13,13 @@ bool HadAna::isTrueSelectedPart() const{
 
 int HadAna::GetParType(){
 
-  if (!reco_beam_true_byE_matched){
+  if (!MC){
+    return kData;
+  }
+  else if (event%2){
+    return kData;
+  }
+  else if (!reco_beam_true_byE_matched){
     if (reco_beam_true_byE_origin == 2) {
       return kMIDcosmic;
     }

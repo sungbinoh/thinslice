@@ -5,7 +5,7 @@
 
 const unsigned int nParTypes = 9;
 
-const char parTypeName[nParTypes+1][100] = {"all",
+const char parTypeName[nParTypes+1][100] = {"Data",
                                             "PiInel",
                                             "PiElas",
                                             "Muon",
@@ -13,13 +13,14 @@ const char parTypeName[nParTypes+1][100] = {"all",
                                             "misID:p",
                                             "misID:pi",
                                             "misID:mu",
-                                            "misID:e/g",
+                                            "misID:e/#gamma",
                                             "misID:other"};
 
 
 
 enum parType{
-  kPiInel = 1,
+  kData,
+  kPiInel,
   kPiElas,
   kMuon,
   kMIDcosmic,

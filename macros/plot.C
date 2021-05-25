@@ -4,39 +4,49 @@
 
 int nc = 0;
 
-TFile *f;
+TFile *fmc;
+TFile *fdata;
 
 void PrintEvents(string name){
-  
-  TH1D *h[nCuts][nParTypes+1];
+
+  TH1D *hdata[nCuts];
+  TH1D *hmc[nCuts][nParTypes+1];
   for (int i = 0; i < nCuts; ++i){
     for (int j = 0; j < nParTypes+1; ++j){
-      h[i][j] = (TH1D*)f->Get(Form("%s_%d_%d",name.c_str(),i,j));
+      hmc[i][j] = (TH1D*)fmc->Get(Form("%s_%d_%d",name.c_str(),i,j));
     }
+    hdata[i] = (TH1D*)fmc->Get(Form("%s_%d_%d",name.c_str(),i,0));
   }
-
+  
   for (int i = 0; i<nCuts; ++i){
     cout<<"=========="<<cutName[i]<<"=========="<<endl;
     for (int j =0; j<nParTypes+1; ++j){
-      cout<<parTypeName[j]<<" "<<h[i][j]->GetEntries()<<endl;
+      if (j==0){
+        cout<<parTypeName[j]<<" "<<hdata[i]->GetEntries()<<endl;
+      }
+      else{
+        cout<<parTypeName[j]<<" "<<hmc[i][j]->GetEntries()<<endl;
+      }
     }
   }
 }
 
 void plot1d(string name, int cut, string xtitle, string ytitle){
 
-  TH1D *h[nCuts][nParTypes+1];
+  TH1D *hdata[nCuts];
+  TH1D *hmc[nCuts][nParTypes+1];
   for (int i = 0; i < nCuts; ++i){
     for (int j = 0; j < nParTypes+1; ++j){
-      h[i][j] = (TH1D*)f->Get(Form("%s_%d_%d",name.c_str(),i,j));
+      hmc[i][j] = (TH1D*)fmc->Get(Form("%s_%d_%d",name.c_str(),i,j));
     }
+    hdata[i] = (TH1D*)fmc->Get(Form("%s_%d_%d",name.c_str(),i,0));
   }
   TCanvas *can = new TCanvas(Form("can_%d",nc), Form("can_%d",nc));
   THStack *hs = new THStack(Form("hs_%d",nc),"");
   for (int i = 0; i<nParTypes; ++i){
-    h[cut][i+1]->SetFillColor(i!=8?i+2:i+3);
-    h[cut][i+1]->SetLineWidth(0);
-    hs->Add(h[cut][i+1]);
+    hmc[cut][i+1]->SetFillColor(i!=8?i+2:i+3);
+    hmc[cut][i+1]->SetLineWidth(0);
+    hs->Add(hmc[cut][i+1]);
   }
 //  h[cut][3]->SetFillColor(kRed);
 //  h[cut][3]->SetLineWidth(0);
@@ -50,20 +60,24 @@ void plot1d(string name, int cut, string xtitle, string ytitle){
 //  h[cut][4]->SetFillColor(6);
 //  h[cut][4]->SetLineWidth(0);
 //  hs->Add(h[cut][4]);
-  hs->Draw("hist");
+  hdata[cut]->SetMarkerStyle(20);
+  hdata[cut]->Draw();
+  hs->Draw("hist same");
   hs->SetTitle(cutName[cut]);
   hs->GetXaxis()->SetTitle(xtitle.c_str());
   hs->GetYaxis()->SetTitle(ytitle.c_str());
   TLegend *leg;
-  if (h[cut][0]->GetMaximumBin() < h[cut][0]->GetNbinsX()/2){
-    leg = new TLegend(0.6,0.4,0.9,0.9);
+  if (hmc[cut][0]->GetMaximumBin() < hmc[cut][0]->GetNbinsX()/2){
+    leg = new TLegend(0.55,0.7,0.9,0.9);
   }
   else{
-    leg = new TLegend(0.2,0.4,0.5,0.9);
+    leg = new TLegend(0.15,0.7,0.5,0.9);
   }
   leg->SetFillStyle(0);
+  leg->SetNColumns(2);
+  leg->AddEntry(hdata[cut],parTypeName[0],"ple");
   for (int i = 0; i<nParTypes; ++i){
-    leg->AddEntry(h[cut][i+1], parTypeName[i+1],"f");
+    leg->AddEntry(hmc[cut][i+1], parTypeName[i+1],"f");
   }
 //  leg->AddEntry(h[cut][3],"#pi^{+} inelastic","f");
 //  leg->AddEntry(h[cut][4],"#pi^{+} elastic","f");
@@ -83,7 +97,7 @@ void plot2d(string name, int cut){
   TH2D *h[nCuts][nParTypes+1];
   for (int i = 0; i < nCuts; ++i){
     for (int j = 0; j < nParTypes+1; ++j){
-      h[i][j] = (TH2D*)f->Get(Form("%s_%d_%d",name.c_str(),i,j));
+      h[i][j] = (TH2D*)fmc->Get(Form("%s_%d_%d",name.c_str(),i,j));
     }
   }
   for (int i = 1; i<=4; ++i){
@@ -98,7 +112,8 @@ void plot(){
 
   gStyle->SetOptStat(0);
 
-  f = TFile::Open("../install/bin/mcprod4a.root");
+  fmc = TFile::Open("../install/bin/mcprod4a.root");
+  fdata = TFile::Open("../install/bin/mcprod4a.root");
 
   for (int i = 0; i<nCuts; ++i){
     plot1d("hmediandEdx", i, "Median dE/dx (MeV/cm)", "Events");
