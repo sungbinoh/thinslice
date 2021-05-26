@@ -72,7 +72,7 @@ void ThinSlice::BookHistograms(){
       hmediandEdx[i][j] = new TH1D(Form("hmediandEdx_%d_%d",i,j), Form("mediandEdx, %s, %s;Median dE/dx (MeV/cm)", cutName[i], parTypeName[j]), 100, 0, 5);
       hmediandEdx[i][j]->Sumw2();
 
-      hdaughter_michel_score[i][j] = new TH1D(Form("hdaughter_michel_score_%d_%d",i,j), Form("daughter_michel_score, %s, %s;Michel score", cutName[i], parTypeName[j]), 100, 0, 1);
+      hdaughter_michel_score[i][j] = new TH1D(Form("hdaughter_michel_score_%d_%d",i,j), Form("daughter_michel_score, %s, %s;Michel score", cutName[i], parTypeName[j]), 110, -0.1, 1);
       hdaughter_michel_score[i][j]->Sumw2();
 
       hdeltax[i][j] = new TH1D(Form("hdeltax_%d_%d",i,j), Form("deltax, %s, %s;#Delta x (cm)", cutName[i], parTypeName[j]), 100, -10, 10);
@@ -266,49 +266,49 @@ void ThinSlice::FillHistograms(int cut, const HadAna & evt){
     FillHistVec1D(htrue_beam_endZ[cut], evt.true_beam_endZ_SCE, evt.partype);
     FillHistVec1D(htrue_beam_endZ_SCE[cut], evt.true_beam_endZ, evt.partype);
     FillHistVec1D(htrue_sliceID[cut], true_sliceID, evt.partype);
-    if (!evt.reco_beam_calo_wire->empty()){
-      FillHistVec1D(hreco_beam_endZ[cut], evt.reco_beam_endZ, evt.partype);
-      FillHistVec1D(hreco_true_beam_endZ[cut], evt.reco_beam_endZ - evt.true_beam_endZ_SCE, evt.partype);
-      FillHistVec2D(hreco_vs_true_beam_endZ[cut], evt.true_beam_endZ_SCE, evt.reco_beam_endZ, evt.partype);
-      FillHistVec2D(hreco_true_vs_true_beam_endZ[cut], evt.true_beam_endZ_SCE, evt.reco_beam_endZ - evt.true_beam_endZ_SCE, evt.partype);
-
-      FillHistVec1D(hreco_beam_endZ_SCE[cut], evt.reco_beam_calo_endZ, evt.partype);
-      FillHistVec1D(hreco_true_beam_endZ_SCE[cut], evt.reco_beam_calo_endZ - evt.true_beam_endZ, evt.partype);
-      FillHistVec2D(hreco_vs_true_beam_endZ_SCE[cut], evt.true_beam_endZ, evt.reco_beam_calo_endZ, evt.partype);
-      FillHistVec2D(hreco_true_vs_true_beam_endZ_SCE[cut], evt.true_beam_endZ, evt.reco_beam_calo_endZ - evt.true_beam_endZ, evt.partype);
-      
-      FillHistVec1D(hreco_sliceID[cut], reco_sliceID, evt.partype);
-      FillHistVec1D(hreco_true_sliceID[cut], reco_sliceID - true_sliceID, evt.partype);
-      FillHistVec2D(hreco_vs_true_sliceID[cut], true_sliceID, reco_sliceID, evt.partype);
-      FillHistVec2D(hreco_true_vs_true_sliceID[cut], true_sliceID, reco_sliceID - true_sliceID, evt.partype);
-
-      FillHistVec1D(hmediandEdx[cut], evt.median_dEdx, evt.partype);
-      FillHistVec1D(hdaughter_michel_score[cut], evt.daughter_michel_score, evt.partype);
-
-      double projectX = (evt.true_beam_startX + -1*evt.true_beam_startZ*(evt.true_beam_startDirX/evt.true_beam_startDirZ) );
-      double projectY = (evt.true_beam_startY + -1*evt.true_beam_startZ*(evt.true_beam_startDirY/evt.true_beam_startDirZ) );
-      double cos = evt.true_beam_startDirX*evt.reco_beam_trackDirX + evt.true_beam_startDirY*evt.reco_beam_trackDirY + evt.true_beam_startDirZ*evt.reco_beam_trackDirZ;
-      FillHistVec1D(hdeltax[cut], evt.reco_beam_startX - projectX, evt.partype);
-      FillHistVec1D(hdeltay[cut], evt.reco_beam_startY - projectY, evt.partype);
-      FillHistVec1D(hdeltaz[cut], evt.reco_beam_startZ, evt.partype);
-      FillHistVec1D(hcostheta[cut], cos, evt.partype);
-
-      if (evt.partype == 0 && evt.MC){
-        for (int i = 0; i<100; ++i){
-          double wei = 1;
-          if (evt.true_beam_PDG == -13){
-            wei = 0.5+i*0.01;
-          }
-          FillHist1D(hdaughter_michel_score_wei[cut][i], evt.daughter_michel_score, wei);
-          
-          wei = 1;
-          if ((*evt.true_beam_endProcess) == "pi+Inelastic" && evt.true_beam_endZ<0){
-            wei = 0.5+i*0.01;
-          }
-          FillHist1D(hmediandEdx_wei[cut][i], evt.median_dEdx, wei);
+    //    if (!evt.reco_beam_calo_wire->empty()){
+    FillHistVec1D(hreco_beam_endZ[cut], evt.reco_beam_endZ, evt.partype);
+    FillHistVec1D(hreco_true_beam_endZ[cut], evt.reco_beam_endZ - evt.true_beam_endZ_SCE, evt.partype);
+    FillHistVec2D(hreco_vs_true_beam_endZ[cut], evt.true_beam_endZ_SCE, evt.reco_beam_endZ, evt.partype);
+    FillHistVec2D(hreco_true_vs_true_beam_endZ[cut], evt.true_beam_endZ_SCE, evt.reco_beam_endZ - evt.true_beam_endZ_SCE, evt.partype);
+    
+    FillHistVec1D(hreco_beam_endZ_SCE[cut], evt.reco_beam_calo_endZ, evt.partype);
+    FillHistVec1D(hreco_true_beam_endZ_SCE[cut], evt.reco_beam_calo_endZ - evt.true_beam_endZ, evt.partype);
+    FillHistVec2D(hreco_vs_true_beam_endZ_SCE[cut], evt.true_beam_endZ, evt.reco_beam_calo_endZ, evt.partype);
+    FillHistVec2D(hreco_true_vs_true_beam_endZ_SCE[cut], evt.true_beam_endZ, evt.reco_beam_calo_endZ - evt.true_beam_endZ, evt.partype);
+    
+    FillHistVec1D(hreco_sliceID[cut], reco_sliceID, evt.partype);
+    FillHistVec1D(hreco_true_sliceID[cut], reco_sliceID - true_sliceID, evt.partype);
+    FillHistVec2D(hreco_vs_true_sliceID[cut], true_sliceID, reco_sliceID, evt.partype);
+    FillHistVec2D(hreco_true_vs_true_sliceID[cut], true_sliceID, reco_sliceID - true_sliceID, evt.partype);
+    
+    FillHistVec1D(hmediandEdx[cut], evt.median_dEdx, evt.partype);
+    FillHistVec1D(hdaughter_michel_score[cut], evt.daughter_michel_score, evt.partype);
+    
+    double projectX = (evt.true_beam_startX + -1*evt.true_beam_startZ*(evt.true_beam_startDirX/evt.true_beam_startDirZ) );
+    double projectY = (evt.true_beam_startY + -1*evt.true_beam_startZ*(evt.true_beam_startDirY/evt.true_beam_startDirZ) );
+    double cos = evt.true_beam_startDirX*evt.reco_beam_trackDirX + evt.true_beam_startDirY*evt.reco_beam_trackDirY + evt.true_beam_startDirZ*evt.reco_beam_trackDirZ;
+    FillHistVec1D(hdeltax[cut], evt.reco_beam_startX - projectX, evt.partype);
+    FillHistVec1D(hdeltay[cut], evt.reco_beam_startY - projectY, evt.partype);
+    FillHistVec1D(hdeltaz[cut], evt.reco_beam_startZ, evt.partype);
+    FillHistVec1D(hcostheta[cut], cos, evt.partype);
+    
+    if (evt.partype == 0 && evt.MC){
+      for (int i = 0; i<100; ++i){
+        double wei = 1;
+        if (evt.true_beam_PDG == -13){
+          wei = 0.5+i*0.01;
         }
+        FillHist1D(hdaughter_michel_score_wei[cut][i], evt.daughter_michel_score, wei);
+        
+        wei = 1;
+        if ((*evt.true_beam_endProcess) == "pi+Inelastic" && evt.true_beam_endZ<0){
+          wei = 0.5+i*0.01;
+        }
+        FillHist1D(hmediandEdx_wei[cut][i], evt.median_dEdx, wei);
       }
-    }      
+    }
+    //    }  
   }
 }
 
@@ -403,7 +403,7 @@ void ThinSlice::Run(HadAna & evt, Unfold & uf){
     // if (Cut(ientry) < 0) continue;
     //std::cout<<evt.run<<" "<<evt.event<<" "<<evt.MC<<" "<<evt.reco_beam_true_byE_matched<<" "<<evt.true_beam_PDG<<" "<<(*evt.true_beam_endProcess)<<std::endl;
     //std::cout<<GetParType(ana)<<std::endl;
-    if (!evt.isTrueSelectedPart()) continue;
+    if (!evt.isSelectedPart()) continue;
     evt.ProcessEvent();
     ProcessEvent(evt, uf);
     FillHistograms(kNocut, evt);

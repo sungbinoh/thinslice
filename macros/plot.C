@@ -3,6 +3,8 @@
 #include "TLegend.h"
 
 int nc = 0;
+double totaldata = 0;
+double totalmc = 0;
 
 TFile *fmc;
 TFile *fdata;
@@ -15,7 +17,7 @@ void PrintEvents(string name){
     for (int j = 0; j < nParTypes+1; ++j){
       hmc[i][j] = (TH1D*)fmc->Get(Form("%s_%d_%d",name.c_str(),i,j));
     }
-    hdata[i] = (TH1D*)fmc->Get(Form("%s_%d_%d",name.c_str(),i,0));
+    hdata[i] = (TH1D*)fdata->Get(Form("%s_%d_%d",name.c_str(),i,0));
   }
   
   for (int i = 0; i<nCuts; ++i){
@@ -33,19 +35,28 @@ void PrintEvents(string name){
 
 void plot1d(string name, int cut, string xtitle, string ytitle){
 
+  static bool first = true;
+
   TH1D *hdata[nCuts];
   TH1D *hmc[nCuts][nParTypes+1];
   for (int i = 0; i < nCuts; ++i){
     for (int j = 0; j < nParTypes+1; ++j){
       hmc[i][j] = (TH1D*)fmc->Get(Form("%s_%d_%d",name.c_str(),i,j));
+      if (i==0 && j!=0 && first){
+        totalmc += hmc[i][j]->Integral();
+      }
     }
-    hdata[i] = (TH1D*)fmc->Get(Form("%s_%d_%d",name.c_str(),i,0));
+    hdata[i] = (TH1D*)fdata->Get(Form("%s_%d_%d",name.c_str(),i,0));
+    if (i==0 && first) totaldata = hdata[i]->Integral();
   }
+  std::cout<<totaldata<<" "<<totalmc<<std::endl;
+  first = false;
   TCanvas *can = new TCanvas(Form("can_%d",nc), Form("can_%d",nc));
   THStack *hs = new THStack(Form("hs_%d",nc),"");
   for (int i = 0; i<nParTypes; ++i){
     hmc[cut][i+1]->SetFillColor(i!=8?i+2:i+3);
     hmc[cut][i+1]->SetLineWidth(0);
+    hmc[cut][i+1]->Scale(totaldata/totalmc);
     hs->Add(hmc[cut][i+1]);
   }
 //  h[cut][3]->SetFillColor(kRed);
@@ -60,12 +71,14 @@ void plot1d(string name, int cut, string xtitle, string ytitle){
 //  h[cut][4]->SetFillColor(6);
 //  h[cut][4]->SetLineWidth(0);
 //  hs->Add(h[cut][4]);
-  hdata[cut]->SetMarkerStyle(20);
-  hdata[cut]->Draw();
-  hs->Draw("hist same");
+  double max = TMath::Max(hs->GetMaximum(), hdata[cut]->GetMaximum());
+  hs->SetMaximum(1.1*max);
+  hs->Draw("hist");
   hs->SetTitle(cutName[cut]);
   hs->GetXaxis()->SetTitle(xtitle.c_str());
   hs->GetYaxis()->SetTitle(ytitle.c_str());
+  hdata[cut]->SetMarkerStyle(20);
+  hdata[cut]->Draw("same");
   TLegend *leg;
   if (hmc[cut][0]->GetMaximumBin() < hmc[cut][0]->GetNbinsX()/2){
     leg = new TLegend(0.55,0.7,0.9,0.9);
@@ -113,7 +126,7 @@ void plot(){
   gStyle->SetOptStat(0);
 
   fmc = TFile::Open("../install/bin/mcprod4a.root");
-  fdata = TFile::Open("../install/bin/mcprod4a.root");
+  fdata = TFile::Open("../install/bin/data.root");
 
   for (int i = 0; i<nCuts; ++i){
     plot1d("hmediandEdx", i, "Median dE/dx (MeV/cm)", "Events");

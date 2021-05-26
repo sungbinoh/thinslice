@@ -10,20 +10,16 @@ class HadAna : public anavar{
  public: 
   //Selected true pdg list
   std::vector<int> truepdglist;
-  void AddTruePDG(int pdg){
-    truepdglist.push_back(pdg);
-  };
+  void AddTruePDG(int pdg);
 
-  //Check is the current particle is selected
-  bool isTrueSelectedPart() const;
+  //Check if the desired particle is selected
+  bool isSelectedPart() const;
 
   int GetParType();
 
   // Pandora slice pdg
   int pandora_slice_pdg;
-  void SetPandoraSlicePDG(int pdg){
-    pandora_slice_pdg = pdg;
-  };
+  void SetPandoraSlicePDG(int pdg);
 
   bool PassPandoraSliceCut() const;
   bool PassBeamQualityCut() const;

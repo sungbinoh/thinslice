@@ -4,12 +4,30 @@
 #include "util.h"
 #include <iostream>
 
-bool HadAna::isTrueSelectedPart() const{
-  for (size_t i = 0; i<truepdglist.size(); ++i){
-    if (true_beam_PDG == truepdglist[i]) return true;
+void HadAna::AddTruePDG(int pdg){
+  truepdglist.push_back(pdg);
+};
+
+bool HadAna::isSelectedPart() const{
+  if (MC){
+    for (size_t i = 0; i<truepdglist.size(); ++i){
+      if (true_beam_PDG == truepdglist[i]) return true;
+    }
+    return false;
   }
-  return false;
+  else{
+    for (size_t i = 0; i<truepdglist.size(); ++i){
+      for (size_t j = 0; j<beam_inst_PDG_candidates->size(); ++j){
+        if ((*beam_inst_PDG_candidates)[j] == truepdglist[i]) return true;
+      }
+    }
+    return false;
+  }
 }
+
+void HadAna::SetPandoraSlicePDG(int pdg){
+  pandora_slice_pdg = pdg;
+};
 
 int HadAna::GetParType(){
 
@@ -139,8 +157,6 @@ void HadAna::ProcessEvent(){
     if (nhits) daughter_michel_score/=nhits;
   }
   
-  if (MC){
-    partype = GetParType();
-  }
+  partype = GetParType();
 }
 
