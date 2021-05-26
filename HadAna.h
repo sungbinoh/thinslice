@@ -34,6 +34,7 @@ class HadAna : public anavar{
   int partype;
   double median_dEdx;
   double daughter_michel_score;
+  double beam_dx, beam_dy, beam_costh;
 
   using anavar::anavar;
 

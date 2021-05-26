@@ -6,6 +6,8 @@ int nc = 0;
 double totaldata = 0;
 double totalmc = 0;
 
+int colors[nParTypes] = {2, 3, 5, 7, 33, 9, 46, 28, 11};
+
 TFile *fmc;
 TFile *fdata;
 
@@ -54,7 +56,7 @@ void plot1d(string name, int cut, string xtitle, string ytitle){
   TCanvas *can = new TCanvas(Form("can_%d",nc), Form("can_%d",nc));
   THStack *hs = new THStack(Form("hs_%d",nc),"");
   for (int i = 0; i<nParTypes; ++i){
-    hmc[cut][i+1]->SetFillColor(i!=8?i+2:i+3);
+    hmc[cut][i+1]->SetFillColor(colors[i]);
     hmc[cut][i+1]->SetLineWidth(0);
     hmc[cut][i+1]->Scale(totaldata/totalmc);
     hs->Add(hmc[cut][i+1]);

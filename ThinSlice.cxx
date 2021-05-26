@@ -285,13 +285,10 @@ void ThinSlice::FillHistograms(int cut, const HadAna & evt){
     FillHistVec1D(hmediandEdx[cut], evt.median_dEdx, evt.partype);
     FillHistVec1D(hdaughter_michel_score[cut], evt.daughter_michel_score, evt.partype);
     
-    double projectX = (evt.true_beam_startX + -1*evt.true_beam_startZ*(evt.true_beam_startDirX/evt.true_beam_startDirZ) );
-    double projectY = (evt.true_beam_startY + -1*evt.true_beam_startZ*(evt.true_beam_startDirY/evt.true_beam_startDirZ) );
-    double cos = evt.true_beam_startDirX*evt.reco_beam_trackDirX + evt.true_beam_startDirY*evt.reco_beam_trackDirY + evt.true_beam_startDirZ*evt.reco_beam_trackDirZ;
-    FillHistVec1D(hdeltax[cut], evt.reco_beam_startX - projectX, evt.partype);
-    FillHistVec1D(hdeltay[cut], evt.reco_beam_startY - projectY, evt.partype);
+    FillHistVec1D(hdeltax[cut], evt.beam_dx, evt.partype);
+    FillHistVec1D(hdeltay[cut], evt.beam_dy, evt.partype);
     FillHistVec1D(hdeltaz[cut], evt.reco_beam_startZ, evt.partype);
-    FillHistVec1D(hcostheta[cut], cos, evt.partype);
+    FillHistVec1D(hcostheta[cut], evt.beam_costh, evt.partype);
     
     if (evt.partype == 0 && evt.MC){
       for (int i = 0; i<100; ++i){

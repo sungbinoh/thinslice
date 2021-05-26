@@ -16,6 +16,8 @@ bool HadAna::isSelectedPart() const{
     return false;
   }
   else{
+
+    if (beam_inst_nMomenta != 1 || beam_inst_nTracks != 1) return false;
     for (size_t i = 0; i<truepdglist.size(); ++i){
       for (size_t j = 0; j<beam_inst_PDG_candidates->size(); ++j){
         if ((*beam_inst_PDG_candidates)[j] == truepdglist[i]) return true;
@@ -80,33 +82,49 @@ bool HadAna::PassPandoraSliceCut() const{
 
 bool HadAna::PassBeamQualityCut() const{
 
-  double xlow = -3.,  xhigh = 7.,  ylow = -8.,  yhigh = 7.;
-  double zlow = 27.5,  zhigh = 32.5,  coslow = 0.93;
+  if (MC){
+    double xlow = -3.,  xhigh = 7.,  ylow = -8.,  yhigh = 7.;
+    double zlow = 27.5,  zhigh = 32.5,  coslow = 0.93;
 
-  double projectX = (true_beam_startX + -1*true_beam_startZ*(true_beam_startDirX/true_beam_startDirZ) );
-  double projectY = (true_beam_startY + -1*true_beam_startZ*(true_beam_startDirY/true_beam_startDirZ) );
-  double cos = true_beam_startDirX*reco_beam_trackDirX + true_beam_startDirY*reco_beam_trackDirY + true_beam_startDirZ*reco_beam_trackDirZ;
-  
-  if ( (reco_beam_startX - projectX) < xlow )
-    return false;
-  
-  if ( (reco_beam_startX - projectX) > xhigh )
-    return false;
-  
-  if ( (reco_beam_startY - projectY) < ylow )
-    return false;
-  
-  if ( (reco_beam_startY - projectY) > yhigh )
-    return false;
-  
-  if (reco_beam_startZ < zlow || zhigh < reco_beam_startZ)
-    return false;
-  
-  if ( cos < coslow)
-    return false;
-  
-  return true;
-  
+    if ( beam_dx < xlow )
+      return false;
+    
+    if ( beam_dx > xhigh )
+      return false;
+    
+    if ( beam_dy < ylow )
+      return false;
+    
+    if ( beam_dy > yhigh )
+      return false;
+    
+    if (reco_beam_startZ < zlow || zhigh < reco_beam_startZ)
+      return false;
+    
+    if ( beam_costh < coslow)
+      return false;
+    
+    return true;
+  }
+  else{
+    double data_xlow = 0., data_xhigh = 10., data_ylow= -5.;
+    double data_yhigh= 10., data_zlow=30., data_zhigh=35., data_coslow=.93;
+
+    if( (beam_dx < data_xlow) || (beam_dx > data_xhigh) )
+      return false;
+    
+    if ( (beam_dy < data_ylow) || (beam_dy > data_yhigh) )
+      return false;
+    
+    if ( (reco_beam_startZ < data_zlow) || (reco_beam_startZ > data_zhigh) )
+      return false;
+    
+    if (beam_costh < data_coslow)
+      return false;
+
+    return true;
+  }
+    
 };
 
 bool HadAna::PassAPA3Cut() const{
@@ -155,8 +173,23 @@ void HadAna::ProcessEvent(){
       daughter_michel_score += (*reco_daughter_PFP_michelScore_collection)[0] * (*reco_daughter_PFP_nHits_collection)[i];
     }
     if (nhits) daughter_michel_score/=nhits;
+    else daughter_michel_score = -999;
   }
-  
+
+  if (MC){
+    double projectX = (true_beam_startX + -1*true_beam_startZ*(true_beam_startDirX/true_beam_startDirZ) );
+    double projectY = (true_beam_startY + -1*true_beam_startZ*(true_beam_startDirY/true_beam_startDirZ) );
+    beam_costh = true_beam_startDirX*reco_beam_trackDirX + true_beam_startDirY*reco_beam_trackDirY + true_beam_startDirZ*reco_beam_trackDirZ;
+    beam_dx = reco_beam_startX - projectX;
+    beam_dy = reco_beam_startY - projectY;
+  }
+  else{
+    beam_dx = reco_beam_startX - beam_inst_X;
+    beam_dy = reco_beam_startY - beam_inst_Y;
+    beam_costh = beam_inst_dirX*reco_beam_trackDirX 
+      + beam_inst_dirY*reco_beam_trackDirY 
+      + beam_inst_dirZ*reco_beam_trackDirZ;
+  }
   partype = GetParType();
 }
 
