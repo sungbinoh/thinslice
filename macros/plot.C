@@ -24,14 +24,17 @@ void PrintEvents(string name){
   
   for (int i = 0; i<nCuts; ++i){
     cout<<"=========="<<cutName[i]<<"=========="<<endl;
+    double totalmc = 0;
     for (int j =0; j<nParTypes+1; ++j){
       if (j==0){
-        cout<<parTypeName[j]<<" "<<hdata[i]->GetEntries()<<endl;
+        cout<<parTypeName[j]<<" "<<hdata[i]->Integral()<<endl;
       }
       else{
-        cout<<parTypeName[j]<<" "<<hmc[i][j]->GetEntries()<<endl;
+        cout<<parTypeName[j]<<" "<<hmc[i][j]->Integral()<<endl;
+        totalmc += hmc[i][j]->Integral();
       }
     }
+    cout<<"Total MC: "<<totalmc<<endl;
   }
 }
 
@@ -51,7 +54,7 @@ void plot1d(string name, int cut, string xtitle, string ytitle){
     hdata[i] = (TH1D*)fdata->Get(Form("%s_%d_%d",name.c_str(),i,0));
     if (i==0 && first) totaldata = hdata[i]->Integral();
   }
-  std::cout<<totaldata<<" "<<totalmc<<std::endl;
+  //std::cout<<totaldata<<" "<<totalmc<<std::endl;
   first = false;
   TCanvas *can = new TCanvas(Form("can_%d",nc), Form("can_%d",nc));
   THStack *hs = new THStack(Form("hs_%d",nc),"");
@@ -126,6 +129,7 @@ void plot2d(string name, int cut){
 void plot(){
 
   gStyle->SetOptStat(0);
+  gErrorIgnoreLevel = kWarning;
 
   fmc = TFile::Open("../install/bin/mcprod4a.root");
   fdata = TFile::Open("../install/bin/data.root");
