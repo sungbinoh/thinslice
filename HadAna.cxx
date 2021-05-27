@@ -1,6 +1,7 @@
 #include "HadAna.h"
 #include "TGraphErrors.h"
 #include "TMath.h"
+#include "TVector3.h"
 #include "util.h"
 #include <iostream>
 
@@ -82,49 +83,11 @@ bool HadAna::PassPandoraSliceCut() const{
 
 bool HadAna::PassBeamQualityCut() const{
 
-  if (MC){
-    double xlow = -3.,  xhigh = 7.,  ylow = -8.,  yhigh = 7.;
-    double zlow = 27.5,  zhigh = 32.5,  coslow = 0.93;
-
-    if ( beam_dx < xlow )
-      return false;
-    
-    if ( beam_dx > xhigh )
-      return false;
-    
-    if ( beam_dy < ylow )
-      return false;
-    
-    if ( beam_dy > yhigh )
-      return false;
-    
-    if (reco_beam_startZ < zlow || zhigh < reco_beam_startZ)
-      return false;
-    
-    if ( beam_costh < coslow)
-      return false;
-    
-    return true;
-  }
-  else{
-    double data_xlow = 0., data_xhigh = 10., data_ylow= -5.;
-    double data_yhigh= 10., data_zlow=30., data_zhigh=35., data_coslow=.93;
-
-    if( (beam_dx < data_xlow) || (beam_dx > data_xhigh) )
-      return false;
-    
-    if ( (beam_dy < data_ylow) || (beam_dy > data_yhigh) )
-      return false;
-    
-    if ( (reco_beam_startZ < data_zlow) || (reco_beam_startZ > data_zhigh) )
-      return false;
-    
-    if (beam_costh < data_coslow)
-      return false;
-
-    return true;
-  }
-    
+  if (std::abs(beam_dx)>3) return false;
+  if (std::abs(beam_dy)>3) return false;
+  if (std::abs(beam_dz)>3) return false;
+  if (beam_costh<0.95) return false;
+  return true;
 };
 
 bool HadAna::PassAPA3Cut() const{
@@ -176,19 +139,42 @@ void HadAna::ProcessEvent(){
     else daughter_michel_score = -999;
   }
 
-  if (MC){
-    double projectX = (true_beam_startX + -1*true_beam_startZ*(true_beam_startDirX/true_beam_startDirZ) );
-    double projectY = (true_beam_startY + -1*true_beam_startZ*(true_beam_startDirY/true_beam_startDirZ) );
-    beam_costh = true_beam_startDirX*reco_beam_trackDirX + true_beam_startDirY*reco_beam_trackDirY + true_beam_startDirZ*reco_beam_trackDirZ;
-    beam_dx = reco_beam_startX - projectX;
-    beam_dy = reco_beam_startY - projectY;
-  }
-  else{
-    beam_dx = reco_beam_startX - beam_inst_X;
-    beam_dy = reco_beam_startY - beam_inst_Y;
-    beam_costh = beam_inst_dirX*reco_beam_trackDirX 
-      + beam_inst_dirY*reco_beam_trackDirY 
-      + beam_inst_dirZ*reco_beam_trackDirZ;
+  beam_dx = -999;
+  beam_dy = -999;
+  beam_dz = -999;
+  beam_costh = -999;
+
+  if (!reco_beam_calo_wire->empty()){
+
+    TVector3 pt0(reco_beam_calo_startX,
+                 reco_beam_calo_startY,
+                 reco_beam_calo_startZ);
+    TVector3 pt1(reco_beam_calo_endX,
+                 reco_beam_calo_endY,
+                 reco_beam_calo_endZ);
+    TVector3 dir = pt1 - pt0;
+    dir = dir.Unit();
+
+    if (MC){
+      beam_dx = (reco_beam_calo_startX - beam_startX_mc)/beam_startX_rms_mc;
+      beam_dy = (reco_beam_calo_startY - beam_startY_mc)/beam_startY_rms_mc;
+      beam_dz = (reco_beam_calo_startZ - beam_startZ_mc)/beam_startZ_rms_mc;
+      TVector3 beamdir(cos(beam_angleX_mc*TMath::Pi()/180),
+                       cos(beam_angleY_mc*TMath::Pi()/180),
+                       cos(beam_angleZ_mc*TMath::Pi()/180));
+      beamdir = beamdir.Unit();
+      beam_costh = dir.Dot(beamdir);
+    }
+    else{
+      beam_dx = (reco_beam_calo_startX - beam_startX_data)/beam_startX_rms_data;
+      beam_dy = (reco_beam_calo_startY - beam_startY_data)/beam_startY_rms_data;
+      beam_dz = (reco_beam_calo_startZ - beam_startZ_data)/beam_startZ_rms_data;
+      TVector3 beamdir(cos(beam_angleX_data*TMath::Pi()/180),
+                       cos(beam_angleY_data*TMath::Pi()/180),
+                       cos(beam_angleZ_data*TMath::Pi()/180));
+      beamdir = beamdir.Unit();
+      beam_costh = dir.Dot(beamdir);
+    }
   }
   partype = GetParType();
 }

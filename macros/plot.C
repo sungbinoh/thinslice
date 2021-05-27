@@ -6,7 +6,7 @@ int nc = 0;
 double totaldata = 0;
 double totalmc = 0;
 
-int colors[nParTypes] = {2, 3, 5, 7, 33, 9, 46, 28, 11};
+int colors[nParTypes] = {2, 3, 5, 7, 33, 9, 46, 28, 41};
 
 TFile *fmc;
 TFile *fdata;
@@ -102,11 +102,11 @@ void plot1d(string name, int cut, string xtitle, string ytitle){
 //  leg->AddEntry(h[cut][2],"#mu^{+}","f");
 //  leg->AddEntry(h[cut][1],"Misidentified","f");
   leg->Draw();
-  can->Print(Form("plots/can_%s_%s.png",name.c_str(), cutName[cut]));
-  can->Print(Form("plots/can_%s_%s.pdf",name.c_str(), cutName[cut]));
+  can->Print(Form("plots/can_%s_%d_%s.png", name.c_str(), cut, cutName[cut]));
+  can->Print(Form("plots/can_%s_%d_%s.pdf", name.c_str(), cut, cutName[cut]));
   gPad->SetLogy();
-  can->Print(Form("plots/canlog_%s_%s.png",name.c_str(), cutName[cut]));
-  can->Print(Form("plots/canlog_%s_%s.pdf",name.c_str(), cutName[cut]));
+  can->Print(Form("plots/canlog_%s_%d_%s.png", name.c_str(), cut, cutName[cut]));
+  can->Print(Form("plots/canlog_%s_%d_%s.pdf", name.c_str(), cut, cutName[cut]));
   ++nc;
 }
 
@@ -147,6 +147,18 @@ void plot(){
     plot1d("hdeltay", i, "#Delta y (cm)", "Events");
     plot1d("hdeltaz", i, "#Delta z (cm)", "Events");
     plot1d("hcostheta", i, "cos#theta", "Events");
+    plot1d("htrklen", i, "Track length (cm)", "Events");
+    plot1d("hreco_beam_startX_SCE", i, "Reco track start X (cm)", "Events");
+    plot1d("hreco_beam_startY_SCE", i, "Reco track start Y (cm)", "Events");
+    plot1d("hreco_beam_startZ_SCE", i, "Reco track start Z (cm)", "Events");
+
+    plot1d("hreco_beam_dcosX_SCE", i, "dcosX", "Events");
+    plot1d("hreco_beam_dcosY_SCE", i, "dcosY", "Events");
+    plot1d("hreco_beam_dcosZ_SCE", i, "dcosZ", "Events");
+
+    plot1d("hreco_beam_angleX_SCE", i, "angleX", "Events");
+    plot1d("hreco_beam_angleY_SCE", i, "angleY", "Events");
+    plot1d("hreco_beam_angleZ_SCE", i, "angleZ", "Events");
   }
 
   PrintEvents("htrue_beam_endZ_SCE");

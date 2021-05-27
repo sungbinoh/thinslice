@@ -60,14 +60,14 @@ void ThinSlice::BookHistograms(){
       hreco_true_vs_true_beam_endZ_SCE[i][j]= new TH2D(Form("hreco_true_vs_true_beam_endZ_SCE_%d_%d",i,j), Form("%s, %s;true_beam_endZ_SCE (cm);reco - true_beam_endZ_SCE (cm)", cutName[i], parTypeName[j]), 70, -100, 600, 100, -100, 100);
 
 
-      htrue_sliceID[i][j] = new TH1D(Form("htrue_sliceID_%d_%d",i,j),Form("true_sliceID, %s, %s;true_sliceID (cm)", cutName[i], parTypeName[j]), 50, -1, 49);
+      htrue_sliceID[i][j] = new TH1D(Form("htrue_sliceID_%d_%d",i,j),Form("true_sliceID, %s, %s;true_sliceID (cm)", cutName[i], parTypeName[j]), 26, -1, 25);
       htrue_sliceID[i][j]->Sumw2();
-      hreco_sliceID[i][j] = new TH1D(Form("hreco_sliceID_%d_%d",i,j),Form("reco_sliceID, %s, %s;reco_sliceID", cutName[i], parTypeName[j]), 50, -1, 49);
+      hreco_sliceID[i][j] = new TH1D(Form("hreco_sliceID_%d_%d",i,j),Form("reco_sliceID, %s, %s;reco_sliceID", cutName[i], parTypeName[j]), 26, -1, 25);
       hreco_sliceID[i][j]->Sumw2();
       hreco_true_sliceID[i][j] = new TH1D(Form("hreco_true_sliceID_%d_%d",i,j), Form("reco_true_sliceID, %s, %s;reco_sliceID - true_sliceID", cutName[i], parTypeName[j]), 20, -10, 10);
       hreco_true_sliceID[i][j]->Sumw2();
-      hreco_vs_true_sliceID[i][j]= new TH2D(Form("hreco_vs_true_sliceID_%d_%d",i,j), Form("%s, %s;true_sliceID;reco_sliceID", cutName[i], parTypeName[j]), 50, -1, 49, 50, -1, 49);
-      hreco_true_vs_true_sliceID[i][j]= new TH2D(Form("hreco_true_vs_true_sliceID_%d_%d",i,j), Form("%s, %s;true_sliceID;reco_sliceID - true_sliceID", cutName[i], parTypeName[j]), 50, -1, 49, 20, -10, 10);
+      hreco_vs_true_sliceID[i][j]= new TH2D(Form("hreco_vs_true_sliceID_%d_%d",i,j), Form("%s, %s;true_sliceID;reco_sliceID", cutName[i], parTypeName[j]), 26, -1, 25, 26, -1, 25);
+      hreco_true_vs_true_sliceID[i][j]= new TH2D(Form("hreco_true_vs_true_sliceID_%d_%d",i,j), Form("%s, %s;true_sliceID;reco_sliceID - true_sliceID", cutName[i], parTypeName[j]), 26, -1, 25, 20, -10, 10);
 
       hmediandEdx[i][j] = new TH1D(Form("hmediandEdx_%d_%d",i,j), Form("mediandEdx, %s, %s;Median dE/dx (MeV/cm)", cutName[i], parTypeName[j]), 100, 0, 5);
       hmediandEdx[i][j]->Sumw2();
@@ -81,11 +81,41 @@ void ThinSlice::BookHistograms(){
       hdeltay[i][j] = new TH1D(Form("hdeltay_%d_%d",i,j), Form("deltay, %s, %s;#Delta y (cm)", cutName[i], parTypeName[j]), 100, -10, 10);
       hdeltay[i][j]->Sumw2();
 
-      hdeltaz[i][j] = new TH1D(Form("hdeltaz_%d_%d",i,j), Form("deltaz, %s, %s;#Delta z (cm)", cutName[i], parTypeName[j]), 100, 20, 35);
+      hdeltaz[i][j] = new TH1D(Form("hdeltaz_%d_%d",i,j), Form("deltaz, %s, %s;#Delta z (cm)", cutName[i], parTypeName[j]), 100, -10, 10);
       hdeltaz[i][j]->Sumw2();
 
-      hcostheta[i][j] = new TH1D(Form("hcostheta_%d_%d",i,j), Form("costheta, %s, %s;cos#theta", cutName[i], parTypeName[j]), 100, 0.5, 1);
+      hcostheta[i][j] = new TH1D(Form("hcostheta_%d_%d",i,j), Form("costheta, %s, %s;cos#theta", cutName[i], parTypeName[j]), 100, 0.9, 1);
       hcostheta[i][j]->Sumw2();
+
+      htrklen[i][j] = new TH1D(Form("htrklen_%d_%d",i,j), Form("trklen, %s, %s;Track length (cm)", cutName[i], parTypeName[j]), 61, -10, 600);
+      htrklen[i][j]->Sumw2();
+
+      hreco_beam_startX_SCE[i][j] = new TH1D(Form("hreco_beam_startX_SCE_%d_%d",i,j), Form("reco_beam_startX_SCE, %s, %s; reco_beam_startX_SCE (cm)", cutName[i], parTypeName[j]), 100, -80, 20);
+      hreco_beam_startX_SCE[i][j]->Sumw2();
+
+      hreco_beam_startY_SCE[i][j] = new TH1D(Form("hreco_beam_startY_SCE_%d_%d",i,j), Form("reco_beam_startY_SCE, %s, %s; reco_beam_startY_SCE (cm)", cutName[i], parTypeName[j]), 100, 350, 500);
+      hreco_beam_startY_SCE[i][j]->Sumw2();
+
+      hreco_beam_startZ_SCE[i][j] = new TH1D(Form("hreco_beam_startZ_SCE_%d_%d",i,j), Form("reco_beam_startZ_SCE, %s, %s; reco_beam_startZ_SCE (cm)", cutName[i], parTypeName[j]), 100, -5, 10);
+      hreco_beam_startZ_SCE[i][j]->Sumw2();
+
+      hreco_beam_dcosX_SCE[i][j] = new TH1D(Form("hreco_beam_dcosX_SCE_%d_%d",i,j), Form("hreco_beam_dcosX_SCE, %s, %s, reco_beam_dcosX_SCE", cutName[i], parTypeName[j]), 100, -1, 1);
+      hreco_beam_dcosX_SCE[i][j]->Sumw2();
+
+      hreco_beam_dcosY_SCE[i][j] = new TH1D(Form("hreco_beam_dcosY_SCE_%d_%d",i,j), Form("hreco_beam_dcosY_SCE, %s, %s, reco_beam_dcosY_SCE", cutName[i], parTypeName[j]), 100, -1, 1);
+      hreco_beam_dcosY_SCE[i][j]->Sumw2();
+
+      hreco_beam_dcosZ_SCE[i][j] = new TH1D(Form("hreco_beam_dcosZ_SCE_%d_%d",i,j), Form("hreco_beam_dcosZ_SCE, %s, %s, reco_beam_dcosZ_SCE", cutName[i], parTypeName[j]), 100, -1, 1);
+      hreco_beam_dcosZ_SCE[i][j]->Sumw2();
+
+      hreco_beam_angleX_SCE[i][j] = new TH1D(Form("hreco_beam_angleX_SCE_%d_%d",i,j), Form("hreco_beam_angleX_SCE, %s, %s, reco_beam_angleX_SCE", cutName[i], parTypeName[j]), 180, 0, 180);
+      hreco_beam_angleX_SCE[i][j]->Sumw2();
+
+      hreco_beam_angleY_SCE[i][j] = new TH1D(Form("hreco_beam_angleY_SCE_%d_%d",i,j), Form("hreco_beam_angleY_SCE, %s, %s, reco_beam_angleY_SCE", cutName[i], parTypeName[j]), 180, 0, 180);
+      hreco_beam_angleY_SCE[i][j]->Sumw2();
+
+      hreco_beam_angleZ_SCE[i][j] = new TH1D(Form("hreco_beam_angleZ_SCE_%d_%d",i,j), Form("hreco_beam_angleZ_SCE, %s, %s, reco_beam_angleZ_SCE", cutName[i], parTypeName[j]), 90, 0, 90);
+      hreco_beam_angleZ_SCE[i][j]->Sumw2();
 
     }
     for (int j = 0; j<100; ++j){
@@ -287,9 +317,31 @@ void ThinSlice::FillHistograms(int cut, const HadAna & evt){
     
     FillHistVec1D(hdeltax[cut], evt.beam_dx, evt.partype);
     FillHistVec1D(hdeltay[cut], evt.beam_dy, evt.partype);
-    FillHistVec1D(hdeltaz[cut], evt.reco_beam_startZ, evt.partype);
+    FillHistVec1D(hdeltaz[cut], evt.beam_dz, evt.partype);
     FillHistVec1D(hcostheta[cut], evt.beam_costh, evt.partype);
-    
+
+    FillHistVec1D(htrklen[cut], evt.reco_beam_alt_len, evt.partype);
+
+    FillHistVec1D(hreco_beam_startX_SCE[cut], evt.reco_beam_calo_startX, evt.partype);
+    FillHistVec1D(hreco_beam_startY_SCE[cut], evt.reco_beam_calo_startY, evt.partype);
+    FillHistVec1D(hreco_beam_startZ_SCE[cut], evt.reco_beam_calo_startZ, evt.partype);
+
+    if (!evt.reco_beam_calo_wire->empty()){    
+      TVector3 pt0(evt.reco_beam_calo_startX,
+                   evt.reco_beam_calo_startY,
+                   evt.reco_beam_calo_startZ);
+      TVector3 pt1(evt.reco_beam_calo_endX,
+                   evt.reco_beam_calo_endY,
+                   evt.reco_beam_calo_endZ);
+      TVector3 dir = pt1 - pt0;
+      dir = dir.Unit();
+      FillHistVec1D(hreco_beam_dcosX_SCE[cut], dir.X(), evt.partype);
+      FillHistVec1D(hreco_beam_dcosY_SCE[cut], dir.Y(), evt.partype);
+      FillHistVec1D(hreco_beam_dcosZ_SCE[cut], dir.Z(), evt.partype);
+      FillHistVec1D(hreco_beam_angleX_SCE[cut], acos(dir.X())*180/TMath::Pi(), evt.partype);
+      FillHistVec1D(hreco_beam_angleY_SCE[cut], acos(dir.Y())*180/TMath::Pi(), evt.partype);
+      FillHistVec1D(hreco_beam_angleZ_SCE[cut], acos(dir.Z())*180/TMath::Pi(), evt.partype);
+    }
     if (evt.partype == 0 && evt.MC){
       for (int i = 0; i<100; ++i){
         double wei = 1;

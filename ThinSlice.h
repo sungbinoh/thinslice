@@ -62,6 +62,18 @@ class ThinSlice {
   TH1D *hdeltaz[nCuts][nParTypes+1];
   TH1D *hcostheta[nCuts][nParTypes+1];
 
+  TH1D *htrklen[nCuts][nParTypes+1];
+
+  TH1D *hreco_beam_startX_SCE[nCuts][nParTypes+1];
+  TH1D *hreco_beam_startY_SCE[nCuts][nParTypes+1];
+  TH1D *hreco_beam_startZ_SCE[nCuts][nParTypes+1];
+  TH1D *hreco_beam_dcosX_SCE[nCuts][nParTypes+1];
+  TH1D *hreco_beam_dcosY_SCE[nCuts][nParTypes+1];
+  TH1D *hreco_beam_dcosZ_SCE[nCuts][nParTypes+1];
+  TH1D *hreco_beam_angleX_SCE[nCuts][nParTypes+1];
+  TH1D *hreco_beam_angleY_SCE[nCuts][nParTypes+1];
+  TH1D *hreco_beam_angleZ_SCE[nCuts][nParTypes+1];
+
   std::string fOutputFileName;
   TFile *outputFile;
   void SetOutputFileName(std::string name){fOutputFileName = name;};
