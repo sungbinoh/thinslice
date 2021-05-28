@@ -5,6 +5,19 @@
 #include "util.h"
 #include <iostream>
 
+HadAna::HadAna(TTree *tree) 
+  : anavar(tree){
+
+  AddTruePDG(-13);
+  AddTruePDG(13);
+  AddTruePDG(211);
+
+  SetPandoraSlicePDG(13);
+
+  SetBeamQualityCuts();
+
+}
+
 void HadAna::AddTruePDG(int pdg){
   truepdglist.push_back(pdg);
 };

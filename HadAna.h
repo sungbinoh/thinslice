@@ -9,6 +9,8 @@
 class HadAna : public anavar{
  public: 
 
+  HadAna(TTree *tree=0);
+
   void AddTruePDG(int pdg);
 
   //Check if the desired particle is selected
