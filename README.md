@@ -8,6 +8,8 @@ setup cmake v3_19_6
 
 git clone https://gitlab.cern.ch/RooUnfold/RooUnfold.git
 
+mkdir SetBeamQualityCuts
+
 cd RooUnfold/build
 
 cmake ..
