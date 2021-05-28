@@ -75,13 +75,13 @@ void ThinSlice::BookHistograms(){
       hdaughter_michel_score[i][j] = new TH1D(Form("hdaughter_michel_score_%d_%d",i,j), Form("daughter_michel_score, %s, %s;Michel score", cutName[i], parTypeName[j]), 110, -0.1, 1);
       hdaughter_michel_score[i][j]->Sumw2();
 
-      hdeltax[i][j] = new TH1D(Form("hdeltax_%d_%d",i,j), Form("deltax, %s, %s;#Delta x (cm)", cutName[i], parTypeName[j]), 100, -10, 10);
+      hdeltax[i][j] = new TH1D(Form("hdeltax_%d_%d",i,j), Form("deltax, %s, %s;#Deltax/#sigma_{x}", cutName[i], parTypeName[j]), 100, -10, 10);
       hdeltax[i][j]->Sumw2();
 
-      hdeltay[i][j] = new TH1D(Form("hdeltay_%d_%d",i,j), Form("deltay, %s, %s;#Delta y (cm)", cutName[i], parTypeName[j]), 100, -10, 10);
+      hdeltay[i][j] = new TH1D(Form("hdeltay_%d_%d",i,j), Form("deltay, %s, %s;#Deltay/#sigma_{y}", cutName[i], parTypeName[j]), 100, -10, 10);
       hdeltay[i][j]->Sumw2();
 
-      hdeltaz[i][j] = new TH1D(Form("hdeltaz_%d_%d",i,j), Form("deltaz, %s, %s;#Delta z (cm)", cutName[i], parTypeName[j]), 100, -10, 10);
+      hdeltaz[i][j] = new TH1D(Form("hdeltaz_%d_%d",i,j), Form("deltaz, %s, %s;#Deltaz/#sigma_{z}", cutName[i], parTypeName[j]), 100, -10, 10);
       hdeltaz[i][j]->Sumw2();
 
       hcostheta[i][j] = new TH1D(Form("hcostheta_%d_%d",i,j), Form("costheta, %s, %s;cos#theta", cutName[i], parTypeName[j]), 100, 0.9, 1);
@@ -99,22 +99,22 @@ void ThinSlice::BookHistograms(){
       hreco_beam_startZ_SCE[i][j] = new TH1D(Form("hreco_beam_startZ_SCE_%d_%d",i,j), Form("reco_beam_startZ_SCE, %s, %s; reco_beam_startZ_SCE (cm)", cutName[i], parTypeName[j]), 100, -5, 10);
       hreco_beam_startZ_SCE[i][j]->Sumw2();
 
-      hreco_beam_dcosX_SCE[i][j] = new TH1D(Form("hreco_beam_dcosX_SCE_%d_%d",i,j), Form("hreco_beam_dcosX_SCE, %s, %s, reco_beam_dcosX_SCE", cutName[i], parTypeName[j]), 100, -1, 1);
+      hreco_beam_dcosX_SCE[i][j] = new TH1D(Form("hreco_beam_dcosX_SCE_%d_%d",i,j), Form("hreco_beam_dcosX_SCE, %s, %s; reco_beam_dcosX_SCE", cutName[i], parTypeName[j]), 100, -1, 1);
       hreco_beam_dcosX_SCE[i][j]->Sumw2();
 
-      hreco_beam_dcosY_SCE[i][j] = new TH1D(Form("hreco_beam_dcosY_SCE_%d_%d",i,j), Form("hreco_beam_dcosY_SCE, %s, %s, reco_beam_dcosY_SCE", cutName[i], parTypeName[j]), 100, -1, 1);
+      hreco_beam_dcosY_SCE[i][j] = new TH1D(Form("hreco_beam_dcosY_SCE_%d_%d",i,j), Form("hreco_beam_dcosY_SCE, %s, %s; reco_beam_dcosY_SCE", cutName[i], parTypeName[j]), 100, -1, 1);
       hreco_beam_dcosY_SCE[i][j]->Sumw2();
 
-      hreco_beam_dcosZ_SCE[i][j] = new TH1D(Form("hreco_beam_dcosZ_SCE_%d_%d",i,j), Form("hreco_beam_dcosZ_SCE, %s, %s, reco_beam_dcosZ_SCE", cutName[i], parTypeName[j]), 100, -1, 1);
+      hreco_beam_dcosZ_SCE[i][j] = new TH1D(Form("hreco_beam_dcosZ_SCE_%d_%d",i,j), Form("hreco_beam_dcosZ_SCE, %s, %s; reco_beam_dcosZ_SCE", cutName[i], parTypeName[j]), 100, -1, 1);
       hreco_beam_dcosZ_SCE[i][j]->Sumw2();
 
-      hreco_beam_angleX_SCE[i][j] = new TH1D(Form("hreco_beam_angleX_SCE_%d_%d",i,j), Form("hreco_beam_angleX_SCE, %s, %s, reco_beam_angleX_SCE", cutName[i], parTypeName[j]), 180, 0, 180);
+      hreco_beam_angleX_SCE[i][j] = new TH1D(Form("hreco_beam_angleX_SCE_%d_%d",i,j), Form("hreco_beam_angleX_SCE, %s, %s; #theta_{x} (deg)", cutName[i], parTypeName[j]), 180, 0, 180);
       hreco_beam_angleX_SCE[i][j]->Sumw2();
 
-      hreco_beam_angleY_SCE[i][j] = new TH1D(Form("hreco_beam_angleY_SCE_%d_%d",i,j), Form("hreco_beam_angleY_SCE, %s, %s, reco_beam_angleY_SCE", cutName[i], parTypeName[j]), 180, 0, 180);
+      hreco_beam_angleY_SCE[i][j] = new TH1D(Form("hreco_beam_angleY_SCE_%d_%d",i,j), Form("hreco_beam_angleY_SCE, %s, %s; #theta_{y} (deg)", cutName[i], parTypeName[j]), 180, 0, 180);
       hreco_beam_angleY_SCE[i][j]->Sumw2();
 
-      hreco_beam_angleZ_SCE[i][j] = new TH1D(Form("hreco_beam_angleZ_SCE_%d_%d",i,j), Form("hreco_beam_angleZ_SCE, %s, %s, reco_beam_angleZ_SCE", cutName[i], parTypeName[j]), 90, 0, 90);
+      hreco_beam_angleZ_SCE[i][j] = new TH1D(Form("hreco_beam_angleZ_SCE_%d_%d",i,j), Form("hreco_beam_angleZ_SCE, %s, %s; #theta_{z} (deg)", cutName[i], parTypeName[j]), 90, 0, 90);
       hreco_beam_angleZ_SCE[i][j]->Sumw2();
 
     }

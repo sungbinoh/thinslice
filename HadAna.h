@@ -8,12 +8,17 @@
 
 class HadAna : public anavar{
  public: 
-  //Selected true pdg list
-  std::vector<int> truepdglist;
+
   void AddTruePDG(int pdg);
 
   //Check if the desired particle is selected
   bool isSelectedPart() const;
+
+  // Set beam cut values
+  void SetBeamQualityCuts(double dx_min = -3, double dx_max = 3,
+                          double dy_min = -3, double dy_max = 3,
+                          double dz_min = -3, double dz_max = 3,
+                          double costh_min = 0.95, double costh_max = 2);
 
   int GetParType();
 
@@ -37,6 +42,16 @@ class HadAna : public anavar{
   double beam_dx, beam_dy, beam_dz, beam_costh;
 
   using anavar::anavar;
+
+ private:
+  
+  //Selected true pdg list
+  std::vector<int> truepdglist;
+
+  double beamcut_dx_min, beamcut_dx_max;
+  double beamcut_dy_min, beamcut_dy_max;
+  double beamcut_dz_min, beamcut_dz_max;
+  double beamcut_costh_min, beamcut_costh_max;
 
 };
 

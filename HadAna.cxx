@@ -17,7 +17,7 @@ bool HadAna::isSelectedPart() const{
     return false;
   }
   else{
-
+    if (!beam_inst_valid) return false;
     if (beam_inst_nMomenta != 1 || beam_inst_nTracks != 1) return false;
     for (size_t i = 0; i<truepdglist.size(); ++i){
       for (size_t j = 0; j<beam_inst_PDG_candidates->size(); ++j){
@@ -31,6 +31,16 @@ bool HadAna::isSelectedPart() const{
 void HadAna::SetPandoraSlicePDG(int pdg){
   pandora_slice_pdg = pdg;
 };
+
+void HadAna::SetBeamQualityCuts(double dx_min, double dx_max,
+                                double dy_min, double dy_max,
+                                double dz_min, double dz_max,
+                                double costh_min, double costh_max){
+  beamcut_dx_min = dx_min; beamcut_dx_max = dx_max;
+  beamcut_dy_min = dy_min; beamcut_dy_max = dy_max;
+  beamcut_dz_min = dz_min; beamcut_dz_max = dz_max;
+  beamcut_costh_min = costh_min; beamcut_costh_max = costh_max;
+}
 
 int HadAna::GetParType(){
 
@@ -83,12 +93,17 @@ bool HadAna::PassPandoraSliceCut() const{
 
 bool HadAna::PassBeamQualityCut() const{
 
-  if (std::abs(beam_dx)>3) return false;
-  if (std::abs(beam_dy)>3) return false;
-  if (std::abs(beam_dz)>3) return false;
-  if (beam_costh<0.95) return false;
+  if (beam_dx<beamcut_dx_min) return false;
+  if (beam_dx>beamcut_dx_max) return false;
+  if (beam_dy<beamcut_dy_min) return false;
+  if (beam_dy>beamcut_dy_max) return false;
+  if (beam_dz<beamcut_dz_min) return false;
+  if (beam_dz>beamcut_dz_max) return false;
+  if (beam_costh<beamcut_costh_min) return false;
+  if (beam_costh>beamcut_costh_max) return false;
+
   return true;
-};
+}
 
 bool HadAna::PassAPA3Cut() const{
 

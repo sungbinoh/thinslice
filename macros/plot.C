@@ -143,9 +143,9 @@ void plot(){
     plot1d("hreco_sliceID", i, "Reco Slice ID", "Events");
     plot1d("hreco_true_beam_endZ_SCE", i, "Reco - True End Z SCE (cm)", "Events");
     plot2d("hreco_vs_true_beam_endZ_SCE",i);
-    plot1d("hdeltax", i, "#Delta x (cm)", "Events");
-    plot1d("hdeltay", i, "#Delta y (cm)", "Events");
-    plot1d("hdeltaz", i, "#Delta z (cm)", "Events");
+    plot1d("hdeltax", i, "#Deltax/#sigma_{x}", "Events");
+    plot1d("hdeltay", i, "#Deltay/#sigma_{y}", "Events");
+    plot1d("hdeltaz", i, "#Deltaz/#sigma_{z}", "Events");
     plot1d("hcostheta", i, "cos#theta", "Events");
     plot1d("htrklen", i, "Track length (cm)", "Events");
     plot1d("hreco_beam_startX_SCE", i, "Reco track start X (cm)", "Events");

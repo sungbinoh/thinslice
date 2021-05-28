@@ -25,6 +25,7 @@ int main(){
   mcevt.AddTruePDG(-13);
   mcevt.AddTruePDG(211);
   mcevt.SetPandoraSlicePDG(13);
+  mcevt.SetBeamQualityCuts();
 
   ThinSlice mcths;
   mcths.SetOutputFileName("mcprod4a.root");
@@ -34,6 +35,7 @@ int main(){
   dataevt.AddTruePDG(13);
   dataevt.AddTruePDG(211);
   dataevt.SetPandoraSlicePDG(13);
+  dataevt.SetBeamQualityCuts();
 
   ThinSlice dataths;
   dataths.SetOutputFileName("data.root");
