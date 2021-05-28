@@ -117,6 +117,8 @@ void ThinSlice::BookHistograms(){
       hreco_beam_angleZ_SCE[i][j] = new TH1D(Form("hreco_beam_angleZ_SCE_%d_%d",i,j), Form("hreco_beam_angleZ_SCE, %s, %s; #theta_{z} (deg)", cutName[i], parTypeName[j]), 90, 0, 90);
       hreco_beam_angleZ_SCE[i][j]->Sumw2();
 
+      hreco_beam_startXY_SCE[i][j] = new TH2D(Form("hreco_beam_startXY_SCE_%d_%d",i,j), Form("reco_beam_startXY_SCE, %s, %s;reco_beam_startX_SCE (cm);reco_beam_startY_SCE (cm)", cutName[i], parTypeName[j]), 100, -80, 20, 100, 350, 500);
+
     }
     for (int j = 0; j<100; ++j){
       hmediandEdx_wei[i][j] = new TH1D(Form("hmediandEdx_wei_%d_%d",i,j), Form("mediandEdx, %s, i=%d;Median dE/dx (MeV/cm)", cutName[i], j), 100, 0, 5);
@@ -342,6 +344,9 @@ void ThinSlice::FillHistograms(int cut, const HadAna & evt){
       FillHistVec1D(hreco_beam_angleY_SCE[cut], acos(dir.Y())*180/TMath::Pi(), evt.partype);
       FillHistVec1D(hreco_beam_angleZ_SCE[cut], acos(dir.Z())*180/TMath::Pi(), evt.partype);
     }
+
+    FillHistVec2D(hreco_beam_startXY_SCE[cut], evt.reco_beam_calo_startX, evt.reco_beam_calo_startY, evt.partype);
+
     if (evt.partype == 0 && evt.MC){
       for (int i = 0; i<100; ++i){
         double wei = 1;
