@@ -117,7 +117,7 @@ void ThinSlice::BookHistograms(){
       hreco_beam_angleZ_SCE[i][j] = new TH1D(Form("hreco_beam_angleZ_SCE_%d_%d",i,j), Form("hreco_beam_angleZ_SCE, %s, %s; #theta_{z} (deg)", cutName[i], parTypeName[j]), 90, 0, 90);
       hreco_beam_angleZ_SCE[i][j]->Sumw2();
 
-      hreco_beam_startXY_SCE[i][j] = new TH2D(Form("hreco_beam_startXY_SCE_%d_%d",i,j), Form("reco_beam_startXY_SCE, %s, %s;reco_beam_startX_SCE (cm);reco_beam_startY_SCE (cm)", cutName[i], parTypeName[j]), 100, -80, 20, 100, 350, 500);
+      hreco_beam_startXY_SCE[i][j] = new TH2D(Form("hreco_beam_startXY_SCE_%d_%d",i,j), Form("reco_beam_startXY_SCE, %s, %s;reco_beam_startX_SCE (cm);reco_beam_startY_SCE (cm)", cutName[i], parTypeName[j]), 1000, -360, 360, 1000, 0, 700);
 
     }
     for (int j = 0; j<100; ++j){

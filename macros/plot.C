@@ -1,6 +1,16 @@
 #include "../EventType.h"
 #include "../EventSelection.h"
+#include "TH1D.h"
+#include "TH2D.h"
+#include "THStack.h"
+#include "TStyle.h"
+#include "TCanvas.h"
+#include "TPad.h"
 #include "TLegend.h"
+#include "TError.h"
+#include <iostream>
+
+using namespace std;
 
 int nc = 0;
 double totaldata = 0;
@@ -56,57 +66,84 @@ void plot1d(string name, int cut, string xtitle, string ytitle){
   }
   //std::cout<<totaldata<<" "<<totalmc<<std::endl;
   first = false;
-  TCanvas *can = new TCanvas(Form("can_%d",nc), Form("can_%d",nc));
+  TCanvas *can = new TCanvas(Form("can_%d",nc), Form("can_%d",nc), 800, 800);
+  TPad *pad1 = new TPad(Form("pad1_%d",nc), Form("pad1_%d",nc), 0, 0.2, 1, 1.);
+  pad1->SetBottomMargin(0.03);
+  pad1->SetGridx();
+  pad1->SetGridy();
+  pad1->Draw();
+  pad1->cd();
+  
+  TH1D *htotmc;
   THStack *hs = new THStack(Form("hs_%d",nc),"");
   for (int i = 0; i<nParTypes; ++i){
     hmc[cut][i+1]->SetFillColor(colors[i]);
     hmc[cut][i+1]->SetLineWidth(0);
     hmc[cut][i+1]->Scale(totaldata/totalmc);
     hs->Add(hmc[cut][i+1]);
+    if (i==0) htotmc = (TH1D*)hmc[cut][1]->Clone(Form("htotmc_%d",nc));
+    else htotmc->Add(hmc[cut][i+1]);
   }
-//  h[cut][3]->SetFillColor(kRed);
-//  h[cut][3]->SetLineWidth(0);
-//  hs->Add(h[cut][3]);
-//  h[cut][2]->SetFillColor(kBlue);
-//  h[cut][2]->SetLineWidth(0);
-//  hs->Add(h[cut][2]);
-//  h[cut][1]->SetFillColor(kGreen);
-//  h[cut][1]->SetLineWidth(0);
-//  hs->Add(h[cut][1]);
-//  h[cut][4]->SetFillColor(6);
-//  h[cut][4]->SetLineWidth(0);
-//  hs->Add(h[cut][4]);
+
   double max = TMath::Max(hs->GetMaximum(), hdata[cut]->GetMaximum());
-  hs->SetMaximum(1.1*max);
+  hs->SetMaximum(1.2*max);
   hs->Draw("hist");
-  hs->SetTitle(cutName[cut]);
+  hs->SetTitle(hdata[cut]->GetTitle());
   hs->GetXaxis()->SetTitle(xtitle.c_str());
+  hs->GetXaxis()->SetTitleSize(0);
+  hs->GetXaxis()->SetLabelSize(0);
   hs->GetYaxis()->SetTitle(ytitle.c_str());
+  hs->GetYaxis()->SetTitleSize(0.04);
+  hs->GetYaxis()->SetTitleOffset(1.8);
+  hs->GetYaxis()->SetLabelSize(0.04);
   hdata[cut]->SetMarkerStyle(20);
   hdata[cut]->Draw("same");
-  TLegend *leg;
-  if (hmc[cut][0]->GetMaximumBin() < hmc[cut][0]->GetNbinsX()/2){
-    leg = new TLegend(0.55,0.7,0.9,0.9);
-  }
-  else{
-    leg = new TLegend(0.15,0.7,0.5,0.9);
-  }
-  leg->SetFillStyle(0);
-  leg->SetNColumns(2);
-  leg->AddEntry(hdata[cut],parTypeName[0],"ple");
+  TLegend *leg = new TLegend(0.15, 0.75, 0.88, 0.9);
+//  if (hmc[cut][0]->GetMaximumBin() < hmc[cut][0]->GetNbinsX()/2){
+//    leg = new TLegend(0.55,0.7,0.9,0.9);
+//  }
+//  else{
+//    leg = new TLegend(0.15,0.7,0.5,0.9);
+//  }
+  //leg->SetFillStyle(0);
+  leg->SetNColumns(3);
+  leg->AddEntry(hdata[cut],Form("%s %.0f",parTypeName[0],hdata[cut]->Integral()),"ple");
+  leg->AddEntry((TObject*)0,Form("TotalMC %.0f",htotmc->Integral()),"");
   for (int i = 0; i<nParTypes; ++i){
-    leg->AddEntry(hmc[cut][i+1], parTypeName[i+1],"f");
+    leg->AddEntry(hmc[cut][i+1], Form("%s %.0f",parTypeName[i+1],hmc[cut][i+1]->Integral()), "f");
   }
-//  leg->AddEntry(h[cut][3],"#pi^{+} inelastic","f");
-//  leg->AddEntry(h[cut][4],"#pi^{+} elastic","f");
-//  leg->AddEntry(h[cut][2],"#mu^{+}","f");
-//  leg->AddEntry(h[cut][1],"Misidentified","f");
   leg->Draw();
+
+  can->cd();
+  TPad *pad2 = new TPad(Form("pad2_%d",nc), Form("pad2_%d",nc), 0, 0, 1, 0.2);
+  pad2->SetTopMargin(0.02);
+  pad2->SetBottomMargin(0.25);
+  pad2->SetGridx();
+  pad2->SetGridy();
+  pad2->Draw();
+  pad2->cd();
+
+  TH1D *hratio = (TH1D*)hdata[cut]->Clone(Form("hratio_%d",nc));
+  hratio->SetTitle("");
+  hratio->Divide(htotmc);
+  hratio->GetYaxis()->SetTitle("Data/MC");
+  hratio->GetXaxis()->SetLabelSize(0.12);
+  hratio->GetXaxis()->SetTitleSize(0.12);
+  hratio->GetXaxis()->SetTitleOffset(1.);
+  hratio->GetYaxis()->SetLabelSize(0.12);
+  hratio->GetYaxis()->SetTitleSize(0.12);
+  hratio->GetYaxis()->SetTitleOffset(.5);
+  hratio->GetYaxis()->SetRangeUser(0,5);
+  hratio->GetYaxis()->SetNdivisions(505);
+  hratio->Draw();
+
   can->Print(Form("plots/can_%s_%d_%s.png", name.c_str(), cut, cutName[cut]));
   can->Print(Form("plots/can_%s_%d_%s.pdf", name.c_str(), cut, cutName[cut]));
-  gPad->SetLogy();
+  hs->SetMaximum(4*max);
+  pad1->SetLogy();
   can->Print(Form("plots/canlog_%s_%d_%s.png", name.c_str(), cut, cutName[cut]));
   can->Print(Form("plots/canlog_%s_%d_%s.pdf", name.c_str(), cut, cutName[cut]));
+
   ++nc;
 }
 
