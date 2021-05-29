@@ -151,10 +151,11 @@ bool HadAna::PassAllCuts() const{
 
 void HadAna::ProcessEvent(){
 
-  partype = -1;
+  partype = GetParType();
 
   median_dEdx = -1;
   daughter_michel_score = 0;
+
   if (!reco_beam_calo_wire->empty()){
 
     median_dEdx = TMath::Median(reco_beam_calibrated_dEdX_SCE->size(), &(*reco_beam_calibrated_dEdX_SCE)[0]);
@@ -204,8 +205,45 @@ void HadAna::ProcessEvent(){
       beam_costh = dir.Dot(beamdir);
     }
   }
-  partype = GetParType();
 
+  dEdx_5cm = -1;
+  /*
+  if (!reco_beam_allTrack_calibrated_dEdX->empty()){
+    dEdx_5cm = 0;
+    int nhits = 0;
+    for (int i = 0; i<reco_beam_allTrack_calibrated_dEdX->size(); ++i){
+      std::cout<<i<<" "<<reco_beam_allTrack_resRange->back()-(*reco_beam_allTrack_resRange)[i]<<" "<<(*reco_beam_allTrack_calibrated_dEdX)[i]<<endl;
+      if (std::abs(reco_beam_allTrack_resRange->back()-(*reco_beam_allTrack_resRange)[i])<5){
+        dEdx_5cm += (*reco_beam_allTrack_calibrated_dEdX)[i];
+        ++nhits;
+      }
+    }
+    if (nhits) dEdx_5cm/=nhits;
+    else dEdx_5cm = -1;
+  }
+  */
+
+  //if (event == 78467) cout<<reco_beam_calibrated_dEdX_SCE->size()<<endl;
+  //cout<<reco_beam_allTrack_calibrated_dEdX->size()<<endl;
+  if (!reco_beam_calibrated_dEdX_SCE->empty()){
+    //dEdx_5cm = 0;
+    //int nhits = 0;
+    std::vector<double> vdEdx;
+    for (int i = 0; i<reco_beam_calibrated_dEdX_SCE->size(); ++i){
+      //std::cout<<i<<" "<<reco_beam_resRange_SCE->back()-(*reco_beam_resRange_SCE)[i]<<" "<<(*reco_beam_calibrated_dEdX_SCE)[i]<<endl;
+      //if (event == 78467) cout<<(*reco_beam_resRange_SCE)[i]<<" "<<(*reco_beam_calo_Z)[i]<<" "<<(*reco_beam_calibrated_dEdX_SCE)[i]<<endl;
+      if ((*reco_beam_resRange_SCE)[i]<5){
+        vdEdx.push_back((*reco_beam_calibrated_dEdX_SCE)[i]);
+        //dEdx_5cm += (*reco_beam_calibrated_dEdX_SCE)[i];
+        //++nhits;
+      }
+    }
+    //if (nhits) dEdx_5cm/=nhits;
+    //else dEdx_5cm = -1;
+    if (!vdEdx.empty()){
+      dEdx_5cm = TMath::Median(vdEdx.size(), &vdEdx[0]);
+    }
+  }
 //  if (!MC && reco_beam_PFP_trackScore_collection>=0 && reco_beam_PFP_trackScore_collection<0.01){
 //    cout<<run<<" "<<event<<endl;
 //  }

@@ -175,6 +175,7 @@ void plot(){
     plot1d("hmediandEdx", i, "Median dE/dx (MeV/cm)", "Events");
     plot1d("hdaughter_michel_score", i, "Daughter Michel Score", "Events");
     plot1d("htrackscore", i, "Track Score", "Events");
+    plot1d("hdEdx_5cm", i, "dEdx_5cm (MeV/cm)", "Events");
     plot1d("hreco_beam_endZ_SCE", i, "Reco track end Z (cm)", "Events");
     plot1d("htrue_beam_endZ_SCE", i, "True pion/muon end Z (cm)", "Events");
     plot1d("htrue_sliceID", i, "True Slice ID", "Events");
