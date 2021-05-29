@@ -75,6 +75,9 @@ void ThinSlice::BookHistograms(){
       hdaughter_michel_score[i][j] = new TH1D(Form("hdaughter_michel_score_%d_%d",i,j), Form("daughter_michel_score, %s, %s;Michel score", cutName[i], parTypeName[j]), 110, -0.1, 1);
       hdaughter_michel_score[i][j]->Sumw2();
 
+      htrackscore[i][j] = new TH1D(Form("htrackscore_%d_%d",i,j), Form("trackscore, %s, %s;Track score", cutName[i], parTypeName[j]), 110, -0.1, 1);
+      htrackscore[i][j]->Sumw2();
+
       hdeltax[i][j] = new TH1D(Form("hdeltax_%d_%d",i,j), Form("deltax, %s, %s;#Deltax/#sigma_{x}", cutName[i], parTypeName[j]), 100, -10, 10);
       hdeltax[i][j]->Sumw2();
 
@@ -316,7 +319,8 @@ void ThinSlice::FillHistograms(int cut, const HadAna & evt){
     
     FillHistVec1D(hmediandEdx[cut], evt.median_dEdx, evt.partype);
     FillHistVec1D(hdaughter_michel_score[cut], evt.daughter_michel_score, evt.partype);
-    
+    FillHistVec1D(htrackscore[cut], evt.reco_beam_PFP_trackScore_collection, evt.partype);
+
     FillHistVec1D(hdeltax[cut], evt.beam_dx, evt.partype);
     FillHistVec1D(hdeltay[cut], evt.beam_dy, evt.partype);
     FillHistVec1D(hdeltaz[cut], evt.beam_dz, evt.partype);

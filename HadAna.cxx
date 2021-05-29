@@ -205,5 +205,10 @@ void HadAna::ProcessEvent(){
     }
   }
   partype = GetParType();
+
+//  if (!MC && reco_beam_PFP_trackScore_collection>=0 && reco_beam_PFP_trackScore_collection<0.01){
+//    cout<<run<<" "<<event<<endl;
+//  }
+
 }
 
