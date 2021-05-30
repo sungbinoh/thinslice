@@ -37,10 +37,10 @@ void PrintEvents(string name){
     double totalmc = 0;
     for (int j =0; j<nIntTypes+1; ++j){
       if (j==0){
-        cout<<parTypeName[j]<<" "<<hdata[i]->Integral()<<endl;
+        cout<<intTypeName[j]<<" "<<hdata[i]->Integral()<<endl;
       }
       else{
-        cout<<parTypeName[j]<<" "<<hmc[i][j]->Integral()<<endl;
+        cout<<intTypeName[j]<<" "<<hmc[i][j]->Integral()<<endl;
         totalmc += hmc[i][j]->Integral();
       }
     }
@@ -107,10 +107,10 @@ void plot1d(string name, int cut, string xtitle, string ytitle){
 //  }
   //leg->SetFillStyle(0);
   leg->SetNColumns(3);
-  leg->AddEntry(hdata[cut],Form("%s %.0f",parTypeName[0],hdata[cut]->Integral()),"ple");
+  leg->AddEntry(hdata[cut],Form("%s %.0f",intTypeName[0],hdata[cut]->Integral()),"ple");
   leg->AddEntry((TObject*)0,Form("TotalMC %.0f",htotmc->Integral()),"");
   for (int i = 0; i<nIntTypes; ++i){
-    leg->AddEntry(hmc[cut][i+1], Form("%s %.0f",parTypeName[i+1],hmc[cut][i+1]->Integral()), "f");
+    leg->AddEntry(hmc[cut][i+1], Form("%s %.0f",intTypeName[i+1],hmc[cut][i+1]->Integral()), "f");
   }
   leg->Draw();
 
@@ -158,8 +158,8 @@ void plot2d(string name, int cut){
   for (int i = 1; i<=4; ++i){
     TCanvas *can = new TCanvas(Form("can_%d",nc), Form("can_%d",nc));
     h[cut][i]->Draw("colz");
-    can->Print(Form("plots/can_%s_%s_%s.png",name.c_str(), cutName[cut], parTypeName[i]));
-    can->Print(Form("plots/can_%s_%s_%s.pdf",name.c_str(), cutName[cut], parTypeName[i]));
+    can->Print(Form("plots/can_%s_%s_%s.png",name.c_str(), cutName[cut], intTypeName[i]));
+    can->Print(Form("plots/can_%s_%s_%s.pdf",name.c_str(), cutName[cut], intTypeName[i]));
     ++nc;
   }
 }

@@ -5,7 +5,7 @@
 
 const unsigned int nIntTypes = 9;
 
-const char parTypeName[nIntTypes+1][100] = {"Data",
+const char intTypeName[nIntTypes+1][100] = {"Data",
                                             "PiInel",
                                             "PiElas",
                                             "Muon",
@@ -18,7 +18,7 @@ const char parTypeName[nIntTypes+1][100] = {"Data",
 
 
 
-enum parType{
+enum intType{
   kData,
   kPiInel,
   kPiElas,
