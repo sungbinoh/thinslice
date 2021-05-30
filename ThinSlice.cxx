@@ -40,7 +40,7 @@ void ThinSlice::BookHistograms(){
   h_recosliceid_pioninelastic_cuts->Sumw2();
 
   for (int i = 0; i < nCuts; ++i){
-    for (int j = 0; j < nParTypes+1; ++j){
+    for (int j = 0; j < nIntTypes+1; ++j){
       htrue_beam_endZ[i][j] = new TH1D(Form("htrue_beam_endZ_%d_%d",i,j),Form("true_beam_endZ, %s, %s;true_beam_endZ (cm)", cutName[i], parTypeName[j]), 70, -100, 600);
       htrue_beam_endZ[i][j]->Sumw2();
       hreco_beam_endZ[i][j] = new TH1D(Form("hreco_beam_endZ_%d_%d",i,j),Form("reco_beam_endZ, %s, %s;reco_beam_endZ (cm)", cutName[i], parTypeName[j]), 70, -100, 600);

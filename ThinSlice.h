@@ -33,47 +33,47 @@ class ThinSlice {
   double true_interactions[nthinslices];
   double true_incidents[nthinslices];
 
-  TH1D *htrue_beam_endZ[nCuts][nParTypes+1];
-  TH1D *hreco_beam_endZ[nCuts][nParTypes+1];
-  TH1D *hreco_true_beam_endZ[nCuts][nParTypes+1];
-  TH2D *hreco_vs_true_beam_endZ[nCuts][nParTypes+1];
-  TH2D *hreco_true_vs_true_beam_endZ[nCuts][nParTypes+1];
+  TH1D *htrue_beam_endZ[nCuts][nIntTypes+1];
+  TH1D *hreco_beam_endZ[nCuts][nIntTypes+1];
+  TH1D *hreco_true_beam_endZ[nCuts][nIntTypes+1];
+  TH2D *hreco_vs_true_beam_endZ[nCuts][nIntTypes+1];
+  TH2D *hreco_true_vs_true_beam_endZ[nCuts][nIntTypes+1];
 
-  TH1D *htrue_beam_endZ_SCE[nCuts][nParTypes+1];
-  TH1D *hreco_beam_endZ_SCE[nCuts][nParTypes+1];
-  TH1D *hreco_true_beam_endZ_SCE[nCuts][nParTypes+1];
-  TH2D *hreco_vs_true_beam_endZ_SCE[nCuts][nParTypes+1];
-  TH2D *hreco_true_vs_true_beam_endZ_SCE[nCuts][nParTypes+1];
+  TH1D *htrue_beam_endZ_SCE[nCuts][nIntTypes+1];
+  TH1D *hreco_beam_endZ_SCE[nCuts][nIntTypes+1];
+  TH1D *hreco_true_beam_endZ_SCE[nCuts][nIntTypes+1];
+  TH2D *hreco_vs_true_beam_endZ_SCE[nCuts][nIntTypes+1];
+  TH2D *hreco_true_vs_true_beam_endZ_SCE[nCuts][nIntTypes+1];
 
-  TH1D *htrue_sliceID[nCuts][nParTypes+1];
-  TH1D *hreco_sliceID[nCuts][nParTypes+1];
-  TH1D *hreco_true_sliceID[nCuts][nParTypes+1];
-  TH2D *hreco_vs_true_sliceID[nCuts][nParTypes+1];
-  TH2D *hreco_true_vs_true_sliceID[nCuts][nParTypes+1];
+  TH1D *htrue_sliceID[nCuts][nIntTypes+1];
+  TH1D *hreco_sliceID[nCuts][nIntTypes+1];
+  TH1D *hreco_true_sliceID[nCuts][nIntTypes+1];
+  TH2D *hreco_vs_true_sliceID[nCuts][nIntTypes+1];
+  TH2D *hreco_true_vs_true_sliceID[nCuts][nIntTypes+1];
 
-  TH1D *hmediandEdx[nCuts][nParTypes+1];
-  TH1D *hdaughter_michel_score[nCuts][nParTypes+1];
-  TH1D *htrackscore[nCuts][nParTypes+1];
-  TH1D *hdEdx_5cm[nCuts][nParTypes+1];
+  TH1D *hmediandEdx[nCuts][nIntTypes+1];
+  TH1D *hdaughter_michel_score[nCuts][nIntTypes+1];
+  TH1D *htrackscore[nCuts][nIntTypes+1];
+  TH1D *hdEdx_5cm[nCuts][nIntTypes+1];
 
-  TH1D *hdeltax[nCuts][nParTypes+1];
-  TH1D *hdeltay[nCuts][nParTypes+1];
-  TH1D *hdeltaz[nCuts][nParTypes+1];
-  TH1D *hcostheta[nCuts][nParTypes+1];
+  TH1D *hdeltax[nCuts][nIntTypes+1];
+  TH1D *hdeltay[nCuts][nIntTypes+1];
+  TH1D *hdeltaz[nCuts][nIntTypes+1];
+  TH1D *hcostheta[nCuts][nIntTypes+1];
 
-  TH1D *htrklen[nCuts][nParTypes+1];
+  TH1D *htrklen[nCuts][nIntTypes+1];
 
-  TH1D *hreco_beam_startX_SCE[nCuts][nParTypes+1];
-  TH1D *hreco_beam_startY_SCE[nCuts][nParTypes+1];
-  TH1D *hreco_beam_startZ_SCE[nCuts][nParTypes+1];
-  TH1D *hreco_beam_dcosX_SCE[nCuts][nParTypes+1];
-  TH1D *hreco_beam_dcosY_SCE[nCuts][nParTypes+1];
-  TH1D *hreco_beam_dcosZ_SCE[nCuts][nParTypes+1];
-  TH1D *hreco_beam_angleX_SCE[nCuts][nParTypes+1];
-  TH1D *hreco_beam_angleY_SCE[nCuts][nParTypes+1];
-  TH1D *hreco_beam_angleZ_SCE[nCuts][nParTypes+1];
+  TH1D *hreco_beam_startX_SCE[nCuts][nIntTypes+1];
+  TH1D *hreco_beam_startY_SCE[nCuts][nIntTypes+1];
+  TH1D *hreco_beam_startZ_SCE[nCuts][nIntTypes+1];
+  TH1D *hreco_beam_dcosX_SCE[nCuts][nIntTypes+1];
+  TH1D *hreco_beam_dcosY_SCE[nCuts][nIntTypes+1];
+  TH1D *hreco_beam_dcosZ_SCE[nCuts][nIntTypes+1];
+  TH1D *hreco_beam_angleX_SCE[nCuts][nIntTypes+1];
+  TH1D *hreco_beam_angleY_SCE[nCuts][nIntTypes+1];
+  TH1D *hreco_beam_angleZ_SCE[nCuts][nIntTypes+1];
 
-  TH2D *hreco_beam_startXY_SCE[nCuts][nParTypes+1];
+  TH2D *hreco_beam_startXY_SCE[nCuts][nIntTypes+1];
 
   std::string fOutputFileName;
   TFile *outputFile;

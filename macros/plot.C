@@ -16,7 +16,7 @@ int nc = 0;
 double totaldata = 0;
 double totalmc = 0;
 
-int colors[nParTypes] = {2, 3, 5, 7, 33, 9, 46, 28, 41};
+int colors[nIntTypes] = {2, 3, 5, 7, 33, 9, 46, 28, 41};
 
 TFile *fmc;
 TFile *fdata;
@@ -24,9 +24,9 @@ TFile *fdata;
 void PrintEvents(string name){
 
   TH1D *hdata[nCuts];
-  TH1D *hmc[nCuts][nParTypes+1];
+  TH1D *hmc[nCuts][nIntTypes+1];
   for (int i = 0; i < nCuts; ++i){
-    for (int j = 0; j < nParTypes+1; ++j){
+    for (int j = 0; j < nIntTypes+1; ++j){
       hmc[i][j] = (TH1D*)fmc->Get(Form("%s_%d_%d",name.c_str(),i,j));
     }
     hdata[i] = (TH1D*)fdata->Get(Form("%s_%d_%d",name.c_str(),i,0));
@@ -35,7 +35,7 @@ void PrintEvents(string name){
   for (int i = 0; i<nCuts; ++i){
     cout<<"=========="<<cutName[i]<<"=========="<<endl;
     double totalmc = 0;
-    for (int j =0; j<nParTypes+1; ++j){
+    for (int j =0; j<nIntTypes+1; ++j){
       if (j==0){
         cout<<parTypeName[j]<<" "<<hdata[i]->Integral()<<endl;
       }
@@ -53,9 +53,9 @@ void plot1d(string name, int cut, string xtitle, string ytitle){
   static bool first = true;
 
   TH1D *hdata[nCuts];
-  TH1D *hmc[nCuts][nParTypes+1];
+  TH1D *hmc[nCuts][nIntTypes+1];
   for (int i = 0; i < nCuts; ++i){
-    for (int j = 0; j < nParTypes+1; ++j){
+    for (int j = 0; j < nIntTypes+1; ++j){
       hmc[i][j] = (TH1D*)fmc->Get(Form("%s_%d_%d",name.c_str(),i,j));
       if (i==0 && j!=0 && first){
         totalmc += hmc[i][j]->Integral();
@@ -76,7 +76,7 @@ void plot1d(string name, int cut, string xtitle, string ytitle){
   
   TH1D *htotmc;
   THStack *hs = new THStack(Form("hs_%d",nc),"");
-  for (int i = 0; i<nParTypes; ++i){
+  for (int i = 0; i<nIntTypes; ++i){
     hmc[cut][i+1]->SetFillColor(colors[i]);
     hmc[cut][i+1]->SetLineWidth(0);
     hmc[cut][i+1]->Scale(totaldata/totalmc);
@@ -109,7 +109,7 @@ void plot1d(string name, int cut, string xtitle, string ytitle){
   leg->SetNColumns(3);
   leg->AddEntry(hdata[cut],Form("%s %.0f",parTypeName[0],hdata[cut]->Integral()),"ple");
   leg->AddEntry((TObject*)0,Form("TotalMC %.0f",htotmc->Integral()),"");
-  for (int i = 0; i<nParTypes; ++i){
+  for (int i = 0; i<nIntTypes; ++i){
     leg->AddEntry(hmc[cut][i+1], Form("%s %.0f",parTypeName[i+1],hmc[cut][i+1]->Integral()), "f");
   }
   leg->Draw();
@@ -149,9 +149,9 @@ void plot1d(string name, int cut, string xtitle, string ytitle){
 
 void plot2d(string name, int cut){
 
-  TH2D *h[nCuts][nParTypes+1];
+  TH2D *h[nCuts][nIntTypes+1];
   for (int i = 0; i < nCuts; ++i){
-    for (int j = 0; j < nParTypes+1; ++j){
+    for (int j = 0; j < nIntTypes+1; ++j){
       h[i][j] = (TH2D*)fmc->Get(Form("%s_%d_%d",name.c_str(),i,j));
     }
   }

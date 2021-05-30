@@ -3,9 +3,9 @@
 
 #include "anavar.h"
 
-const unsigned int nParTypes = 9;
+const unsigned int nIntTypes = 9;
 
-const char parTypeName[nParTypes+1][100] = {"Data",
+const char parTypeName[nIntTypes+1][100] = {"Data",
                                             "PiInel",
                                             "PiElas",
                                             "Muon",
