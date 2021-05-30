@@ -59,7 +59,6 @@ void ThinSlice::BookHistograms(){
       hreco_vs_true_beam_endZ_SCE[i][j]= new TH2D(Form("hreco_vs_true_beam_endZ_SCE_%d_%d",i,j), Form("%s, %s;true_beam_endZ_SCE (cm);reco_beam_endZ_SCE (cm)", cutName[i], intTypeName[j]), 70, -100, 600, 70, -100, 600);
       hreco_true_vs_true_beam_endZ_SCE[i][j]= new TH2D(Form("hreco_true_vs_true_beam_endZ_SCE_%d_%d",i,j), Form("%s, %s;true_beam_endZ_SCE (cm);reco - true_beam_endZ_SCE (cm)", cutName[i], intTypeName[j]), 70, -100, 600, 100, -100, 100);
 
-
       htrue_sliceID[i][j] = new TH1D(Form("htrue_sliceID_%d_%d",i,j),Form("true_sliceID, %s, %s;true_sliceID (cm)", cutName[i], intTypeName[j]), 26, -1, 25);
       htrue_sliceID[i][j]->Sumw2();
       hreco_sliceID[i][j] = new TH1D(Form("hreco_sliceID_%d_%d",i,j),Form("reco_sliceID, %s, %s;reco_sliceID", cutName[i], intTypeName[j]), 26, -1, 25);
@@ -74,6 +73,14 @@ void ThinSlice::BookHistograms(){
 
       hdaughter_michel_score[i][j] = new TH1D(Form("hdaughter_michel_score_%d_%d",i,j), Form("daughter_michel_score, %s, %s;Michel score", cutName[i], intTypeName[j]), 110, -0.1, 1);
       hdaughter_michel_score[i][j]->Sumw2();
+
+      for (int k = 0; k<nthinslices; ++k){
+        hmediandEdxSlice[k][i][j] = new TH1D(Form("hmediandEdxSlice_%d_%d_%d",k,i,j), Form("mediandEdx, %s, %s, sliceID = %d;Median dE/dx (MeV/cm)", cutName[i], intTypeName[j], k), 8, 1, 5);
+        hmediandEdxSlice[k][i][j]->Sumw2();
+
+        hdaughter_michel_scoreSlice[k][i][j] = new TH1D(Form("hdaughter_michel_scoreSlice_%d_%d_%d",k,i,j), Form("daughter_michel_score, %s, %s, sliceID = %d;Michel score", cutName[i], intTypeName[j], k), 10, 0, 1);
+        hdaughter_michel_scoreSlice[k][i][j]->Sumw2();
+      }        
 
       htrackscore[i][j] = new TH1D(Form("htrackscore_%d_%d",i,j), Form("trackscore, %s, %s;Track score", cutName[i], intTypeName[j]), 110, -0.1, 1);
       htrackscore[i][j]->Sumw2();
@@ -315,6 +322,12 @@ void ThinSlice::FillHistograms(int cut, const HadAna & evt){
     
     FillHistVec1D(hmediandEdx[cut], evt.median_dEdx, evt.partype);
     FillHistVec1D(hdaughter_michel_score[cut], evt.daughter_michel_score, evt.partype);
+
+    if (reco_sliceID>=0 && reco_sliceID<nthinslices){
+      FillHistVec1D(hmediandEdxSlice[reco_sliceID][cut], evt.median_dEdx, evt.partype);
+      FillHistVec1D(hdaughter_michel_scoreSlice[reco_sliceID][cut], evt.daughter_michel_score, evt.partype);
+    }
+
     FillHistVec1D(htrackscore[cut], evt.reco_beam_PFP_trackScore_collection, evt.partype);
     FillHistVec1D(hdEdx_5cm[cut], evt.dEdx_5cm, evt.partype);
 
