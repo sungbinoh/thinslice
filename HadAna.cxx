@@ -110,6 +110,7 @@ bool HadAna::PassBeamQualityCut() const{
   if (beam_dx>beamcut_dx_max) return false;
   if (beam_dy<beamcut_dy_min) return false;
   if (beam_dy>beamcut_dy_max) return false;
+  //if (beam_dx*beam_dx+beam_dy*beam_dy>1.5*1.5) return false;
   if (beam_dz<beamcut_dz_min) return false;
   if (beam_dz>beamcut_dz_max) return false;
   if (beam_costh<beamcut_costh_min) return false;
