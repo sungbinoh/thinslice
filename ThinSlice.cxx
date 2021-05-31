@@ -77,6 +77,9 @@ void ThinSlice::BookHistograms(){
       hdaughter_michel_scoreMu[i][j] = new TH1D(Form("hdaughter_michel_scoreMu_%d_%d",i,j), Form("daughter_michel_scoreMu, %s, %s;Michel score", cutName[i], intTypeName[j]), 20, 0, 1);
       hdaughter_michel_scoreMu[i][j]->Sumw2();
 
+      hdaughter_michel_score2Mu[i][j] = new TH1D(Form("hdaughter_michel_score2Mu_%d_%d",i,j), Form("daughter_michel_score2Mu, %s, %s;Michel score", cutName[i], intTypeName[j]), 20, 0, 1);
+      hdaughter_michel_score2Mu[i][j]->Sumw2();
+
       for (int k = 0; k<nthinslices; ++k){
         hmediandEdxSlice[k][i][j] = new TH1D(Form("hmediandEdxSlice_%d_%d_%d",k,i,j), Form("mediandEdx, %s, %s, sliceID = %d;Median dE/dx (MeV/cm)", cutName[i], intTypeName[j], k), 8, 1, 5);
         hmediandEdxSlice[k][i][j]->Sumw2();
@@ -325,8 +328,23 @@ void ThinSlice::FillHistograms(int cut, const HadAna & evt){
     
     FillHistVec1D(hmediandEdx[cut], evt.median_dEdx, evt.partype);
     FillHistVec1D(hdaughter_michel_score[cut], evt.daughter_michel_score, evt.partype);
-    if (evt.reco_beam_calo_endZ>300 && evt.daughter_michel_score>=0){
-      FillHistVec1D(hdaughter_michel_scoreMu[cut], evt.daughter_michel_score, evt.partype);
+    if (evt.reco_beam_calo_endZ>300){
+      if (evt.daughter_michel_score>=0){
+        FillHistVec1D(hdaughter_michel_scoreMu[cut], evt.daughter_michel_score, evt.partype);
+      }
+      int nhits = 0;
+      double michelscore = 0;
+      for (size_t i = 0; i<evt.reco_daughter_PFP_michelScore_collection->size(); ++i){
+        nhits += (*evt.reco_daughter_PFP_nHits_collection)[i];
+        michelscore += (*evt.reco_daughter_PFP_michelScore_collection)[0] * (*evt.reco_daughter_PFP_nHits_collection)[i];
+      }
+      if (nhits && michelscore>=0){
+        michelscore/=nhits;
+        FillHistVec1D(hdaughter_michel_score2Mu[cut], michelscore, evt.partype);
+      }
+//      if (evt.partype == kMuon && evt.daughter_michel_score < 0.01){
+//        cout<<evt.run<<" "<<evt.subrun<<" "<<evt.event<<endl;
+//      }
     }
     if (reco_sliceID>=0 && reco_sliceID<nthinslices){
       FillHistVec1D(hmediandEdxSlice[reco_sliceID][cut], evt.median_dEdx, evt.partype);

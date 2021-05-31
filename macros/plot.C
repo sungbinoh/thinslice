@@ -110,7 +110,7 @@ void plot1d(string name, int cut, string xtitle, string ytitle){
 //  else{
 //    leg = new TLegend(0.15,0.7,0.5,0.9);
 //  }
-  //leg->SetFillStyle(0);
+  leg->SetFillStyle(0);
   leg->SetNColumns(3);
   leg->AddEntry(hdata[cut],Form("%s %.0f",intTypeName[0],hdata[cut]->Integral()),"ple");
   leg->AddEntry((TObject*)0,Form("TotalMC %.0f",htotmc->Integral()),"");
@@ -281,6 +281,7 @@ void plot(){
     plot1d("hmediandEdx", i, "Median dE/dx (MeV/cm)", "Events");
     plot1d("hdaughter_michel_score", i, "Daughter Michel Score", "Events");
     plot1d("hdaughter_michel_scoreMu", i, "Muon Daughter Michel Score", "Events");
+    plot1d("hdaughter_michel_score2Mu", i, "Muon Daughter Michel Score2", "Events");
     plot1d("htrackscore", i, "Track Score", "Events");
     plot1d("hdEdx_5cm", i, "dEdx_5cm (MeV/cm)", "Events");
     plot1d("hreco_beam_endZ_SCE", i, "Reco track end Z (cm)", "Events");

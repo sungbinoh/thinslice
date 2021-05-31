@@ -159,14 +159,15 @@ void HadAna::ProcessEvent(){
 
   if (!reco_beam_calo_wire->empty()){
     median_dEdx = TMath::Median(reco_beam_calibrated_dEdX_SCE->size(), &(*reco_beam_calibrated_dEdX_SCE)[0]);
-    daughter_michel_score = 0;
-    int nhits = 0;
-    for (size_t i = 0; i<reco_daughter_PFP_michelScore_collection->size(); ++i){
-      nhits += (*reco_daughter_PFP_nHits_collection)[i];
-      daughter_michel_score += (*reco_daughter_PFP_michelScore_collection)[0] * (*reco_daughter_PFP_nHits_collection)[i];
-    }
-    if (nhits) daughter_michel_score/=nhits;
-    else daughter_michel_score = -999;
+//    daughter_michel_score = 0;
+//    int nhits = 0;
+//    for (size_t i = 0; i<reco_daughter_PFP_michelScore_collection->size(); ++i){
+//      nhits += (*reco_daughter_PFP_nHits_collection)[i];
+//      daughter_michel_score += (*reco_daughter_PFP_michelScore_collection)[0] * (*reco_daughter_PFP_nHits_collection)[i];
+//    }
+//    if (nhits) daughter_michel_score/=nhits;
+//    else daughter_michel_score = -999;
+    if (reco_beam_vertex_nHits) daughter_michel_score = reco_beam_vertex_michel_score/reco_beam_vertex_nHits;
   }
 
   beam_dx = -999;
