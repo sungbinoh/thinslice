@@ -53,6 +53,7 @@ class ThinSlice {
 
   TH1D *hmediandEdx[nCuts][nIntTypes+1];
   TH1D *hdaughter_michel_score[nCuts][nIntTypes+1];
+  TH1D *hdaughter_michel_scoreMu[nCuts][nIntTypes+1];
   TH1D *htrackscore[nCuts][nIntTypes+1];
   TH1D *hdEdx_5cm[nCuts][nIntTypes+1];
 

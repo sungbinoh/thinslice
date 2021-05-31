@@ -67,13 +67,6 @@ void plot1d(string name, int cut, string xtitle, string ytitle){
   }
   //std::cout<<totaldata<<" "<<totalmc<<std::endl;
   first = false;
-  TCanvas *can = new TCanvas(Form("can_%d",nc), Form("can_%d",nc), 800, 800);
-  TPad *pad1 = new TPad(Form("pad1_%d",nc), Form("pad1_%d",nc), 0, 0.2, 1, 1.);
-  pad1->SetBottomMargin(0.03);
-  pad1->SetGridx();
-  pad1->SetGridy();
-  pad1->Draw();
-  pad1->cd();
   
   TH1D *htotmc;
   THStack *hs = new THStack(Form("hs_%d",nc),"");
@@ -85,6 +78,17 @@ void plot1d(string name, int cut, string xtitle, string ytitle){
     if (i==0) htotmc = (TH1D*)hmc[cut][1]->Clone(Form("htotmc_%d",nc));
     else htotmc->Add(hmc[cut][i+1]);
   }
+
+  if (!htotmc->Integral() || !hdata[cut]->Integral()) return;
+
+  TCanvas *can = new TCanvas(Form("can_%d",nc), Form("can_%d",nc), 800, 800);
+  TPad *pad1 = new TPad(Form("pad1_%d",nc), Form("pad1_%d",nc), 0, 0.2, 1, 1.);
+  pad1->SetBottomMargin(0.03);
+  pad1->SetGridx();
+  pad1->SetGridy();
+  pad1->Draw();
+  pad1->cd();
+  
 
   double max = TMath::Max(hs->GetMaximum(), hdata[cut]->GetMaximum());
   hs->SetMaximum(1.2*max);
@@ -276,6 +280,7 @@ void plot(){
   for (int i = 0; i<nCuts; ++i){
     plot1d("hmediandEdx", i, "Median dE/dx (MeV/cm)", "Events");
     plot1d("hdaughter_michel_score", i, "Daughter Michel Score", "Events");
+    plot1d("hdaughter_michel_scoreMu", i, "Muon Daughter Michel Score", "Events");
     plot1d("htrackscore", i, "Track Score", "Events");
     plot1d("hdEdx_5cm", i, "dEdx_5cm (MeV/cm)", "Events");
     plot1d("hreco_beam_endZ_SCE", i, "Reco track end Z (cm)", "Events");
