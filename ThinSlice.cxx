@@ -334,6 +334,7 @@ void ThinSlice::FillHistograms(int cut, const HadAna & evt){
     if (evt.reco_beam_calo_endZ>300 && evt.median_dEdx<2.4){
       if (evt.daughter_michel_score>=0){
         FillHistVec1D(hdaughter_michel_scoreMu[cut], evt.daughter_michel_score, evt.partype);
+        //if (!evt.MC) cout<<evt.run<<" "<<evt.subrun<<" "<<evt.event<<" "<<evt.daughter_michel_score<<" "<<evt.reco_beam_calo_wire->back()<<" "<<evt.reco_beam_calo_tick->back()<<" "<<evt.reco_beam_calo_wire->front()<<" "<<evt.reco_beam_calo_tick->front()<<endl;
       }
       int nhits = 0;
       double michelscore = 0;
@@ -351,6 +352,7 @@ void ThinSlice::FillHistograms(int cut, const HadAna & evt){
     }
     if (evt.reco_beam_calo_endZ<100 && evt.median_dEdx<2.4){
       if (evt.daughter_michel_score>=0){
+        //if (!evt.MC) cout<<evt.run<<" "<<evt.subrun<<" "<<evt.event<<" "<<evt.daughter_michel_score<<" "<<evt.reco_beam_calo_wire->back()<<" "<<evt.reco_beam_calo_tick->back()<<" "<<evt.reco_beam_calo_wire->front()<<" "<<evt.reco_beam_calo_tick->front()<<endl;
         FillHistVec1D(hdaughter_michel_scorePi[cut], evt.daughter_michel_score, evt.partype);
       }
     }
