@@ -275,6 +275,7 @@ void plot(){
   gErrorIgnoreLevel = kWarning;
 
   fmc = TFile::Open("../install/bin/mcprod4a.root");
+  //fdata = TFile::Open("../install/bin/mcprod4a.root");
   fdata = TFile::Open("../install/bin/data.root");
 
   for (int i = 0; i<nCuts; ++i){

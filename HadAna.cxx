@@ -121,9 +121,9 @@ bool HadAna::PassBeamQualityCut() const{
 
 bool HadAna::PassAPA3Cut() const{
 
-  double cutAPA3_Z = 226.;
+  double cutAPA3_Z = 220.;
 
-  return reco_beam_endZ < cutAPA3_Z;
+  return reco_beam_calo_endZ < cutAPA3_Z;
 }
 
 bool HadAna::PassCaloSizeCut() const{

@@ -5,7 +5,7 @@
 //const int nslices = 480/nwires_in_slice;
 
 const double thinslicewidth = 10; //cm
-const int nthinslices = 23;
+const int nthinslices = 22;
 
 const int nbinse=12; 
 const int nbinsthickness = 100;
