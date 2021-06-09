@@ -3,6 +3,9 @@
 #include "../SliceParams.h"
 
 void plotbkgfits(bool fakedata = false){
+  
+  gStyle->SetOptStat(0);
+  gErrorIgnoreLevel = kWarning;
 
   int colors[nIntTypes] = {2, 3, 5, 7, 33, 9, 46, 28, 41};
 
@@ -93,8 +96,13 @@ void plotbkgfits(bool fakedata = false){
     //  }
     //leg->SetFillStyle(0);
     leg->SetNColumns(3);
-    leg->AddEntry(hmediandEdxSlice[j][kAPA3][0],Form("%s %.0f",intTypeName[0],hmediandEdxSlice[j][kAPA3][0]->Integral()),"ple");
-    leg->AddEntry((TObject*)0,Form("Original MC %.0f",htotmc_orig->Integral()),"");
+    if (fakedata){
+      leg->AddEntry(hmediandEdxSlice[j][kAPA3][0],Form("%s %.0f","fake data",hmediandEdxSlice[j][kAPA3][0]->Integral()),"ple");
+    }
+    else{
+      leg->AddEntry(hmediandEdxSlice[j][kAPA3][0],Form("%s %.0f","data",hmediandEdxSlice[j][kAPA3][0]->Integral()),"ple");
+    }
+    leg->AddEntry(htotmc_orig,Form("Original MC %.0f",htotmc_orig->Integral()),"l");
     leg->AddEntry((TObject*)0,Form("Best fit MC %.0f",htotmc_bestfit->Integral()),"");
     leg->AddEntry((TObject*)0,Form("Proton corr.: %.1f#pm%.1f",corr->GetPointY(j), corr->GetErrorY(j)),"");
     for (int i = 0; i<nIntTypes; ++i){
@@ -102,6 +110,37 @@ void plotbkgfits(bool fakedata = false){
     }
     leg->Draw();
 
+    can->cd();
+    TPad *pad2 = new TPad(Form("pad2_%d",nc), Form("pad2_%d",nc), 0, 0, 1, 0.2);
+    pad2->SetTopMargin(0.02);
+    pad2->SetBottomMargin(0.25);
+    pad2->SetGridx();
+    pad2->SetGridy();
+    pad2->Draw();
+    pad2->cd();
+    
+    TH1D *hratio_bestfit = (TH1D*)hmediandEdxSlice[j][kAPA3][0]->Clone(Form("hratio_bestfit_%d",nc));
+    hratio_bestfit->SetTitle("");
+    hratio_bestfit->Divide(htotmc_bestfit);
+    hratio_bestfit->GetYaxis()->SetTitle("Data/MC");
+    hratio_bestfit->GetXaxis()->SetLabelSize(0.12);
+    hratio_bestfit->GetXaxis()->SetTitleSize(0.12);
+    hratio_bestfit->GetXaxis()->SetTitleOffset(1.);
+    hratio_bestfit->GetYaxis()->SetLabelSize(0.12);
+    hratio_bestfit->GetYaxis()->SetTitleSize(0.12);
+    hratio_bestfit->GetYaxis()->SetTitleOffset(.5);
+    hratio_bestfit->GetYaxis()->SetRangeUser(0,5);
+    hratio_bestfit->GetYaxis()->SetNdivisions(505);
+    hratio_bestfit->Draw();
+    TH1D *hratio_orig = (TH1D*)hmediandEdxSlice[j][kAPA3][0]->Clone(Form("hratio_orig_%d",nc));
+    hratio_orig->Divide(htotmc_orig);
+    hratio_orig->SetLineStyle(2);
+    hratio_orig->Draw("hist same");
+    TLegend *leg2 = new TLegend(0.15,0.7,0.5,0.95);
+    leg2->SetFillStyle(0);
+    leg2->AddEntry(hratio_bestfit,"best fit","ple");
+    leg2->AddEntry(hratio_orig,"original","l");
+    leg2->Draw();
 
     if (fakedata){
       can->Print(Form("plots/canfitmc_%s_%d_%s_%02d.png", "hmediandEdxSlice", kAPA3, cutName[kAPA3], j));
