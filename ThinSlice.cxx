@@ -94,7 +94,7 @@ void ThinSlice::BookHistograms(){
       htrackscore[i][j] = new TH1D(Form("htrackscore_%d_%d",i,j), Form("trackscore, %s, %s;Track score", cutName[i], intTypeName[j]), 110, -0.1, 1);
       htrackscore[i][j]->Sumw2();
 
-      hemscore[i][j] = new TH1D(Form("hemscore_%d_%d",i,j), Form("emscore, %s, %s;Em score", cutName[i], intTypeName[j]), 110, -0.1, 1);
+      hemscore[i][j] = new TH1D(Form("hemscore_%d_%d",i,j), Form("emscore, %s, %s;Em score", cutName[i], intTypeName[j]), 50, 0, 1);
       hemscore[i][j]->Sumw2();
 
       hdEdx_5cm[i][j] = new TH1D(Form("hdEdx_5cm_%d_%d",i,j), Form("dEdx_5cm, %s, %s;dE/dx_5cm (MeV/cm)", cutName[i], intTypeName[j]), 100, 0, 5);
@@ -366,8 +366,8 @@ void ThinSlice::FillHistograms(int cut, const HadAna & evt){
 
     FillHistVec1D(htrackscore[cut], evt.reco_beam_PFP_trackScore_collection, evt.partype);
     FillHistVec1D(hemscore[cut], evt.reco_beam_PFP_emScore_collection, evt.partype);
-//    if (cut == kAPA3 && evt.reco_beam_PFP_emScore_collection > 0.99){
-//      cout<<evt.run<<" "<<evt.event<<endl;
+//    if (cut == kAPA3 && evt.reco_beam_PFP_emScore_collection > 0.9){
+//      cout<<evt.run<<" "<<evt.event<<" "<<evt.reco_beam_PFP_emScore_collection<<" "<<evt.reco_beam_calo_wire->front()<<" "<<evt.reco_beam_calo_tick->back()<<endl;
 //    }
     FillHistVec1D(hdEdx_5cm[cut], evt.dEdx_5cm, evt.partype);
 
