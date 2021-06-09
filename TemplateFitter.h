@@ -24,6 +24,10 @@ class TemplateFitter {
   static int i0, i1;
 
   TMinuit *gMinuit;
+
+ private:
+
+  bool fitsuccess;
   
 };
 

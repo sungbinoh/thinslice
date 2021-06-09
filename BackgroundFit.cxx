@@ -6,12 +6,41 @@
 #include "TH1D.h"
 #include "TGraphErrors.h"
 #include <iostream>
+#include <string>
 
-int main(){
-  
-  TFile *fdata = TFile::Open("mcprod4a.root");
-  //TFile *fdata = TFile::Open("data.root");
+static void show_usage(std::string name)
+{
+  std::cerr << "Usage: " << name <<" <option(s)>\n"
+            << "Options:\n"
+            << "\t-h,--help\t\tShow this help message\n"
+            << "\t-f,--fakedata\t\tDo fit on fake data instead of data"
+            << std::endl;
+}
+
+
+int main(int argc, char* argv[]){
+
+  bool fitfakedata = false;
+
+  for (int i = 1; i < argc; ++i) {
+    std::string arg = argv[i];
+    if ((arg == "-h") || (arg == "--help")) {
+      show_usage(argv[0]);
+      return 0;
+    } else if ((arg == "-f") || (arg == "--fakedata")) {
+      fitfakedata = true;
+    }
+  }
+
   TFile *fmc = TFile::Open("mcprod4a.root");
+
+  TFile *fdata;
+  if (fitfakedata){
+    fdata = TFile::Open("mcprod4a.root");
+  }
+  else{
+    fdata = TFile::Open("data.root");
+  }
 
   TH1D *hmediandEdxSlice[nthinslices][nCuts][nIntTypes+1];
   TH1D *hdaughter_michel_scoreSlice[nthinslices][nCuts][nIntTypes+1];
@@ -66,9 +95,16 @@ int main(){
 
   TGraphErrors *gr_corr_proton = new TGraphErrors(vslice.size(), &vslice[0], &vcorrproton[0], 0, &vcorrprotonerr[0]);
 
-  TFile f("backgroundfits.root","recreate");
-  gr_corr_proton->Write("gr_corr_proton");
-  f.Close();
+  if (fitfakedata){
+    TFile f("backgroundfits_mc.root","recreate");
+    gr_corr_proton->Write("gr_corr_proton");
+    f.Close();
+  }
+  else{
+    TFile f("backgroundfits.root","recreate");
+    gr_corr_proton->Write("gr_corr_proton");
+    f.Close();
+  }
 
   return 0;
 

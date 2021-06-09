@@ -56,25 +56,46 @@ void TemplateFitter::Fit(){
   double vstart = 1;
   double step = 0.01;
   gMinuit->mnparm(0,"corr_fact",vstart,step,0,10,ierflg);
-  
-  arglist[0] = 500;
-  arglist[1] = 1;
-  gMinuit->mnexcm("MIGRAD",arglist,2,ierflg);
 
-  double par, epar;
-  gMinuit->GetParameter(0,par,epar);
+  fitsuccess = false;
 
-  std::cout<<"Best fit = "<<par<<" error = "<<epar<<std::endl;
+  if (h0->Integral(i0,i1) && h2->Integral(i0,i1)){
+    arglist[0] = 500;
+    arglist[1] = 1;
+    gMinuit->mnexcm("MIGRAD",arglist,2,ierflg);
+    
+    double par, epar;
+    gMinuit->GetParameter(0,par,epar);
+
+    TString test =  gMinuit->fCstatu.Data(); 
+    if (test.EqualTo("CONVERGED ")){
+      std::cout<<"Best fit = "<<par<<" error = "<<epar<<std::endl;
+      fitsuccess = true;
+    }
+  }
+  else{
+    std::cout<<"No fit was done because data and/or template are empty."<<std::endl;
+  }
 }
 
 double TemplateFitter::GetPar(){
-  double par, epar;
-  gMinuit->GetParameter(0,par,epar);
-  return par;
+  if (fitsuccess){
+    double par, epar;
+    gMinuit->GetParameter(0,par,epar);
+    return par;
+  }
+  else{
+    return 1;
+  }
 }
 
 double TemplateFitter::GetParError(){
-  double par, epar;
-  gMinuit->GetParameter(0,par,epar);
-  return epar;
+  if (fitsuccess){
+    double par, epar;
+    gMinuit->GetParameter(0,par,epar);
+    return epar;
+  }
+  else{
+    return 2;
+  }
 }
