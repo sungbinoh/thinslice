@@ -48,10 +48,12 @@ void HadAna::SetPandoraSlicePDG(int pdg){
 void HadAna::SetBeamQualityCuts(double dx_min, double dx_max,
                                 double dy_min, double dy_max,
                                 double dz_min, double dz_max,
+                                double dxy_min, double dxy_max,
                                 double costh_min, double costh_max){
   beamcut_dx_min = dx_min; beamcut_dx_max = dx_max;
   beamcut_dy_min = dy_min; beamcut_dy_max = dy_max;
   beamcut_dz_min = dz_min; beamcut_dz_max = dz_max;
+  beamcut_dxy_min = dxy_min; beamcut_dxy_max = dxy_max;
   beamcut_costh_min = costh_min; beamcut_costh_max = costh_max;
 }
 
@@ -106,15 +108,30 @@ bool HadAna::PassPandoraSliceCut() const{
 
 bool HadAna::PassBeamQualityCut() const{
 
-  if (beam_dx<beamcut_dx_min) return false;
-  if (beam_dx>beamcut_dx_max) return false;
-  if (beam_dy<beamcut_dy_min) return false;
-  if (beam_dy>beamcut_dy_max) return false;
-  //if (beam_dx*beam_dx+beam_dy*beam_dy>1.5*1.5) return false;
-  if (beam_dz<beamcut_dz_min) return false;
-  if (beam_dz>beamcut_dz_max) return false;
-  if (beam_costh<beamcut_costh_min) return false;
-  if (beam_costh>beamcut_costh_max) return false;
+  if (beamcut_dx_min<beamcut_dx_max){
+    if (beam_dx<beamcut_dx_min) return false;
+    if (beam_dx>beamcut_dx_max) return false;
+  }
+
+  if (beamcut_dy_min<beamcut_dy_max){
+    if (beam_dy<beamcut_dy_min) return false;
+    if (beam_dy>beamcut_dy_max) return false;
+  }
+
+  if (beamcut_dz_min<beamcut_dz_max){
+    if (beam_dz<beamcut_dz_min) return false;
+    if (beam_dz>beamcut_dz_max) return false;
+  }
+
+  if (beamcut_dxy_min<beamcut_dxy_max){
+    if (beam_dxy<beamcut_dxy_min) return false;
+    if (beam_dxy>beamcut_dxy_max) return false;
+  }
+
+  if (beamcut_costh_min<beamcut_costh_max){
+    if (beam_costh<beamcut_costh_min) return false;
+    if (beam_costh>beamcut_costh_max) return false;
+  }
 
   return true;
 }
@@ -173,6 +190,7 @@ void HadAna::ProcessEvent(){
   beam_dx = -999;
   beam_dy = -999;
   beam_dz = -999;
+  beam_dxy = -999;
   beam_costh = -999;
 
   if (!reco_beam_calo_wire->empty()){
@@ -190,6 +208,7 @@ void HadAna::ProcessEvent(){
       beam_dx = (reco_beam_calo_startX - beam_startX_mc)/beam_startX_rms_mc;
       beam_dy = (reco_beam_calo_startY - beam_startY_mc)/beam_startY_rms_mc;
       beam_dz = (reco_beam_calo_startZ - beam_startZ_mc)/beam_startZ_rms_mc;
+      beam_dxy = sqrt(pow(beam_dx,2) + pow(beam_dy,2));
       TVector3 beamdir(cos(beam_angleX_mc*TMath::Pi()/180),
                        cos(beam_angleY_mc*TMath::Pi()/180),
                        cos(beam_angleZ_mc*TMath::Pi()/180));
@@ -200,6 +219,7 @@ void HadAna::ProcessEvent(){
       beam_dx = (reco_beam_calo_startX - beam_startX_data)/beam_startX_rms_data;
       beam_dy = (reco_beam_calo_startY - beam_startY_data)/beam_startY_rms_data;
       beam_dz = (reco_beam_calo_startZ - beam_startZ_data)/beam_startZ_rms_data;
+      beam_dxy = sqrt(pow(beam_dx,2) + pow(beam_dy,2));
       TVector3 beamdir(cos(beam_angleX_data*TMath::Pi()/180),
                        cos(beam_angleY_data*TMath::Pi()/180),
                        cos(beam_angleZ_data*TMath::Pi()/180));

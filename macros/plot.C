@@ -313,6 +313,6 @@ void plot(){
   plot1dslice("hmediandEdxSlice", 4, "Median dE/dx (MeV/cm)", "Events");
   plot1dslice("hdaughter_michel_scoreSlice", 4, "Median dE/dx (MeV/cm)", "Events");
 
-  PrintEvents("htrue_beam_endZ_SCE");
+  PrintEvents("hreco_beam_endZ_SCE");
 
 }

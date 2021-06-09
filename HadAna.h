@@ -17,10 +17,11 @@ class HadAna : public anavar{
   bool isSelectedPart() const;
 
   // Set beam cut values
-  void SetBeamQualityCuts(double dx_min = -3, double dx_max = 3,
-                          double dy_min = -3, double dy_max = 3,
+  void SetBeamQualityCuts(double dx_min = 3, double dx_max = -3,
+                          double dy_min = 3, double dy_max = -3,
                           double dz_min = -3, double dz_max = 3,
-                          double costh_min = 0.95, double costh_max = 2);
+                          double dxy_min = -1, double dxy_max = 3,
+                          double costh_min = 2, double costh_max = -2);
 
   int GetParType();
 
@@ -42,7 +43,7 @@ class HadAna : public anavar{
   double median_dEdx;
   double daughter_michel_score;
   double dEdx_5cm;
-  double beam_dx, beam_dy, beam_dz, beam_costh;
+  double beam_dx, beam_dy, beam_dz, beam_dxy, beam_costh;
 
   using anavar::anavar;
 
@@ -54,6 +55,7 @@ class HadAna : public anavar{
   double beamcut_dx_min, beamcut_dx_max;
   double beamcut_dy_min, beamcut_dy_max;
   double beamcut_dz_min, beamcut_dz_max;
+  double beamcut_dxy_min, beamcut_dxy_max;
   double beamcut_costh_min, beamcut_costh_max;
 
 };
