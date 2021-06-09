@@ -21,7 +21,7 @@ class HadAna : public anavar{
                           double dy_min = 3, double dy_max = -3,
                           double dz_min = -3, double dz_max = 3,
                           double dxy_min = -1, double dxy_max = 3,
-                          double costh_min = 2, double costh_max = -2);
+                          double costh_min = 0.95, double costh_max = 2);
 
   int GetParType();
 
