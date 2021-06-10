@@ -5,6 +5,7 @@
 #include "TFile.h"
 #include "TH1D.h"
 #include "TGraphErrors.h"
+#include "TVectorD.h"
 #include <iostream>
 #include <string>
 
@@ -45,6 +46,9 @@ int main(int argc, char* argv[]){
   TH1D *hmediandEdxSlice[nthinslices][nCuts][nIntTypes+1];
   TH1D *hdaughter_michel_scoreSlice[nthinslices][nCuts][nIntTypes+1];
 
+  TH1D *hmediandEdx[nCuts][nIntTypes+1];
+  TH1D *hdaughter_michel_score[nCuts][nIntTypes+1];
+
   double totaldata = 0;
   double totalmc = 0;
 
@@ -60,6 +64,16 @@ int main(int argc, char* argv[]){
           hmediandEdxSlice[k][i][j] = (TH1D*)fmc->Get(Form("hmediandEdxSlice_%d_%d_%d",k,i,j));
           hdaughter_michel_scoreSlice[k][i][j] = (TH1D*)fmc->Get(Form("hdaughter_michel_scoreSlice_%d_%d_%d",k,i,j));
           if (i==0) totalmc += hmediandEdxSlice[k][i][j]->Integral();
+        }
+        if (k==0){
+          if (j==0){
+            hmediandEdx[i][j] = (TH1D*)fdata->Get(Form("hmediandEdx_%d_%d",i,j));
+            hdaughter_michel_score[i][j] = (TH1D*)fdata->Get(Form("hdaughter_michel_score_%d_%d",i,j));
+          }
+          else{
+            hmediandEdx[i][j] = (TH1D*)fmc->Get(Form("hmediandEdx_%d_%d",i,j));
+            hdaughter_michel_score[i][j] = (TH1D*)fmc->Get(Form("hdaughter_michel_score_%d_%d",i,j));
+          }
         }
       }
     }
@@ -121,17 +135,57 @@ int main(int argc, char* argv[]){
 
   TGraphErrors *gr_corr_muon = new TGraphErrors(vslice.size(), &vslice[0], &vcorrmuon[0], 0, &vcorrmuonerr[0]);
 
+  TH1D *h0 = hmediandEdx[kAPA3][kData];
+  TH1D *h1 = hmediandEdx[kAPA3][kPiInel];
+  h1->Add(hmediandEdx[kAPA3][kPiElas]);
+  h1->Add(hmediandEdx[kAPA3][kMuon]);
+  h1->Add(hmediandEdx[kAPA3][kMIDcosmic]);
+  h1->Add(hmediandEdx[kAPA3][kMIDpi]);
+  h1->Add(hmediandEdx[kAPA3][kMIDmu]);
+  h1->Add(hmediandEdx[kAPA3][kMIDeg]);
+  h1->Add(hmediandEdx[kAPA3][kMIDother]);
+  TH1D *h2 = hmediandEdx[kAPA3][kMIDp];
+  h1->Scale(totaldata/totalmc);
+  h2->Scale(totaldata/totalmc);
+  fitter.SetHistograms(h0, h1, h2);
+  fitter.SetFitRange(h0->FindBin(2.5),-1);
+  fitter.Fit();
+  TVectorD fitresults(4);
+  fitresults[0] = fitter.GetPar();
+  fitresults[1] = fitter.GetParError();
+  std::cout<<fitter.GetPar()<<" "<<fitter.GetParError()<<std::endl;
+
+  h0 = hdaughter_michel_score[kAPA3][kData];
+  h1 = hdaughter_michel_score[kAPA3][kPiInel];
+  h1->Add(hdaughter_michel_score[kAPA3][kPiElas]);
+  h1->Add(hdaughter_michel_score[kAPA3][kMIDp]);
+  h1->Add(hdaughter_michel_score[kAPA3][kMIDcosmic]);
+  h1->Add(hdaughter_michel_score[kAPA3][kMIDpi]);
+  h1->Add(hdaughter_michel_score[kAPA3][kMIDeg]);
+  h1->Add(hdaughter_michel_score[kAPA3][kMIDother]);
+  h2 = hdaughter_michel_score[kAPA3][kMuon];
+  h2->Add(hdaughter_michel_score[kAPA3][kMIDmu]);
+  h1->Scale(totaldata/totalmc);
+  h2->Scale(totaldata/totalmc);
+  fitter.SetHistograms(h0, h1, h2);
+  fitter.SetFitRange(h0->FindBin(0.55),-1);
+  fitter.Fit();
+  fitresults[2] = fitter.GetPar();
+  fitresults[3] = fitter.GetParError();
+  std::cout<<fitter.GetPar()<<" "<<fitter.GetParError()<<std::endl;
 
   if (fitfakedata){
     TFile f("backgroundfits_mc.root","recreate");
     gr_corr_proton->Write("gr_corr_proton");
     gr_corr_muon->Write("gr_corr_muon");
+    fitresults.Write("fitresults");
     f.Close();
   }
   else{
     TFile f("backgroundfits.root","recreate");
     gr_corr_proton->Write("gr_corr_proton");
     gr_corr_muon->Write("gr_corr_muon");
+    fitresults.Write("fitresults");
     f.Close();
   }
 
