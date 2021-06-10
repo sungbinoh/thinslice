@@ -95,14 +95,43 @@ int main(int argc, char* argv[]){
 
   TGraphErrors *gr_corr_proton = new TGraphErrors(vslice.size(), &vslice[0], &vcorrproton[0], 0, &vcorrprotonerr[0]);
 
+  std::vector<double> vcorrmuon;
+  std::vector<double> vcorrmuonerr;
+  
+  for (int i = 0; i<nthinslices; ++i){
+    std::cout<<"Slice "<<i<<std::endl;
+    TH1D *h0 = hdaughter_michel_scoreSlice[i][kAPA3][kData];
+    TH1D *h1 = hdaughter_michel_scoreSlice[i][kAPA3][kPiInel];
+    h1->Add(hdaughter_michel_scoreSlice[i][kAPA3][kPiElas]);
+    h1->Add(hdaughter_michel_scoreSlice[i][kAPA3][kMIDp]);
+    h1->Add(hdaughter_michel_scoreSlice[i][kAPA3][kMIDcosmic]);
+    h1->Add(hdaughter_michel_scoreSlice[i][kAPA3][kMIDpi]);
+    h1->Add(hdaughter_michel_scoreSlice[i][kAPA3][kMIDeg]);
+    h1->Add(hdaughter_michel_scoreSlice[i][kAPA3][kMIDother]);
+    TH1D *h2 = hdaughter_michel_scoreSlice[i][kAPA3][kMuon];
+    h2->Add(hdaughter_michel_scoreSlice[i][kAPA3][kMIDmu]);
+    h1->Scale(totaldata/totalmc);
+    h2->Scale(totaldata/totalmc);
+    fitter.SetHistograms(h0, h1, h2);
+    fitter.SetFitRange(5,10);
+    fitter.Fit();
+    vcorrmuon.push_back(fitter.GetPar());
+    vcorrmuonerr.push_back(fitter.GetParError());
+  }
+
+  TGraphErrors *gr_corr_muon = new TGraphErrors(vslice.size(), &vslice[0], &vcorrmuon[0], 0, &vcorrmuonerr[0]);
+
+
   if (fitfakedata){
     TFile f("backgroundfits_mc.root","recreate");
     gr_corr_proton->Write("gr_corr_proton");
+    gr_corr_muon->Write("gr_corr_muon");
     f.Close();
   }
   else{
     TFile f("backgroundfits.root","recreate");
     gr_corr_proton->Write("gr_corr_proton");
+    gr_corr_muon->Write("gr_corr_muon");
     f.Close();
   }
 
