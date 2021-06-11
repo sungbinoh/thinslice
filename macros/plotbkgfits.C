@@ -5,7 +5,7 @@
 int nc = 0;
 double totaldata = 0;
 double totalmc = 0;
-int colors[nIntTypes] = {2, 3, 5, 7, 33, 9, 46, 28, 41};
+int colors[nIntTypes] = {2, 3, 800, 7, 33, 9, 46, 28, 41};
 
 void plotmediandEdx(TH1D *h[nCuts][nIntTypes+1], int j, double correction, double correction_err, bool fakedata){
   
