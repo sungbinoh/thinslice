@@ -101,7 +101,7 @@ int main(int argc, char* argv[]){
     h1->Scale(totaldata/totalmc);
     h2->Scale(totaldata/totalmc);
     fitter.SetHistograms(h0, h1, h2);
-    fitter.SetFitRange(5,8);
+    fitter.SetFitRange(4,-1);
     fitter.Fit();
     vcorrproton.push_back(fitter.GetPar());
     vcorrprotonerr.push_back(fitter.GetParError());
@@ -127,7 +127,7 @@ int main(int argc, char* argv[]){
     h1->Scale(totaldata/totalmc);
     h2->Scale(totaldata/totalmc);
     fitter.SetHistograms(h0, h1, h2);
-    fitter.SetFitRange(5,10);
+    fitter.SetFitRange(6,10);
     fitter.Fit();
     vcorrmuon.push_back(fitter.GetPar());
     vcorrmuonerr.push_back(fitter.GetParError());
