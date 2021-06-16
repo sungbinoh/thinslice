@@ -39,7 +39,7 @@
 # include directories and C++ standard are propagated to our libraries or executables.
 # Note: To ensure compatibility with Cling, targets *must* be compiled using the
 # same C++ standard as ROOT was compiled with.
-  add_library(Event SHARED anavar.C HadAna.cxx ThinSlice.cxx util.cxx Unfold.cxx TemplateFitter.cxx)
+  add_library(Event SHARED anavar.C HadAna.cxx ThinSlice.cxx ProtonInel.cxx util.cxx Unfold.cxx TemplateFitter.cxx)
   target_link_libraries(Event PUBLIC ${ROOT_LIBRARIES} ${RooUnfold_LIBRARIES})
 #   target_compile_options(Event INTERFACE ${CMAKE_REQUIRED_FLAGS})
 # Create the main program using the library.
@@ -49,5 +49,8 @@
   add_executable(BackgroundFit BackgroundFit.cxx)
   target_link_libraries(BackgroundFit Event)
 
-  install(TARGETS RunCrossSection BackgroundFit DESTINATION bin)
+  add_executable(RunProtonInel RunProtonInel.cxx)
+  target_link_libraries(RunProtonInel Event)
+
+  install(TARGETS RunCrossSection BackgroundFit RunProtonInel DESTINATION bin)
   install(TARGETS Event DESTINATION lib)

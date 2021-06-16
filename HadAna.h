@@ -41,7 +41,9 @@ class HadAna{
   bool PassCaloSizeCut(const anavar& evt) const;
   bool PassMichelScoreCut() const;
   bool PassMediandEdxCut() const;
+
   bool PassPiCuts(const anavar& evt) const;
+  bool PassPCuts(const anavar& evt) const;
 
   // Event information
   void ProcessEvent(const anavar& evt);

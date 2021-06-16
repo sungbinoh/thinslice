@@ -216,6 +216,15 @@ bool HadAna::PassPiCuts(const anavar& evt) const{
     PassMediandEdxCut();
 }
 
+bool HadAna::PassPCuts(const anavar& evt) const{
+  return PassPandoraSliceCut(evt)&&
+    PassCaloSizeCut(evt)&&
+    PassBeamQualityCut()&&
+    PassAPA3Cut(evt)&&
+    PassMichelScoreCut()&&
+    PassMediandEdxCut();
+}
+
 void HadAna::ProcessEvent(const anavar& evt){
 
   pitype = GetPiParType(evt);
