@@ -65,14 +65,14 @@ void ProtonInel::BookHistograms(){
       hreco_vs_true_beam_endZ_SCE[i][j]= new TH2D(Form("hreco_vs_true_beam_endZ_SCE_%d_%d",i,j), Form("%s, %s;true_beam_endZ_SCE (cm);reco_beam_endZ_SCE (cm)", p::cutName[i], p::intTypeName[j]), 70, -100, 600, 70, -100, 600);
       hreco_true_vs_true_beam_endZ_SCE[i][j]= new TH2D(Form("hreco_true_vs_true_beam_endZ_SCE_%d_%d",i,j), Form("%s, %s;true_beam_endZ_SCE (cm);reco - true_beam_endZ_SCE (cm)", p::cutName[i], p::intTypeName[j]), 70, -100, 600, 100, -100, 100);
 
-      htrue_sliceID[i][j] = new TH1D(Form("htrue_sliceID_%d_%d",i,j),Form("true_sliceID, %s, %s;true_sliceID (cm)", p::cutName[i], p::intTypeName[j]), 26, -1, 25);
+      htrue_sliceID[i][j] = new TH1D(Form("htrue_sliceID_%d_%d",i,j),Form("true_sliceID, %s, %s;true_sliceID (cm)", p::cutName[i], p::intTypeName[j]), p::nthinslices+2, -1, p::nthinslices+1);
       htrue_sliceID[i][j]->Sumw2();
-      hreco_sliceID[i][j] = new TH1D(Form("hreco_sliceID_%d_%d",i,j),Form("reco_sliceID, %s, %s;reco_sliceID", p::cutName[i], p::intTypeName[j]), 26, -1, 25);
+      hreco_sliceID[i][j] = new TH1D(Form("hreco_sliceID_%d_%d",i,j),Form("reco_sliceID, %s, %s;reco_sliceID", p::cutName[i], p::intTypeName[j]), p::nthinslices+2, -1, p::nthinslices+1);
       hreco_sliceID[i][j]->Sumw2();
       hreco_true_sliceID[i][j] = new TH1D(Form("hreco_true_sliceID_%d_%d",i,j), Form("reco_true_sliceID, %s, %s;reco_sliceID - true_sliceID", p::cutName[i], p::intTypeName[j]), 20, -10, 10);
       hreco_true_sliceID[i][j]->Sumw2();
-      hreco_vs_true_sliceID[i][j]= new TH2D(Form("hreco_vs_true_sliceID_%d_%d",i,j), Form("%s, %s;true_sliceID;reco_sliceID", p::cutName[i], p::intTypeName[j]), 26, -1, 25, 26, -1, 25);
-      hreco_true_vs_true_sliceID[i][j]= new TH2D(Form("hreco_true_vs_true_sliceID_%d_%d",i,j), Form("%s, %s;true_sliceID;reco_sliceID - true_sliceID", p::cutName[i], p::intTypeName[j]), 26, -1, 25, 20, -10, 10);
+      hreco_vs_true_sliceID[i][j]= new TH2D(Form("hreco_vs_true_sliceID_%d_%d",i,j), Form("%s, %s;true_sliceID;reco_sliceID", p::cutName[i], p::intTypeName[j]), p::nthinslices+2, -1, p::nthinslices+1, p::nthinslices+2, -1, p::nthinslices+1);
+      hreco_true_vs_true_sliceID[i][j]= new TH2D(Form("hreco_true_vs_true_sliceID_%d_%d",i,j), Form("%s, %s;true_sliceID;reco_sliceID - true_sliceID", p::cutName[i], p::intTypeName[j]), p::nthinslices+2, -1, p::nthinslices+1, 20, -10, 10);
 
       hmediandEdx[i][j] = new TH1D(Form("hmediandEdx_%d_%d",i,j), Form("mediandEdx, %s, %s;Median dE/dx (MeV/cm)", p::cutName[i], p::intTypeName[j]), 100, 0, 5);
       hmediandEdx[i][j]->Sumw2();
@@ -178,12 +178,12 @@ void ProtonInel::ProcessEvent(const anavar & evt, Unfold & uf){
     if (true_sliceID < 0) true_sliceID = -1;
     if (evt.true_beam_endZ < 0) true_sliceID = -1;
     if (true_sliceID >= p::nthinslices) true_sliceID = p::nthinslices;
-    if (evt.true_beam_PDG == 211){
+    if (evt.true_beam_PDG == 2212){
       for (int i = 0; i<=true_sliceID; ++i){
         if (i<p::nthinslices) ++true_incidents[i];
       }
     }
-    if ((*evt.true_beam_endProcess) == "pi+Inelastic"){
+    if ((*evt.true_beam_endProcess) == "protonInelastic"){
       if (true_sliceID < p::nthinslices && true_sliceID>=0){
         ++true_interactions[true_sliceID];
       }
@@ -257,7 +257,7 @@ void ProtonInel::ProcessEvent(const anavar & evt, Unfold & uf){
   }
 
   if (evt.MC){
-    if (evt.true_beam_PDG == 211){
+    if (evt.true_beam_PDG == 2212){
       if (isTestSample){
         h_truesliceid_pion_all->Fill(true_sliceID);
       }
@@ -283,7 +283,7 @@ void ProtonInel::ProcessEvent(const anavar & evt, Unfold & uf){
         }
       }
       
-      if ((*evt.true_beam_endProcess) == "pi+Inelastic"){
+      if ((*evt.true_beam_endProcess) == "protonInelastic"){
         if (isTestSample){
           h_truesliceid_pioninelastic_all->Fill(true_sliceID);
         }

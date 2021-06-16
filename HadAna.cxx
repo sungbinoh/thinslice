@@ -141,7 +141,7 @@ int HadAna::GetPParType(const anavar& evt){
     }
   }
   else if (evt.true_beam_PDG == 2212){
-    if ((*evt.true_beam_endProcess) == "protonIne"){
+    if ((*evt.true_beam_endProcess) == "protonInelastic"){
       return p::kPInel;
     }
     else return p::kPElas;
@@ -219,10 +219,7 @@ bool HadAna::PassPiCuts(const anavar& evt) const{
 bool HadAna::PassPCuts(const anavar& evt) const{
   return PassPandoraSliceCut(evt)&&
     PassCaloSizeCut(evt)&&
-    PassBeamQualityCut()&&
-    PassAPA3Cut(evt)&&
-    PassMichelScoreCut()&&
-    PassMediandEdxCut();
+    PassBeamQualityCut();
 }
 
 void HadAna::ProcessEvent(const anavar& evt){
