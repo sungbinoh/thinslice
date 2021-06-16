@@ -19,20 +19,19 @@ int main(){
   TChain *datachain = new TChain();
   datachain->Add("/data/tjyang/dune/pduneana_Prod4_1GeV_5387_5_12_21.root/pduneana/beamana");
 
-  Unfold uf(nthinslices+2, -1, nthinslices+1);
+  Unfold uf(pi::nthinslices+2, -1, pi::nthinslices+1);
 
-  HadAna mcevt(mcchain);
+  anavar mcevt(mcchain);
 
   ThinSlice mcths;
   mcths.SetOutputFileName("mcprod4a.root");
   mcths.Run(mcevt, uf);
 
-  HadAna dataevt(datachain);
+  anavar dataevt(datachain);
 
   ThinSlice dataths;
   dataths.SetOutputFileName("data.root");
   dataths.Run(dataevt, uf);
-
 
   return 0;
 

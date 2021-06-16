@@ -4,17 +4,18 @@
 #include "EventType.h"
 #include "EventSelection.h"
 #include "SliceParams.h"
-#include "anavar.h"
 
-class HadAna : public anavar{
+class anavar;
+
+class HadAna{
  public: 
 
-  HadAna(TTree *tree=0);
+  HadAna();
 
   void AddTruePDG(int pdg);
 
   //Check if the desired particle is selected
-  bool isSelectedPart() const;
+  bool isSelectedPart(const anavar& evt) const;
 
   // Set beam cut values
   void SetBeamQualityCuts(double dx_min = 3, double dx_max = -3,
@@ -23,29 +24,29 @@ class HadAna : public anavar{
                           double dxy_min = -1, double dxy_max = 3,
                           double costh_min = 0.95, double costh_max = 2);
 
-  int GetParType();
+  int GetPiParType(const anavar& evt);
+  int GetPParType(const anavar& evt);
 
   // Pandora slice pdg
   int pandora_slice_pdg;
   void SetPandoraSlicePDG(int pdg);
 
-  bool PassPandoraSliceCut() const;
+  bool PassPandoraSliceCut(const anavar& evt) const;
   bool PassBeamQualityCut() const;
-  bool PassAPA3Cut() const;
-  bool PassCaloSizeCut() const;
+  bool PassAPA3Cut(const anavar& evt) const;
+  bool PassCaloSizeCut(const anavar& evt) const;
   bool PassMichelScoreCut() const;
   bool PassMediandEdxCut() const;
-  bool PassAllCuts() const;
+  bool PassPiCuts(const anavar& evt) const;
 
   // Event information
-  void ProcessEvent();
-  int partype;
+  void ProcessEvent(const anavar& evt);
+  int pitype;
+  int ptype;
   double median_dEdx;
   double daughter_michel_score;
   double dEdx_5cm;
   double beam_dx, beam_dy, beam_dz, beam_dxy, beam_costh;
-
-  using anavar::anavar;
 
  private:
   

@@ -43,18 +43,18 @@ int main(int argc, char* argv[]){
     fdata = TFile::Open("data.root");
   }
 
-  TH1D *hmediandEdxSlice[nthinslices][nCuts][nIntTypes+1];
-  TH1D *hdaughter_michel_scoreSlice[nthinslices][nCuts][nIntTypes+1];
+  TH1D *hmediandEdxSlice[pi::nthinslices][pi::nCuts][pi::nIntTypes+1];
+  TH1D *hdaughter_michel_scoreSlice[pi::nthinslices][pi::nCuts][pi::nIntTypes+1];
 
-  TH1D *hmediandEdx[nCuts][nIntTypes+1];
-  TH1D *hdaughter_michel_score[nCuts][nIntTypes+1];
+  TH1D *hmediandEdx[pi::nCuts][pi::nIntTypes+1];
+  TH1D *hdaughter_michel_score[pi::nCuts][pi::nIntTypes+1];
 
   double totaldata = 0;
   double totalmc = 0;
 
-  for (int i = 0; i < nCuts; ++i){
-    for (int j = 0; j < nIntTypes+1; ++j){
-      for (int k = 0; k < nthinslices; ++k){
+  for (int i = 0; i < pi::nCuts; ++i){
+    for (int j = 0; j < pi::nIntTypes+1; ++j){
+      for (int k = 0; k < pi::nthinslices; ++k){
         if (j==0){
           hmediandEdxSlice[k][i][j] = (TH1D*)fdata->Get(Form("hmediandEdxSlice_%d_%d_%d",k,i,j));
           hdaughter_michel_scoreSlice[k][i][j] = (TH1D*)fdata->Get(Form("hdaughter_michel_scoreSlice_%d_%d_%d",k,i,j));
@@ -85,19 +85,19 @@ int main(int argc, char* argv[]){
   std::vector<double> vcorrproton;
   std::vector<double> vcorrprotonerr;
 
-  for (int i = 0; i<nthinslices; ++i){
+  for (int i = 0; i<pi::nthinslices; ++i){
     std::cout<<"Slice "<<i<<std::endl;
     vslice.push_back(i);
-    TH1D *h0 = hmediandEdxSlice[i][kAPA3][kData];
-    TH1D *h1 = hmediandEdxSlice[i][kAPA3][kPiInel];
-    h1->Add(hmediandEdxSlice[i][kAPA3][kPiElas]);
-    h1->Add(hmediandEdxSlice[i][kAPA3][kMuon]);
-    h1->Add(hmediandEdxSlice[i][kAPA3][kMIDcosmic]);
-    h1->Add(hmediandEdxSlice[i][kAPA3][kMIDpi]);
-    h1->Add(hmediandEdxSlice[i][kAPA3][kMIDmu]);
-    h1->Add(hmediandEdxSlice[i][kAPA3][kMIDeg]);
-    h1->Add(hmediandEdxSlice[i][kAPA3][kMIDother]);
-    TH1D *h2 = hmediandEdxSlice[i][kAPA3][kMIDp];
+    TH1D *h0 = hmediandEdxSlice[i][pi::kAPA3][pi::kData];
+    TH1D *h1 = hmediandEdxSlice[i][pi::kAPA3][pi::kPiInel];
+    h1->Add(hmediandEdxSlice[i][pi::kAPA3][pi::kPiElas]);
+    h1->Add(hmediandEdxSlice[i][pi::kAPA3][pi::kMuon]);
+    h1->Add(hmediandEdxSlice[i][pi::kAPA3][pi::kMIDcosmic]);
+    h1->Add(hmediandEdxSlice[i][pi::kAPA3][pi::kMIDpi]);
+    h1->Add(hmediandEdxSlice[i][pi::kAPA3][pi::kMIDmu]);
+    h1->Add(hmediandEdxSlice[i][pi::kAPA3][pi::kMIDeg]);
+    h1->Add(hmediandEdxSlice[i][pi::kAPA3][pi::kMIDother]);
+    TH1D *h2 = hmediandEdxSlice[i][pi::kAPA3][pi::kMIDp];
     h1->Scale(totaldata/totalmc);
     h2->Scale(totaldata/totalmc);
     fitter.SetHistograms(h0, h1, h2);
@@ -112,18 +112,18 @@ int main(int argc, char* argv[]){
   std::vector<double> vcorrmuon;
   std::vector<double> vcorrmuonerr;
   
-  for (int i = 0; i<nthinslices; ++i){
+  for (int i = 0; i<pi::nthinslices; ++i){
     std::cout<<"Slice "<<i<<std::endl;
-    TH1D *h0 = hdaughter_michel_scoreSlice[i][kAPA3][kData];
-    TH1D *h1 = hdaughter_michel_scoreSlice[i][kAPA3][kPiInel];
-    h1->Add(hdaughter_michel_scoreSlice[i][kAPA3][kPiElas]);
-    h1->Add(hdaughter_michel_scoreSlice[i][kAPA3][kMIDp]);
-    h1->Add(hdaughter_michel_scoreSlice[i][kAPA3][kMIDcosmic]);
-    h1->Add(hdaughter_michel_scoreSlice[i][kAPA3][kMIDpi]);
-    h1->Add(hdaughter_michel_scoreSlice[i][kAPA3][kMIDeg]);
-    h1->Add(hdaughter_michel_scoreSlice[i][kAPA3][kMIDother]);
-    TH1D *h2 = hdaughter_michel_scoreSlice[i][kAPA3][kMuon];
-    h2->Add(hdaughter_michel_scoreSlice[i][kAPA3][kMIDmu]);
+    TH1D *h0 = hdaughter_michel_scoreSlice[i][pi::kAPA3][pi::kData];
+    TH1D *h1 = hdaughter_michel_scoreSlice[i][pi::kAPA3][pi::kPiInel];
+    h1->Add(hdaughter_michel_scoreSlice[i][pi::kAPA3][pi::kPiElas]);
+    h1->Add(hdaughter_michel_scoreSlice[i][pi::kAPA3][pi::kMIDp]);
+    h1->Add(hdaughter_michel_scoreSlice[i][pi::kAPA3][pi::kMIDcosmic]);
+    h1->Add(hdaughter_michel_scoreSlice[i][pi::kAPA3][pi::kMIDpi]);
+    h1->Add(hdaughter_michel_scoreSlice[i][pi::kAPA3][pi::kMIDeg]);
+    h1->Add(hdaughter_michel_scoreSlice[i][pi::kAPA3][pi::kMIDother]);
+    TH1D *h2 = hdaughter_michel_scoreSlice[i][pi::kAPA3][pi::kMuon];
+    h2->Add(hdaughter_michel_scoreSlice[i][pi::kAPA3][pi::kMIDmu]);
     h1->Scale(totaldata/totalmc);
     h2->Scale(totaldata/totalmc);
     fitter.SetHistograms(h0, h1, h2);
@@ -135,16 +135,16 @@ int main(int argc, char* argv[]){
 
   TGraphErrors *gr_corr_muon = new TGraphErrors(vslice.size(), &vslice[0], &vcorrmuon[0], 0, &vcorrmuonerr[0]);
 
-  TH1D *h0 = hmediandEdx[kAPA3][kData];
-  TH1D *h1 = hmediandEdx[kAPA3][kPiInel];
-  h1->Add(hmediandEdx[kAPA3][kPiElas]);
-  h1->Add(hmediandEdx[kAPA3][kMuon]);
-  h1->Add(hmediandEdx[kAPA3][kMIDcosmic]);
-  h1->Add(hmediandEdx[kAPA3][kMIDpi]);
-  h1->Add(hmediandEdx[kAPA3][kMIDmu]);
-  h1->Add(hmediandEdx[kAPA3][kMIDeg]);
-  h1->Add(hmediandEdx[kAPA3][kMIDother]);
-  TH1D *h2 = hmediandEdx[kAPA3][kMIDp];
+  TH1D *h0 = hmediandEdx[pi::kAPA3][pi::kData];
+  TH1D *h1 = hmediandEdx[pi::kAPA3][pi::kPiInel];
+  h1->Add(hmediandEdx[pi::kAPA3][pi::kPiElas]);
+  h1->Add(hmediandEdx[pi::kAPA3][pi::kMuon]);
+  h1->Add(hmediandEdx[pi::kAPA3][pi::kMIDcosmic]);
+  h1->Add(hmediandEdx[pi::kAPA3][pi::kMIDpi]);
+  h1->Add(hmediandEdx[pi::kAPA3][pi::kMIDmu]);
+  h1->Add(hmediandEdx[pi::kAPA3][pi::kMIDeg]);
+  h1->Add(hmediandEdx[pi::kAPA3][pi::kMIDother]);
+  TH1D *h2 = hmediandEdx[pi::kAPA3][pi::kMIDp];
   h1->Scale(totaldata/totalmc);
   h2->Scale(totaldata/totalmc);
   fitter.SetHistograms(h0, h1, h2);
@@ -155,16 +155,16 @@ int main(int argc, char* argv[]){
   fitresults[1] = fitter.GetParError();
   std::cout<<fitter.GetPar()<<" "<<fitter.GetParError()<<std::endl;
 
-  h0 = hdaughter_michel_score[kAPA3][kData];
-  h1 = hdaughter_michel_score[kAPA3][kPiInel];
-  h1->Add(hdaughter_michel_score[kAPA3][kPiElas]);
-  h1->Add(hdaughter_michel_score[kAPA3][kMIDp]);
-  h1->Add(hdaughter_michel_score[kAPA3][kMIDcosmic]);
-  h1->Add(hdaughter_michel_score[kAPA3][kMIDpi]);
-  h1->Add(hdaughter_michel_score[kAPA3][kMIDeg]);
-  h1->Add(hdaughter_michel_score[kAPA3][kMIDother]);
-  h2 = hdaughter_michel_score[kAPA3][kMuon];
-  h2->Add(hdaughter_michel_score[kAPA3][kMIDmu]);
+  h0 = hdaughter_michel_score[pi::kAPA3][pi::kData];
+  h1 = hdaughter_michel_score[pi::kAPA3][pi::kPiInel];
+  h1->Add(hdaughter_michel_score[pi::kAPA3][pi::kPiElas]);
+  h1->Add(hdaughter_michel_score[pi::kAPA3][pi::kMIDp]);
+  h1->Add(hdaughter_michel_score[pi::kAPA3][pi::kMIDcosmic]);
+  h1->Add(hdaughter_michel_score[pi::kAPA3][pi::kMIDpi]);
+  h1->Add(hdaughter_michel_score[pi::kAPA3][pi::kMIDeg]);
+  h1->Add(hdaughter_michel_score[pi::kAPA3][pi::kMIDother]);
+  h2 = hdaughter_michel_score[pi::kAPA3][pi::kMuon];
+  h2->Add(hdaughter_michel_score[pi::kAPA3][pi::kMIDmu]);
   h1->Scale(totaldata/totalmc);
   h2->Scale(totaldata/totalmc);
   fitter.SetHistograms(h0, h1, h2);

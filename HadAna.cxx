@@ -1,12 +1,10 @@
+#include "anavar.h"
 #include "HadAna.h"
-#include "TGraphErrors.h"
 #include "TMath.h"
 #include "TVector3.h"
-#include "util.h"
 #include <iostream>
 
-HadAna::HadAna(TTree *tree) 
-  : anavar(tree){
+HadAna::HadAna(){
 
   AddTruePDG(-13);
   AddTruePDG(13);
@@ -22,19 +20,19 @@ void HadAna::AddTruePDG(int pdg){
   truepdglist.push_back(pdg);
 };
 
-bool HadAna::isSelectedPart() const{
-  if (MC){
+bool HadAna::isSelectedPart(const anavar& evt) const{
+  if (evt.MC){
     for (size_t i = 0; i<truepdglist.size(); ++i){
-      if (true_beam_PDG == truepdglist[i]) return true;
+      if (evt.true_beam_PDG == truepdglist[i]) return true;
     }
     return false;
   }
   else{
-    if (!beam_inst_valid) return false;
-    if (beam_inst_nMomenta != 1 || beam_inst_nTracks != 1) return false;
+    if (!evt.beam_inst_valid) return false;
+    if (evt.beam_inst_nMomenta != 1 || evt.beam_inst_nTracks != 1) return false;
     for (size_t i = 0; i<truepdglist.size(); ++i){
-      for (size_t j = 0; j<beam_inst_PDG_candidates->size(); ++j){
-        if ((*beam_inst_PDG_candidates)[j] == truepdglist[i]) return true;
+      for (size_t j = 0; j<evt.beam_inst_PDG_candidates->size(); ++j){
+        if ((*evt.beam_inst_PDG_candidates)[j] == truepdglist[i]) return true;
       }
     }
     return false;
@@ -57,53 +55,92 @@ void HadAna::SetBeamQualityCuts(double dx_min, double dx_max,
   beamcut_costh_min = costh_min; beamcut_costh_max = costh_max;
 }
 
-int HadAna::GetParType(){
+int HadAna::GetPiParType(const anavar& evt){
 
-  if (!MC){
-    return kData;
+  if (!evt.MC){
+    return pi::kData;
   }
-  else if (event%2){
-    return kData;
+  else if (evt.event%2){
+    return pi::kData;
   }
-  else if (!reco_beam_true_byE_matched){
-    if (reco_beam_true_byE_origin == 2) {
-      return kMIDcosmic;
+  else if (!evt.reco_beam_true_byE_matched){
+    if (evt.reco_beam_true_byE_origin == 2) {
+      return pi::kMIDcosmic;
     }
-    else if (std::abs(reco_beam_true_byE_PDG) == 211){
-      return kMIDpi;
+    else if (std::abs(evt.reco_beam_true_byE_PDG) == 211){
+      return pi::kMIDpi;
     }
-    else if (reco_beam_true_byE_PDG == 2212){
-      return kMIDp;
+    else if (evt.reco_beam_true_byE_PDG == 2212){
+      return pi::kMIDp;
     }
-    else if (std::abs(reco_beam_true_byE_PDG) == 13){
-      return kMIDmu;
+    else if (std::abs(evt.reco_beam_true_byE_PDG) == 13){
+      return pi::kMIDmu;
     }
-    else if (std::abs(reco_beam_true_byE_PDG) == 11 ||
-             reco_beam_true_byE_PDG == 22){
-      return kMIDeg;
+    else if (std::abs(evt.reco_beam_true_byE_PDG) == 11 ||
+             evt.reco_beam_true_byE_PDG == 22){
+      return pi::kMIDeg;
     }
     else {
       //std::cout<<reco_beam_true_byE_PDG<<std::endl;
-      return kMIDother;
+      return pi::kMIDother;
     }
   }
-  else if (true_beam_PDG == -13){
-    return kMuon;
+  else if (evt.true_beam_PDG == -13){
+    return pi::kMuon;
   }
-  else if (true_beam_PDG == 211){
-    if ((*true_beam_endProcess) == "pi+Inelastic"){
-      return kPiInel;
+  else if (evt.true_beam_PDG == 211){
+    if ((*evt.true_beam_endProcess) == "pi+Inelastic"){
+      return pi::kPiInel;
     }
-    else return kPiElas;
+    else return pi::kPiElas;
   }
   
-  return kMIDother;
+  return pi::kMIDother;
 }
 
+int HadAna::GetPParType(const anavar& evt){
 
-bool HadAna::PassPandoraSliceCut() const{
+  if (!evt.MC){
+    return p::kData;
+  }
+  else if (evt.event%2){
+    return p::kData;
+  }
+  else if (!evt.reco_beam_true_byE_matched){
+    if (evt.reco_beam_true_byE_origin == 2) {
+      return p::kMIDcosmic;
+    }
+    else if (std::abs(evt.reco_beam_true_byE_PDG) == 211){
+      return p::kMIDpi;
+    }
+    else if (evt.reco_beam_true_byE_PDG == 2212){
+      return p::kMIDp;
+    }
+    else if (std::abs(evt.reco_beam_true_byE_PDG) == 13){
+      return p::kMIDmu;
+    }
+    else if (std::abs(evt.reco_beam_true_byE_PDG) == 11 ||
+             evt.reco_beam_true_byE_PDG == 22){
+      return p::kMIDeg;
+    }
+    else {
+      //std::cout<<reco_beam_true_byE_PDG<<std::endl;
+      return p::kMIDother;
+    }
+  }
+  else if (evt.true_beam_PDG == 2212){
+    if ((*evt.true_beam_endProcess) == "protonIne"){
+      return p::kPInel;
+    }
+    else return p::kPElas;
+  }
+  
+  return p::kMIDother;
+}
 
-  return (reco_beam_type == pandora_slice_pdg);
+bool HadAna::PassPandoraSliceCut(const anavar& evt) const{
+
+  return (evt.reco_beam_type == pandora_slice_pdg);
 }
 
 bool HadAna::PassBeamQualityCut() const{
@@ -136,16 +173,16 @@ bool HadAna::PassBeamQualityCut() const{
   return true;
 }
 
-bool HadAna::PassAPA3Cut() const{
+bool HadAna::PassAPA3Cut(const anavar& evt) const{
 
   double cutAPA3_Z = 220.;
 
-  return reco_beam_calo_endZ < cutAPA3_Z;
+  return evt.reco_beam_calo_endZ < cutAPA3_Z;
 }
 
-bool HadAna::PassCaloSizeCut() const{
+bool HadAna::PassCaloSizeCut(const anavar& evt) const{
   
-  return !(reco_beam_calo_wire->empty());
+  return !(evt.reco_beam_calo_wire->empty());
 }
 
 bool HadAna::PassMichelScoreCut() const{
@@ -158,24 +195,25 @@ bool HadAna::PassMediandEdxCut() const{
   return median_dEdx < 2.4;
 }
 
-bool HadAna::PassAllCuts() const{
-  return PassPandoraSliceCut()&&
-    PassCaloSizeCut()&&
+bool HadAna::PassPiCuts(const anavar& evt) const{
+  return PassPandoraSliceCut(evt)&&
+    PassCaloSizeCut(evt)&&
     PassBeamQualityCut()&&
-    PassAPA3Cut()&&
+    PassAPA3Cut(evt)&&
     PassMichelScoreCut()&&
     PassMediandEdxCut();
 }
 
-void HadAna::ProcessEvent(){
+void HadAna::ProcessEvent(const anavar& evt){
 
-  partype = GetParType();
+  pitype = GetPiParType(evt);
+  ptype = GetPParType(evt);
 
   median_dEdx = -1;
   daughter_michel_score = -999;
 
-  if (!reco_beam_calo_wire->empty()){
-    median_dEdx = TMath::Median(reco_beam_calibrated_dEdX_SCE->size(), &(*reco_beam_calibrated_dEdX_SCE)[0]);
+  if (!evt.reco_beam_calo_wire->empty()){
+    median_dEdx = TMath::Median(evt.reco_beam_calibrated_dEdX_SCE->size(), &(*evt.reco_beam_calibrated_dEdX_SCE)[0]);
 //    daughter_michel_score = 0;
 //    int nhits = 0;
 //    for (size_t i = 0; i<reco_daughter_PFP_michelScore_collection->size(); ++i){
@@ -184,7 +222,7 @@ void HadAna::ProcessEvent(){
 //    }
 //    if (nhits) daughter_michel_score/=nhits;
 //    else daughter_michel_score = -999;
-    if (reco_beam_vertex_nHits) daughter_michel_score = reco_beam_vertex_michel_score/reco_beam_vertex_nHits;
+    if (evt.reco_beam_vertex_nHits) daughter_michel_score = evt.reco_beam_vertex_michel_score/evt.reco_beam_vertex_nHits;
   }
 
   beam_dx = -999;
@@ -193,21 +231,21 @@ void HadAna::ProcessEvent(){
   beam_dxy = -999;
   beam_costh = -999;
 
-  if (!reco_beam_calo_wire->empty()){
+  if (!evt.reco_beam_calo_wire->empty()){
 
-    TVector3 pt0(reco_beam_calo_startX,
-                 reco_beam_calo_startY,
-                 reco_beam_calo_startZ);
-    TVector3 pt1(reco_beam_calo_endX,
-                 reco_beam_calo_endY,
-                 reco_beam_calo_endZ);
+    TVector3 pt0(evt.reco_beam_calo_startX,
+                 evt.reco_beam_calo_startY,
+                 evt.reco_beam_calo_startZ);
+    TVector3 pt1(evt.reco_beam_calo_endX,
+                 evt.reco_beam_calo_endY,
+                 evt.reco_beam_calo_endZ);
     TVector3 dir = pt1 - pt0;
     dir = dir.Unit();
 
-    if (MC){
-      beam_dx = (reco_beam_calo_startX - beam_startX_mc)/beam_startX_rms_mc;
-      beam_dy = (reco_beam_calo_startY - beam_startY_mc)/beam_startY_rms_mc;
-      beam_dz = (reco_beam_calo_startZ - beam_startZ_mc)/beam_startZ_rms_mc;
+    if (evt.MC){
+      beam_dx = (evt.reco_beam_calo_startX - beam_startX_mc)/beam_startX_rms_mc;
+      beam_dy = (evt.reco_beam_calo_startY - beam_startY_mc)/beam_startY_rms_mc;
+      beam_dz = (evt.reco_beam_calo_startZ - beam_startZ_mc)/beam_startZ_rms_mc;
       beam_dxy = sqrt(pow(beam_dx,2) + pow(beam_dy,2));
       TVector3 beamdir(cos(beam_angleX_mc*TMath::Pi()/180),
                        cos(beam_angleY_mc*TMath::Pi()/180),
@@ -216,9 +254,9 @@ void HadAna::ProcessEvent(){
       beam_costh = dir.Dot(beamdir);
     }
     else{
-      beam_dx = (reco_beam_calo_startX - beam_startX_data)/beam_startX_rms_data;
-      beam_dy = (reco_beam_calo_startY - beam_startY_data)/beam_startY_rms_data;
-      beam_dz = (reco_beam_calo_startZ - beam_startZ_data)/beam_startZ_rms_data;
+      beam_dx = (evt.reco_beam_calo_startX - beam_startX_data)/beam_startX_rms_data;
+      beam_dy = (evt.reco_beam_calo_startY - beam_startY_data)/beam_startY_rms_data;
+      beam_dz = (evt.reco_beam_calo_startZ - beam_startZ_data)/beam_startZ_rms_data;
       beam_dxy = sqrt(pow(beam_dx,2) + pow(beam_dy,2));
       TVector3 beamdir(cos(beam_angleX_data*TMath::Pi()/180),
                        cos(beam_angleY_data*TMath::Pi()/180),
@@ -247,15 +285,15 @@ void HadAna::ProcessEvent(){
 
   //if (event == 78467) cout<<reco_beam_calibrated_dEdX_SCE->size()<<endl;
   //cout<<reco_beam_allTrack_calibrated_dEdX->size()<<endl;
-  if (!reco_beam_calibrated_dEdX_SCE->empty()){
+  if (!evt.reco_beam_calibrated_dEdX_SCE->empty()){
     //dEdx_5cm = 0;
     //int nhits = 0;
     std::vector<double> vdEdx;
-    for (int i = 0; i<reco_beam_calibrated_dEdX_SCE->size(); ++i){
+    for (int i = 0; i<evt.reco_beam_calibrated_dEdX_SCE->size(); ++i){
       //std::cout<<i<<" "<<reco_beam_resRange_SCE->back()-(*reco_beam_resRange_SCE)[i]<<" "<<(*reco_beam_calibrated_dEdX_SCE)[i]<<endl;
       //if (event == 78467) cout<<(*reco_beam_resRange_SCE)[i]<<" "<<(*reco_beam_calo_Z)[i]<<" "<<(*reco_beam_calibrated_dEdX_SCE)[i]<<endl;
-      if ((*reco_beam_resRange_SCE)[i]<5){
-        vdEdx.push_back((*reco_beam_calibrated_dEdX_SCE)[i]);
+      if ((*evt.reco_beam_resRange_SCE)[i]<5){
+        vdEdx.push_back((*evt.reco_beam_calibrated_dEdX_SCE)[i]);
         //dEdx_5cm += (*reco_beam_calibrated_dEdX_SCE)[i];
         //++nhits;
       }

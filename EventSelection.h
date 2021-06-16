@@ -1,25 +1,27 @@
 #ifndef EVENTSELECTION_H
 #define EVENTSELECTION_H
 
-const unsigned int nCuts = 7;
+namespace pi{
+  const unsigned int nCuts = 7;
 
-const char cutName[nCuts][100] = {"Nocut",
-                                  "PandoraSlice",
-                                  "CaloSize",
-                                  "BeamQuality",
-                                  "APA3",
-                                  "MichelScore",
-                                  "MediandEdx"};
-
-enum cut{
-  kNocut = 0,
-  kPandoraSlice,
-  kCaloSize,
-  kBeamQuality,
-  kAPA3,
-  kMichelScore,
-  kMediandEdx
-};
+  const char cutName[nCuts][100] = {"Nocut",
+                                    "PandoraSlice",
+                                    "CaloSize",
+                                    "BeamQuality",
+                                    "APA3",
+                                    "MichelScore",
+                                    "MediandEdx"};
+  
+  enum cut{
+    kNocut = 0,
+    kPandoraSlice,
+    kCaloSize,
+    kBeamQuality,
+    kAPA3,
+    kMichelScore,
+    kMediandEdx
+  };
+}
 
 const double beam_startX_data = -27.911;
 const double beam_startY_data = 424.364;

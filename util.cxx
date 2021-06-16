@@ -1,8 +1,8 @@
 #include "util.h"
 
-void FillHistVec1D(TH1D *hist[nIntTypes+1], const double &value, const int &partype){
+void FillHistVec1D(TH1D *hist[pi::nIntTypes+1], const double &value, const int &partype){
   //hist[0]->Fill(value);
-  if (partype>=0 && partype < nIntTypes+1){
+  if (partype>=0 && partype < pi::nIntTypes+1){
     if (value<hist[partype]->GetXaxis()->GetXmin()){
       hist[partype]->Fill(hist[partype]->GetXaxis()->GetXmin());
     }
@@ -15,9 +15,9 @@ void FillHistVec1D(TH1D *hist[nIntTypes+1], const double &value, const int &part
   }
 }
 
-void FillHistVec2D(TH2D *hist[nIntTypes+1], const double &value1, const double &value2, const int &partype){
+void FillHistVec2D(TH2D *hist[pi::nIntTypes+1], const double &value1, const double &value2, const int &partype){
   //hist[0]->Fill(value1, value2);
-  if (partype>=0 && partype < nIntTypes+1){
+  if (partype>=0 && partype < pi::nIntTypes+1){
     hist[partype]->Fill(value1, value2);
   }
 }
