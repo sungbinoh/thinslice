@@ -12,6 +12,10 @@ class HadAna{
 
   HadAna();
 
+  void InitPi();
+
+  void InitP();
+
   void AddTruePDG(int pdg);
 
   //Check if the desired particle is selected

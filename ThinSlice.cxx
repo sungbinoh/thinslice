@@ -10,6 +10,7 @@
 #include <iostream>
 
 ThinSlice::ThinSlice(){
+  hadana.InitPi();
 }
 
 void ThinSlice::BookHistograms(){

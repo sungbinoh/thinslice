@@ -5,6 +5,9 @@
 #include <iostream>
 
 HadAna::HadAna(){
+}
+
+void HadAna::InitPi(){
 
   AddTruePDG(-13);
   AddTruePDG(13);
@@ -13,8 +16,17 @@ HadAna::HadAna(){
   SetPandoraSlicePDG(13);
 
   SetBeamQualityCuts();
-
 }
+
+void HadAna::InitP(){
+
+  AddTruePDG(2212);
+
+  SetPandoraSlicePDG(13);
+
+  SetBeamQualityCuts();
+}
+
 
 void HadAna::AddTruePDG(int pdg){
   truepdglist.push_back(pdg);

@@ -53,9 +53,9 @@ void Unfold::SaveHistograms(){
   pur_Inc->Write("pur_Inc");
 
   TH2D *hint = (TH2D*)response_SliceID_Int.Hresponse();
-  hint->SetTitle("Pion Inelastic Scatterings;Reco Slice ID;True Slice ID");
+  hint->SetTitle("Interactions;Reco Slice ID;True Slice ID");
   hint->Write("response_SliceID_Int");
   TH2D *hinc = (TH2D*)response_SliceID_Inc.Hresponse();
-  hinc->SetTitle("All Pions; Reco Slice ID; True Slice ID");
+  hinc->SetTitle("Incidents; Reco Slice ID; True Slice ID");
   hinc->Write("response_SliceID_Inc");
 }
