@@ -21,6 +21,9 @@ class HadAna{
   //Check if the desired particle is selected
   bool isSelectedPart(const anavar& evt) const;
 
+  //Select events with cosmic trigger in data
+  bool isCosmics(const anavar& evt) const;
+
   // Set beam cut values
   void SetBeamQualityCuts(double dx_min = 3, double dx_max = -3,
                           double dy_min = 3, double dy_max = -3,

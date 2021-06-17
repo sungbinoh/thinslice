@@ -16,11 +16,13 @@ using namespace std;
 int nc = 0;
 double totaldata = 0;
 double totalmc = 0;
+double totalcosmics = 0;
 
 int colors[pi::nIntTypes] = {2, 3, 800, 7, 33, 9, 46, 28, 41};
 
 TFile *fmc;
 TFile *fdata;
+TFile *fcosmics;
 
 void PrintEvents(string name){
 
@@ -54,6 +56,7 @@ void plot1d(string name, int cut, string xtitle, string ytitle){
   static bool first = true;
 
   TH1D *hdata[pi::nCuts];
+  TH1D *hcosmics[pi::nCuts];
   TH1D *hmc[pi::nCuts][pi::nIntTypes+1];
   for (int i = 0; i < pi::nCuts; ++i){
     for (int j = 0; j < pi::nIntTypes+1; ++j){
@@ -63,7 +66,11 @@ void plot1d(string name, int cut, string xtitle, string ytitle){
       }
     }
     hdata[i] = (TH1D*)fdata->Get(Form("%s_%d_%d",name.c_str(),i,0));
-    if (i==0 && first) totaldata = hdata[i]->Integral();
+    hcosmics[i] = (TH1D*)fcosmics->Get(Form("%s_%d_%d",name.c_str(),i,0));
+    if (i==0 && first){
+      totaldata = hdata[i]->Integral();
+      totalcosmics = hcosmics[i]->Integral();
+    }
   }
   //std::cout<<totaldata<<" "<<totalmc<<std::endl;
   first = false;
@@ -103,6 +110,9 @@ void plot1d(string name, int cut, string xtitle, string ytitle){
   hs->GetYaxis()->SetLabelSize(0.04);
   hdata[cut]->SetMarkerStyle(20);
   hdata[cut]->Draw("same");
+  hcosmics[cut]->Scale(totaldata/totalcosmics);
+  hcosmics[cut]->SetLineStyle(2);
+  hcosmics[cut]->Draw("hist same");
   TLegend *leg = new TLegend(0.15, 0.75, 0.88, 0.9);
 //  if (hmc[cut][0]->GetMaximumBin() < hmc[cut][0]->GetNbinsX()/2){
 //    leg = new TLegend(0.55,0.7,0.9,0.9);
@@ -117,6 +127,7 @@ void plot1d(string name, int cut, string xtitle, string ytitle){
   for (int i = 0; i<pi::nIntTypes; ++i){
     leg->AddEntry(hmc[cut][i+1], Form("%s %.0f",pi::intTypeName[i+1],hmc[cut][i+1]->Integral()), "f");
   }
+  leg->AddEntry(hcosmics[cut], Form("%s %.0f","Cosmics",hcosmics[cut]->Integral()),"l");
   leg->Draw();
 
   can->cd();
@@ -277,6 +288,7 @@ void plot(){
   fmc = TFile::Open("../../install/bin/mcprod4a.root");
   //fdata = TFile::Open("../install/bin/mcprod4a.root");
   fdata = TFile::Open("../../install/bin/data.root");
+  fcosmics = TFile::Open("../../install/bin/cosmics.root");
 
   for (int i = 0; i<pi::nCuts; ++i){
     plot1d("hmediandEdx", i, "Median dE/dx (MeV/cm)", "Events");

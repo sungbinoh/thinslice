@@ -11,6 +11,7 @@
 
 ThinSlice::ThinSlice(){
   hadana.InitPi();
+  selectCosmics = false;
 }
 
 void ThinSlice::BookHistograms(){
@@ -503,7 +504,12 @@ void ThinSlice::Run(anavar & evt, Unfold & uf){
     // if (Cut(ientry) < 0) continue;
     //std::cout<<evt.run<<" "<<evt.event<<" "<<evt.MC<<" "<<evt.reco_beam_true_byE_matched<<" "<<evt.true_beam_PDG<<" "<<(*evt.true_beam_endProcess)<<std::endl;
     //std::cout<<GetParType(ana)<<std::endl;
-    if (!hadana.isSelectedPart(evt)) continue;
+    if (selectCosmics){
+      if (!hadana.isCosmics(evt)) continue;
+    }
+    else{
+      if (!hadana.isSelectedPart(evt)) continue;
+    }
     ProcessEvent(evt, uf);
     FillHistograms(pi::kNocut, evt);
     if (hadana.PassPandoraSliceCut(evt)){
@@ -539,4 +545,10 @@ void ThinSlice::Run(anavar & evt, Unfold & uf){
   uf.SaveHistograms();
   CalcXS(uf);
   SaveHistograms();
+}
+
+void ThinSlice::SetSelectCosmics(bool sc){
+
+  selectCosmics = sc;
+
 }

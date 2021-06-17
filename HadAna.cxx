@@ -51,6 +51,15 @@ bool HadAna::isSelectedPart(const anavar& evt) const{
   }
 }
 
+bool HadAna::isCosmics(const anavar& evt) const{
+  if (evt.MC) return false;
+  else{
+    if (!evt.beam_inst_valid) return true;
+    else return false;
+  }
+  return false;
+}
+
 void HadAna::SetPandoraSlicePDG(int pdg){
   pandora_slice_pdg = pdg;
 };

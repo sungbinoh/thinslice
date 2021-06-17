@@ -33,6 +33,11 @@ int main(){
   dataths.SetOutputFileName("data.root");
   dataths.Run(dataevt, uf);
 
+  ThinSlice cosmicsths;
+  cosmicsths.SetSelectCosmics(true);
+  cosmicsths.SetOutputFileName("cosmics.root");
+  cosmicsths.Run(dataevt, uf);
+
   return 0;
 
 }

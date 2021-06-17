@@ -22,6 +22,8 @@ class ThinSlice {
 
   bool isTestSample;
 
+  bool selectCosmics;
+
   TH1D *reco_incE[pi::nthinslices];
   TH1D *true_incE[pi::nthinslices];
   TH1D *reco_AngCorr;
@@ -100,6 +102,8 @@ class ThinSlice {
   void CalcXS(const Unfold & uf);
 
   void Run(anavar & evt, Unfold & uf);
+
+  void SetSelectCosmics(bool sc);
 
 };
 
