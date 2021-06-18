@@ -87,17 +87,19 @@ void plot1d(string name, int cut, string xtitle, string ytitle){
   }
 
   if (!htotmc->Integral() || !hdata[cut]->Integral()) return;
+  hcosmics[cut]->Scale(totaldata/totalcosmics);
 
   TCanvas *can = new TCanvas(Form("can_%d",nc), Form("can_%d",nc), 800, 800);
   TPad *pad1 = new TPad(Form("pad1_%d",nc), Form("pad1_%d",nc), 0, 0.2, 1, 1.);
   pad1->SetBottomMargin(0.03);
-  pad1->SetGridx();
-  pad1->SetGridy();
+//  pad1->SetGridx();
+//  pad1->SetGridy();
   pad1->Draw();
   pad1->cd();
   
 
   double max = TMath::Max(hs->GetMaximum(), hdata[cut]->GetMaximum());
+  max = TMath::Max(max, hcosmics[cut]->GetMaximum());
   hs->SetMaximum(1.2*max);
   hs->Draw("hist");
   hs->SetTitle(hdata[cut]->GetTitle());
@@ -106,11 +108,10 @@ void plot1d(string name, int cut, string xtitle, string ytitle){
   hs->GetXaxis()->SetLabelSize(0);
   hs->GetYaxis()->SetTitle(ytitle.c_str());
   hs->GetYaxis()->SetTitleSize(0.04);
-  hs->GetYaxis()->SetTitleOffset(1.8);
+  hs->GetYaxis()->SetTitleOffset(1.35);
   hs->GetYaxis()->SetLabelSize(0.04);
   hdata[cut]->SetMarkerStyle(20);
   hdata[cut]->Draw("same");
-  hcosmics[cut]->Scale(totaldata/totalcosmics);
   hcosmics[cut]->SetLineStyle(2);
   hcosmics[cut]->Draw("hist same");
   TLegend *leg = new TLegend(0.15, 0.75, 0.88, 0.9);
@@ -133,7 +134,7 @@ void plot1d(string name, int cut, string xtitle, string ytitle){
   can->cd();
   TPad *pad2 = new TPad(Form("pad2_%d",nc), Form("pad2_%d",nc), 0, 0, 1, 0.2);
   pad2->SetTopMargin(0.02);
-  pad2->SetBottomMargin(0.25);
+  pad2->SetBottomMargin(0.3);
   pad2->SetGridx();
   pad2->SetGridy();
   pad2->Draw();
@@ -143,13 +144,18 @@ void plot1d(string name, int cut, string xtitle, string ytitle){
   hratio->SetTitle("");
   hratio->Divide(htotmc);
   hratio->GetYaxis()->SetTitle("Data/MC");
-  hratio->GetXaxis()->SetLabelSize(0.12);
-  hratio->GetXaxis()->SetTitleSize(0.12);
+  hratio->GetXaxis()->SetLabelSize(0.15);
+  hratio->GetXaxis()->SetTitleSize(0.15);
   hratio->GetXaxis()->SetTitleOffset(1.);
-  hratio->GetYaxis()->SetLabelSize(0.12);
-  hratio->GetYaxis()->SetTitleSize(0.12);
-  hratio->GetYaxis()->SetTitleOffset(.5);
-  hratio->GetYaxis()->SetRangeUser(0,5);
+  hratio->GetYaxis()->SetLabelSize(0.15);
+  hratio->GetYaxis()->SetTitleSize(0.15);
+  hratio->GetYaxis()->SetTitleOffset(.3);
+//  if (hratio->GetMaximum()>5){
+//    hratio->GetYaxis()->SetRangeUser(0,hratio->GetMaximum()*1.1);
+//  }
+//  else{
+  hratio->GetYaxis()->SetRangeUser(0,2);
+    //  }
   hratio->GetYaxis()->SetNdivisions(505);
   hratio->Draw();
 
