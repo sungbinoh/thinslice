@@ -119,8 +119,13 @@ void ThinSlice::BookHistograms(){
       hcostheta[i][j] = new TH1D(Form("hcostheta_%d_%d",i,j), Form("costheta, %s, %s;cos#theta", pi::cutName[i], pi::intTypeName[j]), 100, 0.9, 1);
       hcostheta[i][j]->Sumw2();
 
-      htrklen[i][j] = new TH1D(Form("htrklen_%d_%d",i,j), Form("trklen, %s, %s;Track length (cm)", pi::cutName[i], pi::intTypeName[j]), 61, -10, 600);
-      htrklen[i][j]->Sumw2();
+      hreco_trklen[i][j] = new TH1D(Form("hreco_trklen_%d_%d",i,j), Form("reco_trklen, %s, %s;Track length (cm)", pi::cutName[i], pi::intTypeName[j]), 61, -10, 600);
+      hreco_trklen[i][j]->Sumw2();
+      htrue_trklen[i][j] = new TH1D(Form("htrue_trklen_%d_%d",i,j), Form("true_trklen, %s, %s;Track length (cm)", pi::cutName[i], pi::intTypeName[j]), 61, -10, 600);
+      htrue_trklen[i][j]->Sumw2();
+      hdiff_trklen[i][j] = new TH1D(Form("hdiff_trklen_%d_%d",i,j), Form("diff_trklen, %s, %s;Track length (cm)", pi::cutName[i], pi::intTypeName[j]), 60, -600, 600);
+      hdiff_trklen[i][j]->Sumw2();
+      hreco_vs_true_trklen[i][j]= new TH2D(Form("hreco_vs_true_trklen_%d_%d",i,j), Form("%s, %s;true_trklen (cm);reco_trklen (cm)", pi::cutName[i], pi::intTypeName[j]), 61, -10, 600, 61, -10, 600);
 
       hreco_beam_startX_SCE[i][j] = new TH1D(Form("hreco_beam_startX_SCE_%d_%d",i,j), Form("reco_beam_startX_SCE, %s, %s; reco_beam_startX_SCE (cm)", pi::cutName[i], pi::intTypeName[j]), 100, -80, 20);
       hreco_beam_startX_SCE[i][j]->Sumw2();
@@ -385,7 +390,10 @@ void ThinSlice::FillHistograms(int cut, const anavar & evt){
     FillHistVec1D(hdeltaz[cut], hadana.beam_dz, hadana.pitype);
     FillHistVec1D(hcostheta[cut], hadana.beam_costh, hadana.pitype);
 
-    FillHistVec1D(htrklen[cut], evt.reco_beam_alt_len, hadana.pitype);
+    FillHistVec1D(hreco_trklen[cut], evt.reco_beam_alt_len, hadana.pitype);
+    FillHistVec1D(htrue_trklen[cut], hadana.true_trklen, hadana.pitype);
+    FillHistVec1D(hdiff_trklen[cut], evt.reco_beam_alt_len - hadana.true_trklen, hadana.pitype);
+    FillHistVec2D(hreco_vs_true_trklen[cut], hadana.true_trklen, evt.reco_beam_alt_len, hadana.pitype);
 
     FillHistVec1D(hreco_beam_startX_SCE[cut], evt.reco_beam_calo_startX, hadana.pitype);
     FillHistVec1D(hreco_beam_startY_SCE[cut], evt.reco_beam_calo_startY, hadana.pitype);

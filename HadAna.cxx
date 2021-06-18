@@ -335,5 +335,22 @@ void HadAna::ProcessEvent(const anavar& evt){
 //    cout<<run<<" "<<event<<endl;
 //  }
 
+
+  double temp = 999;
+  int start_idx = 0;
+  for (int i=0; i<evt.true_beam_traj_Z->size(); i++){
+    if (abs((*evt.true_beam_traj_Z)[i]) < temp){
+      temp = abs((*evt.true_beam_traj_Z)[i]);
+      start_idx = i;
+    }
+  }
+  true_trklen = -1999; // initialize
+  for (int i=start_idx+1; i<evt.true_beam_traj_Z->size(); i++){
+    if (i == start_idx+1) true_trklen = 0;
+    true_trklen += sqrt( pow( (*evt.true_beam_traj_X)[i]-(*evt.true_beam_traj_X)[i-1], 2)
+                        + pow( (*evt.true_beam_traj_Y)[i]-(*evt.true_beam_traj_Y)[i-1], 2)
+                        + pow( (*evt.true_beam_traj_Z)[i]-(*evt.true_beam_traj_Z)[i-1], 2)
+                        );
+  }
 }
 
