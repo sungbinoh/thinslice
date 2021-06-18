@@ -56,6 +56,8 @@ class HadAna{
   double daughter_michel_score;
   double dEdx_5cm;
   double beam_dx, beam_dy, beam_dz, beam_dxy, beam_costh;
+  
+  double true_trklen;
 
  private:
   
