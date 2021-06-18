@@ -530,6 +530,9 @@ void ThinSlice::Run(anavar & evt, Unfold & uf){
               }
             }
             */
+//            if (selectCosmics && hadana.median_dEdx > 3){
+//              std::cout<<evt.run<<" "<<evt.subrun<<" "<<evt.event<<std::endl;
+//            }
             if (hadana.PassMichelScoreCut()){
               FillHistograms(pi::kMichelScore, evt);
               if (hadana.PassMediandEdxCut()){
