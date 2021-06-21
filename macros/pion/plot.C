@@ -315,7 +315,7 @@ void plot(){
     plot1d("hdeltay", i, "#Deltay/#sigma_{y}", "Events");
     plot1d("hdeltaz", i, "#Deltaz/#sigma_{z}", "Events");
     plot1d("hcostheta", i, "cos#theta", "Events");
-    plot1d("htrklen", i, "Track length (cm)", "Events");
+    plot1d("hreco_trklen", i, "Reco track length (cm)", "Events");
     plot1d("hreco_beam_startX_SCE", i, "Reco track start X (cm)", "Events");
     plot1d("hreco_beam_startY_SCE", i, "Reco track start Y (cm)", "Events");
     plot1d("hreco_beam_startZ_SCE", i, "Reco track start Z (cm)", "Events");
