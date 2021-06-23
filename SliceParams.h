@@ -13,8 +13,8 @@ namespace pi{
 }
 
 namespace p{
-  const double thinslicewidth = 10; //cm
-  const int nthinslices = 11;
+  const double thinslicewidth = 4; //cm
+  const int nthinslices = 24;
   
   const int nbinse=12; 
   const int nbinsthickness = 100;

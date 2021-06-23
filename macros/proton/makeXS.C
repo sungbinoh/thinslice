@@ -182,7 +182,7 @@ void makeXS(){
   gr_recoxs->SetTitle("Proton Inelastic Cross Section");
   gr_recoxs->GetXaxis()->SetTitle("Proton Kinetic Energy (MeV)");
   gr_recoxs->GetYaxis()->SetTitle("#sigma_{inelastic} (mb)");
-  gr_recoxs->GetYaxis()->SetRangeUser(0, 900);
+  gr_recoxs->GetYaxis()->SetRangeUser(0, 1000);
   gr_recoxs->SetLineWidth(2);
   gr_recoxs->Draw("ape");
   gr_truexs->SetMarkerColor(3);
