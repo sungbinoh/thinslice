@@ -159,13 +159,13 @@ void plot1d(string name, int cut, string xtitle, string ytitle){
   hratio->GetYaxis()->SetNdivisions(505);
   hratio->Draw();
 
-  can->Print(Form("plots/can_%s_%d_%s.png", name.c_str(), cut, pi::cutName[cut]));
-  can->Print(Form("plots/can_%s_%d_%s.pdf", name.c_str(), cut, pi::cutName[cut]));
+  can->Print(Form("../plots/can_%s_%d_%s.png", name.c_str(), cut, pi::cutName[cut]));
+  can->Print(Form("../plots/can_%s_%d_%s.pdf", name.c_str(), cut, pi::cutName[cut]));
   hs->SetMaximum(8*max);
   hs->SetMinimum(1);
   pad1->SetLogy();
-  can->Print(Form("plots/canlog_%s_%d_%s.png", name.c_str(), cut, pi::cutName[cut]));
-  can->Print(Form("plots/canlog_%s_%d_%s.pdf", name.c_str(), cut, pi::cutName[cut]));
+  can->Print(Form("../plots/canlog_%s_%d_%s.png", name.c_str(), cut, pi::cutName[cut]));
+  can->Print(Form("../plots/canlog_%s_%d_%s.pdf", name.c_str(), cut, pi::cutName[cut]));
 
   ++nc;
 }
@@ -256,13 +256,13 @@ void plot1dslice(string name, int cut, string xtitle, string ytitle){
     hratio->GetYaxis()->SetNdivisions(505);
     hratio->Draw();
     
-    can->Print(Form("plots/can_%s_%d_%s_%02d.png", name.c_str(), cut, pi::cutName[cut], j));
-    can->Print(Form("plots/can_%s_%d_%s_%02d.pdf", name.c_str(), cut, pi::cutName[cut], j));
+    can->Print(Form("../plots/can_%s_%d_%s_%02d.png", name.c_str(), cut, pi::cutName[cut], j));
+    can->Print(Form("../plots/can_%s_%d_%s_%02d.pdf", name.c_str(), cut, pi::cutName[cut], j));
     hs->SetMaximum(8*max);
     hs->SetMinimum(1);
     pad1->SetLogy();
-    can->Print(Form("plots/canlog_%s_%d_%s_%02d.png", name.c_str(), cut, pi::cutName[cut], j));
-    can->Print(Form("plots/canlog_%s_%d_%s_%02d.pdf", name.c_str(), cut, pi::cutName[cut], j));
+    can->Print(Form("../plots/canlog_%s_%d_%s_%02d.png", name.c_str(), cut, pi::cutName[cut], j));
+    can->Print(Form("../plots/canlog_%s_%d_%s_%02d.pdf", name.c_str(), cut, pi::cutName[cut], j));
     
     ++nc;
     
@@ -281,8 +281,8 @@ void plot2d(string name, int cut){
   for (int i = 1; i<=4; ++i){
     TCanvas *can = new TCanvas(Form("can_%d",nc), Form("can_%d",nc));
     h[cut][i]->Draw("colz");
-    can->Print(Form("plots/can_%s_%s_%s.png",name.c_str(), pi::cutName[cut], pi::intTypeName[i]));
-    can->Print(Form("plots/can_%s_%s_%s.pdf",name.c_str(), pi::cutName[cut], pi::intTypeName[i]));
+    can->Print(Form("../plots/can_%s_%s_%s.png",name.c_str(), pi::cutName[cut], pi::intTypeName[i]));
+    can->Print(Form("../plots/can_%s_%s_%s.pdf",name.c_str(), pi::cutName[cut], pi::intTypeName[i]));
     ++nc;
   }
 }
@@ -291,10 +291,10 @@ void plot(){
   gStyle->SetOptStat(0);
   gErrorIgnoreLevel = kWarning;
 
-  fmc = TFile::Open("../../install/bin/mcprod4a.root");
+  fmc = TFile::Open("../../build/mcprod4a.root");
   //fdata = TFile::Open("../install/bin/mcprod4a.root");
-  fdata = TFile::Open("../../install/bin/data.root");
-  fcosmics = TFile::Open("../../install/bin/cosmics.root");
+  fdata = TFile::Open("../../build/data.root");
+  fcosmics = TFile::Open("../../build/cosmics.root");
 
   for (int i = 0; i<pi::nCuts; ++i){
     plot1d("hmediandEdx", i, "Median dE/dx (MeV/cm)", "Events");

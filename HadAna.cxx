@@ -15,7 +15,7 @@ void HadAna::InitPi(){
 
   SetPandoraSlicePDG(13);
 
-  SetBeamQualityCuts();
+  SetBeamQualityCuts();//why no arguments?
 }
 
 void HadAna::InitP(){
@@ -29,22 +29,22 @@ void HadAna::InitP(){
 
 
 void HadAna::AddTruePDG(int pdg){
-  truepdglist.push_back(pdg);
+  truepdglist.push_back(pdg);//append
 };
 
 bool HadAna::isSelectedPart(const anavar& evt) const{
   if (evt.MC){
     for (size_t i = 0; i<truepdglist.size(); ++i){
-      if (evt.true_beam_PDG == truepdglist[i]) return true;
+      if (evt.true_beam_PDG == truepdglist[i]) return true;//truth match
     }
     return false;
   }
-  else{
+  else{//real data
     if (!evt.beam_inst_valid) return false;
     if (evt.beam_inst_nMomenta != 1 || evt.beam_inst_nTracks != 1) return false;
     for (size_t i = 0; i<truepdglist.size(); ++i){
       for (size_t j = 0; j<evt.beam_inst_PDG_candidates->size(); ++j){
-        if ((*evt.beam_inst_PDG_candidates)[j] == truepdglist[i]) return true;
+        if ((*evt.beam_inst_PDG_candidates)[j] == truepdglist[i]) return true;//what's this used for?
       }
     }
     return false;
@@ -81,10 +81,10 @@ int HadAna::GetPiParType(const anavar& evt){
   if (!evt.MC){
     return pi::kData;
   }
-  else if (evt.event%2){
+  else if (evt.event%2){//divide half of MC as data as well
     return pi::kData;
   }
-  else if (!evt.reco_beam_true_byE_matched){
+  else if (!evt.reco_beam_true_byE_matched){//mismatched
     if (evt.reco_beam_true_byE_origin == 2) {
       return pi::kMIDcosmic;
     }
@@ -159,7 +159,7 @@ int HadAna::GetPParType(const anavar& evt){
   return p::kMIDother;
 }
 
-bool HadAna::PassPandoraSliceCut(const anavar& evt) const{
+bool HadAna::PassPandoraSliceCut(const anavar& evt) const{//whether recognized by Pandora correctly?
 
   return (evt.reco_beam_type == pandora_slice_pdg);
 }
@@ -181,7 +181,7 @@ bool HadAna::PassBeamQualityCut() const{
     if (beam_dz>beamcut_dz_max) return false;
   }
 
-  if (beamcut_dxy_min<beamcut_dxy_max){
+  if (beamcut_dxy_min<beamcut_dxy_max){//what's dxy?
     if (beam_dxy<beamcut_dxy_min) return false;
     if (beam_dxy>beamcut_dxy_max) return false;
   }
@@ -201,7 +201,7 @@ bool HadAna::PassAPA3Cut(const anavar& evt) const{
   return evt.reco_beam_calo_endZ < cutAPA3_Z;
 }
 
-bool HadAna::PassCaloSizeCut(const anavar& evt) const{
+bool HadAna::PassCaloSizeCut(const anavar& evt) const{//Require hits associated with Pandora track in collection plane?
   
   return !(evt.reco_beam_calo_wire->empty());
 }
@@ -211,7 +211,7 @@ bool HadAna::PassMichelScoreCut() const{
   return daughter_michel_score < 0.55;
 }
 
-bool HadAna::PassMediandEdxCut() const{
+bool HadAna::PassMediandEdxCut() const{//to remove proton background
 
   return median_dEdx < 2.4;
 }
@@ -312,7 +312,7 @@ void HadAna::ProcessEvent(const anavar& evt){
 
   //if (event == 78467) cout<<reco_beam_calibrated_dEdX_SCE->size()<<endl;
   //cout<<reco_beam_allTrack_calibrated_dEdX->size()<<endl;
-  if (!evt.reco_beam_calibrated_dEdX_SCE->empty()){
+  if (!evt.reco_beam_calibrated_dEdX_SCE->empty()){//what's this used for?
     //dEdx_5cm = 0;
     //int nhits = 0;
     std::vector<double> vdEdx;
@@ -335,7 +335,7 @@ void HadAna::ProcessEvent(const anavar& evt){
 //    cout<<run<<" "<<event<<endl;
 //  }
 
-
+  // calculate true_trklen
   double temp = 999;
   int start_idx = 0;
   for (int i=0; i<evt.true_beam_traj_Z->size(); i++){
