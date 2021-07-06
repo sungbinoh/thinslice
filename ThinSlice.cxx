@@ -197,7 +197,8 @@ void ThinSlice::ProcessEvent(const anavar & evt, Unfold & uf){
       if (!(evt.reco_beam_calo_wire->empty()) && evt.reco_beam_true_byE_matched){//truth matched. so it must be the true track?
         std::vector<std::vector<double>> vincE(pi::nthinslices);
         for (size_t i = 0; i<evt.reco_beam_calo_wire->size(); ++i){
-          int this_sliceID = int((*evt.reco_beam_calo_Z)[i]/pi::thinslicewidth);
+          //int this_sliceID = int((*evt.reco_beam_calo_Z)[i]/pi::thinslicewidth);
+          int this_sliceID = int((hadana.reco_trklen_accum)[i]/pi::thinslicewidth);
           if (this_sliceID>=pi::nthinslices) continue;
           if (this_sliceID<0) continue;
           double this_incE = (*evt.reco_beam_incidentEnergies)[i];//reco_beam_incidentEnergies is a vector<double>
@@ -228,6 +229,7 @@ void ThinSlice::ProcessEvent(const anavar & evt, Unfold & uf){
         std::vector<std::vector<double>> vincE(pi::nthinslices);
         for (size_t i = 0; i<evt.true_beam_traj_Z->size()-1; ++i){//last point always has KE = 0
           int this_sliceID = int((*evt.true_beam_traj_Z)[i]/pi::thinslicewidth);
+          //int this_sliceID = int((hadana.true_trklen_accum)[i]/pi::thinslicewidth);
           double this_incE = (*evt.true_beam_traj_KE)[i];
           if (this_sliceID>=pi::nthinslices) continue;
           if (this_sliceID<0) continue;
@@ -462,6 +464,7 @@ void ThinSlice::CalcXS(const Unfold & uf){
   double err_reco_trueincE[pi::nthinslices] = {0};
   double truexs[pi::nthinslices] = {0};
   double err_truexs[pi::nthinslices] = {0};
+  double true_cosangle = 1.;
 
   double NA=6.02214076e23;
   double MAr=39.95; //gmol
@@ -478,8 +481,9 @@ void ThinSlice::CalcXS(const Unfold & uf){
     err_reco_trueincE[i] = sqrt(pow(err_trueincE[i],2)+pow(err_recoincE[i],2));//is it proper to simply use root_sum_square?
     //std::cout<<i<<" "<<avg_trueincE[i]<<std::endl;
     if (true_incidents[i] && true_interactions[i]){
-      truexs[i] = MAr/(Density*NA*pi::thinslicewidth/true_AngCorr->GetMean())*log(true_incidents[i]/(true_incidents[i]-true_interactions[i]))*1e27;
-      err_truexs[i] = MAr/(Density*NA*pi::thinslicewidth/true_AngCorr->GetMean())*1e27*sqrt(true_interactions[i]+pow(true_interactions[i],2)/true_incidents[i])/true_incidents[i];//so error from true_AngCorr is neglected?
+      //true_cosangle = true_AngCorr->GetMean();
+      truexs[i] = MAr/(Density*NA*pi::thinslicewidth/true_cosangle)*log(true_incidents[i]/(true_incidents[i]-true_interactions[i]))*1e27;
+      err_truexs[i] = MAr/(Density*NA*pi::thinslicewidth/true_cosangle)*1e27*sqrt(true_interactions[i]+pow(true_interactions[i],2)/true_incidents[i])/true_incidents[i];//so error from true_AngCorr is neglected?
     }
   }
 
