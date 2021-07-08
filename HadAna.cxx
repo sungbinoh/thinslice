@@ -15,7 +15,7 @@ void HadAna::InitPi(){
 
   SetPandoraSlicePDG(13);
 
-  SetBeamQualityCuts();
+  SetBeamQualityCuts();//why no arguments?
 }
 
 void HadAna::InitP(){
@@ -356,19 +356,20 @@ void HadAna::ProcessEvent(const anavar& evt){
     true_trklen_accum[i] = true_trklen;
     //cout<<i<<"\t"<<true_trklen_accum[i]<<endl;
   }
-  
+
   // reco
   reco_trklen_accum.reserve(evt.reco_beam_calo_Z->size());
-  temp = -1999;
+  reco_trklen = -1999; // reco_trklen
   for (int i=1; i<evt.reco_beam_calo_Z->size(); i++){
-    if (i == 1) temp = 0;
-    temp += sqrt( pow( (*evt.reco_beam_calo_X)[i]-(*evt.reco_beam_calo_X)[i-1], 2)
+    if (i == 1) reco_trklen = 0;
+    reco_trklen += sqrt( pow( (*evt.reco_beam_calo_X)[i]-(*evt.reco_beam_calo_X)[i-1], 2)
                         + pow( (*evt.reco_beam_calo_Y)[i]-(*evt.reco_beam_calo_Y)[i-1], 2)
                         + pow( (*evt.reco_beam_calo_Z)[i]-(*evt.reco_beam_calo_Z)[i-1], 2)
                         );
-    reco_trklen_accum[i] = temp;
+    reco_trklen_accum[i] = reco_trklen;
     //cout<<i<<"\t"<<reco_trklen_accum[i]<<endl;
   }
-  //cout<<"$$$"<<evt.reco_beam_alt_len<<"\t"<<temp<<endl;//the two are the same
+  //cout<<"$$$"<<evt.reco_beam_alt_len<<"\t"<<reco_trklen<<endl;//the two are the same
+  reco_trklen = evt.reco_beam_alt_len;
 }
 

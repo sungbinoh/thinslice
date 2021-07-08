@@ -180,7 +180,8 @@ void ThinSlice::ProcessEvent(const anavar & evt, Unfold & uf){
   //if (evt.MC && evt.event%2 == 0) isTestSample = false;
 
   if (evt.MC){
-    true_sliceID = int(evt.true_beam_endZ/pi::thinslicewidth);
+    //true_sliceID = int(evt.true_beam_endZ/pi::thinslicewidth);
+    true_sliceID = int(hadana.true_trklen/pi::thinslicewidth);
     if (true_sliceID < 0) true_sliceID = -1;
     if (evt.true_beam_endZ < 0) true_sliceID = -1;
     if (true_sliceID >= pi::nthinslices) true_sliceID = pi::nthinslices;
@@ -228,8 +229,8 @@ void ThinSlice::ProcessEvent(const anavar & evt, Unfold & uf){
       if (!(evt.true_beam_traj_Z->empty())){
         std::vector<std::vector<double>> vincE(pi::nthinslices);
         for (size_t i = 0; i<evt.true_beam_traj_Z->size()-1; ++i){//last point always has KE = 0
-          int this_sliceID = int((*evt.true_beam_traj_Z)[i]/pi::thinslicewidth);
-          //int this_sliceID = int((hadana.true_trklen_accum)[i]/pi::thinslicewidth);
+          //int this_sliceID = int((*evt.true_beam_traj_Z)[i]/pi::thinslicewidth);
+          int this_sliceID = int((hadana.true_trklen_accum)[i]/pi::thinslicewidth);
           double this_incE = (*evt.true_beam_traj_KE)[i];
           if (this_sliceID>=pi::nthinslices) continue;
           if (this_sliceID<0) continue;
@@ -258,7 +259,8 @@ void ThinSlice::ProcessEvent(const anavar & evt, Unfold & uf){
   }
 
   if (!evt.reco_beam_calo_wire->empty()){
-    reco_sliceID = int(evt.reco_beam_calo_endZ/pi::thinslicewidth);
+    //reco_sliceID = int(evt.reco_beam_calo_endZ/pi::thinslicewidth);
+    reco_sliceID = int(hadana.reco_trklen/pi::thinslicewidth);
     if (reco_sliceID < 0) reco_sliceID = -1;
     if (evt.reco_beam_calo_endZ < 0) reco_sliceID = -1;
     if (reco_sliceID >= pi::nthinslices) reco_sliceID = pi::nthinslices;
