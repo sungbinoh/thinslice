@@ -338,11 +338,13 @@ void HadAna::ProcessEvent(const anavar& evt){
   // calculate true_trklen
   double temp = 999;
   int start_idx = 0;
+  true_trklen_accum.reserve(evt.true_beam_traj_Z->size());
   for (int i=0; i<evt.true_beam_traj_Z->size(); i++){
     if (abs((*evt.true_beam_traj_Z)[i]) < temp){
       temp = abs((*evt.true_beam_traj_Z)[i]);
-      start_idx = i;
+      start_idx = i; // find the point where the beam enters TPC (the smallest abs(Z))
     }
+    true_trklen_accum[i] = 0.; // initialize true_trklen_accum
   }
   true_trklen = -1999; // initialize
   for (int i=start_idx+1; i<evt.true_beam_traj_Z->size(); i++){
@@ -351,6 +353,23 @@ void HadAna::ProcessEvent(const anavar& evt){
                         + pow( (*evt.true_beam_traj_Y)[i]-(*evt.true_beam_traj_Y)[i-1], 2)
                         + pow( (*evt.true_beam_traj_Z)[i]-(*evt.true_beam_traj_Z)[i-1], 2)
                         );
+    true_trklen_accum[i] = true_trklen;
+    //cout<<i<<"\t"<<true_trklen_accum[i]<<endl;
   }
+
+  // reco
+  reco_trklen_accum.reserve(evt.reco_beam_calo_Z->size());
+  reco_trklen = -1999; // reco_trklen
+  for (int i=1; i<evt.reco_beam_calo_Z->size(); i++){
+    if (i == 1) reco_trklen = 0;
+    reco_trklen += sqrt( pow( (*evt.reco_beam_calo_X)[i]-(*evt.reco_beam_calo_X)[i-1], 2)
+                        + pow( (*evt.reco_beam_calo_Y)[i]-(*evt.reco_beam_calo_Y)[i-1], 2)
+                        + pow( (*evt.reco_beam_calo_Z)[i]-(*evt.reco_beam_calo_Z)[i-1], 2)
+                        );
+    reco_trklen_accum[i] = reco_trklen;
+    //cout<<i<<"\t"<<reco_trklen_accum[i]<<endl;
+  }
+  //cout<<"$$$"<<evt.reco_beam_alt_len<<"\t"<<reco_trklen<<endl;//the two are the same
+  reco_trklen = evt.reco_beam_alt_len;
 }
 
