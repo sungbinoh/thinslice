@@ -1,8 +1,8 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Tue May 11 18:04:34 2021 by ROOT version 6.22/06
+// Fri Jul  9 21:04:38 2021 by ROOT version 6.18/04
 // from TTree beamana/beam analysis tree
-// found on file: ../pduneana_Prod4.1_5_11_21.root
+// found on file: pduneana_data.root
 //////////////////////////////////////////////////////////
 
 #ifndef anavar_h
@@ -64,6 +64,10 @@ public :
    Int_t           reco_beam_vertex_nHits;
    Double_t        reco_beam_vertex_michel_score;
    Int_t           reco_beam_trackID;
+   Int_t           n_beam_slices;
+   Int_t           n_beam_particles;
+   vector<int>     *beam_track_IDs;
+   vector<double>  *beam_particle_scores;
    vector<double>  *reco_beam_dQdX_SCE;
    vector<double>  *reco_beam_EField_SCE;
    vector<double>  *reco_beam_calo_X;
@@ -351,6 +355,7 @@ public :
    Int_t           beam_inst_nTracks;
    Int_t           beam_inst_nMomenta;
    Bool_t          beam_inst_valid;
+   Int_t           beam_inst_trigger;
    Double_t        reco_beam_Chi2_proton;
    Int_t           reco_beam_Chi2_ndof;
    vector<double>  *reco_daughter_allTrack_momByRange_proton;
@@ -450,6 +455,10 @@ public :
    TBranch        *b_reco_beam_vertex_nHits;   //!
    TBranch        *b_reco_beam_vertex_michel_score;   //!
    TBranch        *b_reco_beam_trackID;   //!
+   TBranch        *b_n_beam_slices;   //!
+   TBranch        *b_n_beam_particles;   //!
+   TBranch        *b_beam_track_IDs;   //!
+   TBranch        *b_beam_particle_scores;   //!
    TBranch        *b_reco_beam_dQdX_SCE;   //!
    TBranch        *b_reco_beam_EField_SCE;   //!
    TBranch        *b_reco_beam_calo_X;   //!
@@ -737,6 +746,7 @@ public :
    TBranch        *b_beam_inst_nTracks;   //!
    TBranch        *b_beam_inst_nMomenta;   //!
    TBranch        *b_beam_inst_valid;   //!
+   TBranch        *b_beam_inst_trigger;   //!
    TBranch        *b_reco_beam_Chi2_proton;   //!
    TBranch        *b_reco_beam_Chi2_ndof;   //!
    TBranch        *b_reco_daughter_allTrack_momByRange_proton;   //!
@@ -815,16 +825,16 @@ public :
 #endif
 
 #ifdef anavar_cxx
-anavar::anavar(TTree *tree) : fChain(0) 
+anavar::anavar(TTree *tree) : fChain(0)
 {
 // if parameter tree is not specified (or zero), connect the file
 // used to generate this class and read the Tree.
    if (tree == 0) {
-      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("../pduneana_Prod4.1_5_11_21.root");
+      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("pduneana_data.root");
       if (!f || !f->IsOpen()) {
-         f = new TFile("../pduneana_Prod4.1_5_11_21.root");
+         f = new TFile("pduneana_data.root");
       }
-      TDirectory * dir = (TDirectory*)f->Get("../pduneana_Prod4.1_5_11_21.root:/pduneana");
+      TDirectory * dir = (TDirectory*)f->Get("pduneana_data.root:/pduneana");
       dir->GetObject("beamana",tree);
 
    }
@@ -873,6 +883,8 @@ void anavar::Init(TTree *tree)
    reco_beam_calo_endDirX = 0;
    reco_beam_calo_endDirY = 0;
    reco_beam_calo_endDirZ = 0;
+   beam_track_IDs = 0;
+   beam_particle_scores = 0;
    reco_beam_dQdX_SCE = 0;
    reco_beam_EField_SCE = 0;
    reco_beam_calo_X = 0;
@@ -1149,6 +1161,10 @@ void anavar::Init(TTree *tree)
    fChain->SetBranchAddress("reco_beam_vertex_nHits", &reco_beam_vertex_nHits, &b_reco_beam_vertex_nHits);
    fChain->SetBranchAddress("reco_beam_vertex_michel_score", &reco_beam_vertex_michel_score, &b_reco_beam_vertex_michel_score);
    fChain->SetBranchAddress("reco_beam_trackID", &reco_beam_trackID, &b_reco_beam_trackID);
+   fChain->SetBranchAddress("n_beam_slices", &n_beam_slices, &b_n_beam_slices);
+   fChain->SetBranchAddress("n_beam_particles", &n_beam_particles, &b_n_beam_particles);
+   fChain->SetBranchAddress("beam_track_IDs", &beam_track_IDs, &b_beam_track_IDs);
+   fChain->SetBranchAddress("beam_particle_scores", &beam_particle_scores, &b_beam_particle_scores);
    fChain->SetBranchAddress("reco_beam_dQdX_SCE", &reco_beam_dQdX_SCE, &b_reco_beam_dQdX_SCE);
    fChain->SetBranchAddress("reco_beam_EField_SCE", &reco_beam_EField_SCE, &b_reco_beam_EField_SCE);
    fChain->SetBranchAddress("reco_beam_calo_X", &reco_beam_calo_X, &b_reco_beam_calo_X);
@@ -1436,6 +1452,7 @@ void anavar::Init(TTree *tree)
    fChain->SetBranchAddress("beam_inst_nTracks", &beam_inst_nTracks, &b_beam_inst_nTracks);
    fChain->SetBranchAddress("beam_inst_nMomenta", &beam_inst_nMomenta, &b_beam_inst_nMomenta);
    fChain->SetBranchAddress("beam_inst_valid", &beam_inst_valid, &b_beam_inst_valid);
+   fChain->SetBranchAddress("beam_inst_trigger", &beam_inst_trigger, &b_beam_inst_trigger);
    fChain->SetBranchAddress("reco_beam_Chi2_proton", &reco_beam_Chi2_proton, &b_reco_beam_Chi2_proton);
    fChain->SetBranchAddress("reco_beam_Chi2_ndof", &reco_beam_Chi2_ndof, &b_reco_beam_Chi2_ndof);
    fChain->SetBranchAddress("reco_daughter_allTrack_momByRange_proton", &reco_daughter_allTrack_momByRange_proton, &b_reco_daughter_allTrack_momByRange_proton);

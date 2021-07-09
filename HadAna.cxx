@@ -40,7 +40,7 @@ bool HadAna::isSelectedPart(const anavar& evt) const{
     return false;
   }
   else{//real data
-    if (!evt.beam_inst_valid) return false;
+    if (evt.beam_inst_trigger != 8) return false;
     if (evt.beam_inst_nMomenta != 1 || evt.beam_inst_nTracks != 1) return false;
     for (size_t i = 0; i<truepdglist.size(); ++i){
       for (size_t j = 0; j<evt.beam_inst_PDG_candidates->size(); ++j){
@@ -54,7 +54,7 @@ bool HadAna::isSelectedPart(const anavar& evt) const{
 bool HadAna::isCosmics(const anavar& evt) const{
   if (evt.MC) return false;
   else{
-    if (!evt.beam_inst_valid) return true;
+    if (evt.beam_inst_trigger == 8) return true;
     else return false;
   }
   return false;

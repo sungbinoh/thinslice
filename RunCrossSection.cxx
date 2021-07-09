@@ -17,7 +17,7 @@ int main(){
 
 
   TChain *datachain = new TChain();
-  datachain->Add("/dune/data/users/calcuttj/pduneana_Prod4_1GeV_5387_5_12_21.root/pduneana/beamana");
+  datachain->Add("/pnfs/dune/scratch/users/yinrui/pduneana_Prod4/6_30_21_5387/output_sce_1GeV/pduneana_data.root/pduneana/beamana");
 
   Unfold uf(pi::nthinslices+2, -1, pi::nthinslices+1);
 
@@ -27,7 +27,7 @@ int main(){
   mcths.SetOutputFileName("mcprod4a.root");
   mcths.Run(mcevt, uf);
 
-  /*anavar dataevt(datachain);
+  anavar dataevt(datachain);
 
   ThinSlice dataths;
   dataths.SetOutputFileName("data.root");
@@ -36,7 +36,7 @@ int main(){
   ThinSlice cosmicsths;
   cosmicsths.SetSelectCosmics(true);
   cosmicsths.SetOutputFileName("cosmics.root");
-  cosmicsths.Run(dataevt, uf);*/
+  cosmicsths.Run(dataevt, uf);
 
   return 0;
 
