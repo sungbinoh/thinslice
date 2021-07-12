@@ -4,7 +4,7 @@ void makeXS(){
 
   gStyle->SetOptStat(0);
 
-  TFile *file = TFile::Open("../../install/bin/mcprod4a.root");
+  TFile *file = TFile::Open("../../build/mcprod4a.root");
 
   TH1D *eff_num_Int = (TH1D*)file->Get("eff_num_Int");
   TH1D *eff_den_Int = (TH1D*)file->Get("eff_den_Int");
@@ -165,9 +165,9 @@ void makeXS(){
   TGraphErrors *gr_trueincE = (TGraphErrors*)file->Get("gr_trueincE");
   TGraphErrors *gr_truexs = (TGraphErrors*)file->Get("gr_truexs");
   for (int i = 0; i<pi::nthinslices; ++i){
-    xs[i] = MAr/(Density*NA*pi::thinslicewidth/true_AngCorr->GetMean())*log(Ninc[i]/(Ninc[i]-Nint[i]))*1e27;
+    xs[i] = MAr/(Density*NA*pi::thinslicewidth)*log(Ninc[i]/(Ninc[i]-Nint[i]))*1e27;
     //err_xs[i] = MAr/(Density*NA*pi::thinslicewidth)*1e27*sqrt(N_int[i]+pow(N_int[i],2)/N_inc[i])/N_incidents[i];
-    err_xs[i] = MAr/(Density*NA*pi::thinslicewidth/true_AngCorr->GetMean())*1e27*sqrt(pow(Nint[i]*err_inc[i]/Ninc[i]/(Ninc[i]-Nint[i]),2)+pow(err_int[i]/(Ninc[i]-Nint[i]),2));
+    err_xs[i] = MAr/(Density*NA*pi::thinslicewidth)*1e27*sqrt(pow(Nint[i]*err_inc[i]/Ninc[i]/(Ninc[i]-Nint[i]),2)+pow(err_int[i]/(Ninc[i]-Nint[i]),2));
     incE[i] = gr_trueincE->GetPointY(i);
     //std::cout<<i<<" "<<Ninc[i]<<" "<<Nint[i]<<" "<<xs[i]<<" "<<incE[i]<<std::endl;
   }

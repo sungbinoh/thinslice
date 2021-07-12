@@ -48,6 +48,7 @@ class ThinSlice {
   TH2D *hreco_vs_true_beam_endZ[pi::nCuts][pi::nIntTypes+1];
   TH2D *hreco_true_vs_true_beam_endZ[pi::nCuts][pi::nIntTypes+1];
 
+  // after SCE correction
   TH1D *htrue_beam_endZ_SCE[pi::nCuts][pi::nIntTypes+1];
   TH1D *hreco_beam_endZ_SCE[pi::nCuts][pi::nIntTypes+1];
   TH1D *hreco_true_beam_endZ_SCE[pi::nCuts][pi::nIntTypes+1];

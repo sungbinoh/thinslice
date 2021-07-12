@@ -35,12 +35,12 @@ void HadAna::AddTruePDG(int pdg){
 bool HadAna::isSelectedPart(const anavar& evt) const{
   if (evt.MC){
     for (size_t i = 0; i<truepdglist.size(); ++i){
-      if (evt.true_beam_PDG == truepdglist[i]) return true;
+      if (evt.true_beam_PDG == truepdglist[i]) return true; // truth matched
     }
     return false;
   }
-  else{
-    if (!evt.beam_inst_valid) return false;
+  else{ // real data
+    if (evt.beam_inst_trigger == 8) return false; // is cosmics
     if (evt.beam_inst_nMomenta != 1 || evt.beam_inst_nTracks != 1) return false;
     for (size_t i = 0; i<truepdglist.size(); ++i){
       for (size_t j = 0; j<evt.beam_inst_PDG_candidates->size(); ++j){
@@ -54,7 +54,7 @@ bool HadAna::isSelectedPart(const anavar& evt) const{
 bool HadAna::isCosmics(const anavar& evt) const{
   if (evt.MC) return false;
   else{
-    if (!evt.beam_inst_valid) return true;
+    if (evt.beam_inst_trigger == 8) return true;
     else return false;
   }
   return false;
@@ -81,10 +81,10 @@ int HadAna::GetPiParType(const anavar& evt){
   if (!evt.MC){
     return pi::kData;
   }
-  else if (evt.event%2){
+  else if (evt.event%2){ // divide half of MC as fake data
     return pi::kData;
   }
-  else if (!evt.reco_beam_true_byE_matched){
+  else if (!evt.reco_beam_true_byE_matched){ // mismatched
     if (evt.reco_beam_true_byE_origin == 2) {
       return pi::kMIDcosmic;
     }
@@ -159,12 +159,12 @@ int HadAna::GetPParType(const anavar& evt){
   return p::kMIDother;
 }
 
-bool HadAna::PassPandoraSliceCut(const anavar& evt) const{
+bool HadAna::PassPandoraSliceCut(const anavar& evt) const{ // whether recognized by Pandora correctly
 
   return (evt.reco_beam_type == pandora_slice_pdg);
 }
 
-bool HadAna::PassBeamQualityCut() const{
+bool HadAna::PassBeamQualityCut() const{ // cut on beam entrance location and beam angle
 
   if (beamcut_dx_min<beamcut_dx_max){
     if (beam_dx<beamcut_dx_min) return false;
@@ -194,24 +194,24 @@ bool HadAna::PassBeamQualityCut() const{
   return true;
 }
 
-bool HadAna::PassAPA3Cut(const anavar& evt) const{
+bool HadAna::PassAPA3Cut(const anavar& evt) const{ // only use track in the first TPC
 
   double cutAPA3_Z = 220.;
 
   return evt.reco_beam_calo_endZ < cutAPA3_Z;
 }
 
-bool HadAna::PassCaloSizeCut(const anavar& evt) const{
+bool HadAna::PassCaloSizeCut(const anavar& evt) const{ // Require hits information in collection plane
   
   return !(evt.reco_beam_calo_wire->empty());
 }
 
-bool HadAna::PassMichelScoreCut() const{
+bool HadAna::PassMichelScoreCut() const{ // further veto muon tracks according to Michel score
   
   return daughter_michel_score < 0.55;
 }
 
-bool HadAna::PassMediandEdxCut() const{
+bool HadAna::PassMediandEdxCut() const{ // to remove proton background
 
   return median_dEdx < 2.4;
 }
@@ -335,14 +335,16 @@ void HadAna::ProcessEvent(const anavar& evt){
 //    cout<<run<<" "<<event<<endl;
 //  }
 
-
+  // calculate true track length
   double temp = 999;
   int start_idx = 0;
+  true_trklen_accum.reserve(evt.true_beam_traj_Z->size()); // initialize true_trklen_accum
   for (int i=0; i<evt.true_beam_traj_Z->size(); i++){
     if (abs((*evt.true_beam_traj_Z)[i]) < temp){
       temp = abs((*evt.true_beam_traj_Z)[i]);
-      start_idx = i;
+      start_idx = i; // find the point where the beam enters the TPC (find the smallest abs(Z))
     }
+    true_trklen_accum[i] = 0.; // initialize true_trklen_accum
   }
   true_trklen = -1999; // initialize
   for (int i=start_idx+1; i<evt.true_beam_traj_Z->size(); i++){
@@ -351,6 +353,20 @@ void HadAna::ProcessEvent(const anavar& evt){
                         + pow( (*evt.true_beam_traj_Y)[i]-(*evt.true_beam_traj_Y)[i-1], 2)
                         + pow( (*evt.true_beam_traj_Z)[i]-(*evt.true_beam_traj_Z)[i-1], 2)
                         );
+    true_trklen_accum[i] = true_trklen;
   }
+  
+  // calculate reco track length
+  reco_trklen_accum.reserve(evt.reco_beam_calo_Z->size());
+  reco_trklen = -1999;
+  for (int i=1; i<evt.reco_beam_calo_Z->size(); i++){
+    if (i == 1) reco_trklen = 0;
+    reco_trklen += sqrt( pow( (*evt.reco_beam_calo_X)[i]-(*evt.reco_beam_calo_X)[i-1], 2)
+                        + pow( (*evt.reco_beam_calo_Y)[i]-(*evt.reco_beam_calo_Y)[i-1], 2)
+                        + pow( (*evt.reco_beam_calo_Z)[i]-(*evt.reco_beam_calo_Z)[i-1], 2)
+                        );
+    reco_trklen_accum[i] = reco_trklen;
+  }
+  // reco_trklen = evt.reco_beam_alt_len; // they should be the same
 }
 

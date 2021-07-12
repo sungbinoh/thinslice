@@ -18,7 +18,7 @@ void ThinSlice::BookHistograms(){
 
   outputFile = TFile::Open(fOutputFileName.c_str(), "recreate");
   
-  for (int i = 0; i<pi::nthinslices; ++i){
+  for (int i = 0; i<pi::nthinslices; ++i){ // energy distribution in each thin slice
     reco_incE[i] = new TH1D(Form("reco_incE_%d",i),Form("Reco incident energy, %.1f < z < %.1f (cm)",i*pi::thinslicewidth, (i+1)*pi::thinslicewidth), pi::nbinse, 0, 1200.);
     true_incE[i] = new TH1D(Form("true_incE_%d",i),Form("True incident energy, %.1f < z < %.1f (cm)",i*pi::thinslicewidth, (i+1)*pi::thinslicewidth), pi::nbinse, 0, 1200.);
     reco_incE[i]->Sumw2();
@@ -176,28 +176,30 @@ void ThinSlice::ProcessEvent(const anavar & evt, Unfold & uf){
   reco_sliceID = -1;
   true_sliceID = -1;
 
-  isTestSample = (hadana.pitype == pi::kData);
+  isTestSample = (hadana.pitype == pi::kData); // fake data
   //if (evt.MC && evt.event%2 == 0) isTestSample = false;
 
   if (evt.MC){
-    true_sliceID = int(evt.true_beam_endZ/pi::thinslicewidth);
+    //true_sliceID = int(evt.true_beam_endZ/pi::thinslicewidth);
+    true_sliceID = int(hadana.true_trklen/pi::thinslicewidth);
     if (true_sliceID < 0) true_sliceID = -1;
     if (evt.true_beam_endZ < 0) true_sliceID = -1;
     if (true_sliceID >= pi::nthinslices) true_sliceID = pi::nthinslices;
     if (evt.true_beam_PDG == 211){
       for (int i = 0; i<=true_sliceID; ++i){
-        if (i<pi::nthinslices) ++true_incidents[i];
+        if (i<pi::nthinslices) ++true_incidents[i]; // count incident events
       }
     }
     if ((*evt.true_beam_endProcess) == "pi+Inelastic"){
       if (true_sliceID < pi::nthinslices && true_sliceID>=0){
-        ++true_interactions[true_sliceID];
+        ++true_interactions[true_sliceID]; // count interaction events
       }
       // Reco info
       if (!(evt.reco_beam_calo_wire->empty()) && evt.reco_beam_true_byE_matched){
         std::vector<std::vector<double>> vincE(pi::nthinslices);
         for (size_t i = 0; i<evt.reco_beam_calo_wire->size(); ++i){
-          int this_sliceID = int((*evt.reco_beam_calo_Z)[i]/pi::thinslicewidth);
+          //int this_sliceID = int((*evt.reco_beam_calo_Z)[i]/pi::thinslicewidth);
+          int this_sliceID = int((hadana.reco_trklen_accum)[i]/pi::thinslicewidth);
           if (this_sliceID>=pi::nthinslices) continue;
           if (this_sliceID<0) continue;
           double this_incE = (*evt.reco_beam_incidentEnergies)[i];
@@ -218,16 +220,17 @@ void ThinSlice::ProcessEvent(const anavar & evt, Unfold & uf){
         TVector3 pt1(evt.reco_beam_calo_endX,
                      evt.reco_beam_calo_endY,
                      evt.reco_beam_calo_endZ);
-        TVector3 dir = pt1 - pt0;
+        TVector3 dir = pt1 - pt0; // direction of the track is determine by the start/end point
         dir = dir.Unit();
-        reco_AngCorr->Fill(dir.Z());
+        reco_AngCorr->Fill(dir.Z()); // projection to Z of the direction of the track
       }
 
       // True info
       if (!(evt.true_beam_traj_Z->empty())){
         std::vector<std::vector<double>> vincE(pi::nthinslices);
         for (size_t i = 0; i<evt.true_beam_traj_Z->size()-1; ++i){//last point always has KE = 0
-          int this_sliceID = int((*evt.true_beam_traj_Z)[i]/pi::thinslicewidth);
+          //int this_sliceID = int((*evt.true_beam_traj_Z)[i]/pi::thinslicewidth);
+          int this_sliceID = int((hadana.true_trklen_accum)[i]/pi::thinslicewidth);
           double this_incE = (*evt.true_beam_traj_KE)[i];
           if (this_sliceID>=pi::nthinslices) continue;
           if (this_sliceID<0) continue;
@@ -256,7 +259,8 @@ void ThinSlice::ProcessEvent(const anavar & evt, Unfold & uf){
   }
 
   if (!evt.reco_beam_calo_wire->empty()){
-    reco_sliceID = int(evt.reco_beam_calo_endZ/pi::thinslicewidth);
+    //reco_sliceID = int(evt.reco_beam_calo_endZ/pi::thinslicewidth);
+    reco_sliceID = int(hadana.reco_trklen/pi::thinslicewidth);
     if (reco_sliceID < 0) reco_sliceID = -1;
     if (evt.reco_beam_calo_endZ < 0) reco_sliceID = -1;
     if (reco_sliceID >= pi::nthinslices) reco_sliceID = pi::nthinslices;
@@ -346,6 +350,7 @@ void ThinSlice::FillHistograms(int cut, const anavar & evt){
     FillHistVec2D(hreco_vs_true_sliceID[cut], true_sliceID, reco_sliceID, hadana.pitype);
     FillHistVec2D(hreco_true_vs_true_sliceID[cut], true_sliceID, reco_sliceID - true_sliceID, hadana.pitype);
     
+    // below are variables not provided by evt directly (calculated in hadana)
     FillHistVec1D(hmediandEdx[cut], hadana.median_dEdx, hadana.pitype);
     FillHistVec1D(hdaughter_michel_score[cut], hadana.daughter_michel_score, hadana.pitype);
     if (evt.reco_beam_calo_endZ>300 && hadana.median_dEdx<2.4){
@@ -390,10 +395,10 @@ void ThinSlice::FillHistograms(int cut, const anavar & evt){
     FillHistVec1D(hdeltaz[cut], hadana.beam_dz, hadana.pitype);
     FillHistVec1D(hcostheta[cut], hadana.beam_costh, hadana.pitype);
 
-    FillHistVec1D(hreco_trklen[cut], evt.reco_beam_alt_len, hadana.pitype);
+    FillHistVec1D(hreco_trklen[cut], hadana.reco_trklen, hadana.pitype);
     FillHistVec1D(htrue_trklen[cut], hadana.true_trklen, hadana.pitype);
-    FillHistVec1D(hdiff_trklen[cut], evt.reco_beam_alt_len - hadana.true_trklen, hadana.pitype);
-    FillHistVec2D(hreco_vs_true_trklen[cut], hadana.true_trklen, evt.reco_beam_alt_len, hadana.pitype);
+    FillHistVec1D(hdiff_trklen[cut], hadana.reco_trklen - hadana.true_trklen, hadana.pitype);
+    FillHistVec2D(hreco_vs_true_trklen[cut], hadana.true_trklen, hadana.reco_trklen, hadana.pitype);
 
     FillHistVec1D(hreco_beam_startX_SCE[cut], evt.reco_beam_calo_startX, hadana.pitype);
     FillHistVec1D(hreco_beam_startY_SCE[cut], evt.reco_beam_calo_startY, hadana.pitype);
@@ -441,6 +446,7 @@ void ThinSlice::CalcXS(const Unfold & uf){
   double err_reco_trueincE[pi::nthinslices] = {0};
   double truexs[pi::nthinslices] = {0};
   double err_truexs[pi::nthinslices] = {0};
+  double true_cosangle = 1.;
 
   double NA=6.02214076e23;
   double MAr=39.95; //gmol
@@ -457,8 +463,9 @@ void ThinSlice::CalcXS(const Unfold & uf){
     err_reco_trueincE[i] = sqrt(pow(err_trueincE[i],2)+pow(err_recoincE[i],2));
     //std::cout<<i<<" "<<avg_trueincE[i]<<std::endl;
     if (true_incidents[i] && true_interactions[i]){
-      truexs[i] = MAr/(Density*NA*pi::thinslicewidth/true_AngCorr->GetMean())*log(true_incidents[i]/(true_incidents[i]-true_interactions[i]))*1e27;
-      err_truexs[i] = MAr/(Density*NA*pi::thinslicewidth/true_AngCorr->GetMean())*1e27*sqrt(true_interactions[i]+pow(true_interactions[i],2)/true_incidents[i])/true_incidents[i];
+      //true_cosangle = true_AngCorr->GetMean(); // no need to include angle correction
+      truexs[i] = MAr/(Density*NA*pi::thinslicewidth/true_cosangle)*log(true_incidents[i]/(true_incidents[i]-true_interactions[i]))*1e27;
+      err_truexs[i] = MAr/(Density*NA*pi::thinslicewidth/true_cosangle)*1e27*sqrt(true_interactions[i]+pow(true_interactions[i],2)/true_incidents[i])/true_incidents[i];
     }
   }
 

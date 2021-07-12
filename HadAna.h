@@ -58,6 +58,9 @@ class HadAna{
   double beam_dx, beam_dy, beam_dz, beam_dxy, beam_costh;
   
   double true_trklen;
+  double reco_trklen;
+  std::vector<double> true_trklen_accum;
+  std::vector<double> reco_trklen_accum;
 
  private:
   
