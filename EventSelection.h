@@ -39,7 +39,7 @@ namespace p{
   };
 }
 
-const double beam_startX_data = -27.911;//can this be input automatically rather than manually
+const double beam_startX_data = -27.911;
 const double beam_startY_data = 424.364;
 const double beam_startZ_data = 3.77836;
 const double beam_startX_rms_data = 4.71128;
