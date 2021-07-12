@@ -16,7 +16,7 @@ ThinSlice::ThinSlice(){
 
 void ThinSlice::BookHistograms(){
 
-  outputFile = TFile::Open(fOutputFileName.c_str(), "recreate");//why c_str?
+  outputFile = TFile::Open(fOutputFileName.c_str(), "recreate"); // why c_str?
   
   for (int i = 0; i<pi::nthinslices; ++i){ // energy distribution in each thin slice
     reco_incE[i] = new TH1D(Form("reco_incE_%d",i),Form("Reco incident energy, %.1f < z < %.1f (cm)",i*pi::thinslicewidth, (i+1)*pi::thinslicewidth), pi::nbinse, 0, 1200.);
@@ -25,7 +25,7 @@ void ThinSlice::BookHistograms(){
     true_incE[i]->Sumw2();
   }
 
-  reco_AngCorr = new TH1D("reco_AngCorr","Reco angle correction", 100, 0, 1.); // angle correction histograms
+  reco_AngCorr = new TH1D("reco_AngCorr","Reco angle correction", 100, 0, 1.);
   true_AngCorr = new TH1D("true_AngCorr","true angle correction", 100, 0, 1.);
   reco_AngCorr->Sumw2();
   true_AngCorr->Sumw2();
@@ -195,14 +195,14 @@ void ThinSlice::ProcessEvent(const anavar & evt, Unfold & uf){
         ++true_interactions[true_sliceID]; // count interaction events
       }
       // Reco info
-      if (!(evt.reco_beam_calo_wire->empty()) && evt.reco_beam_true_byE_matched){//truth matched. so it must be the true track?
+      if (!(evt.reco_beam_calo_wire->empty()) && evt.reco_beam_true_byE_matched){ // truth matched. so it must be the true track?
         std::vector<std::vector<double>> vincE(pi::nthinslices);
         for (size_t i = 0; i<evt.reco_beam_calo_wire->size(); ++i){
           //int this_sliceID = int((*evt.reco_beam_calo_Z)[i]/pi::thinslicewidth);
           int this_sliceID = int((hadana.reco_trklen_accum)[i]/pi::thinslicewidth);
           if (this_sliceID>=pi::nthinslices) continue;
           if (this_sliceID<0) continue;
-          double this_incE = (*evt.reco_beam_incidentEnergies)[i];//reco_beam_incidentEnergies is a vector<double>
+          double this_incE = (*evt.reco_beam_incidentEnergies)[i];
           vincE[this_sliceID].push_back(this_incE);
         }
         for (size_t i = 0; i<vincE.size(); ++i){
@@ -211,7 +211,7 @@ void ThinSlice::ProcessEvent(const anavar & evt, Unfold & uf){
             for (size_t j = 0; j<vincE[i].size(); ++j){
               sum_incE += vincE[i][j];
             }
-            reco_incE[i]->Fill(sum_incE/vincE[i].size());//mean E in this slice?
+            reco_incE[i]->Fill(sum_incE/vincE[i].size());
           }
         }
         TVector3 pt0(evt.reco_beam_calo_startX,
@@ -331,8 +331,8 @@ void ThinSlice::ProcessEvent(const anavar & evt, Unfold & uf){
 void ThinSlice::FillHistograms(int cut, const anavar & evt){
   
   if (cut>=0 && cut < pi::nCuts){
-    FillHistVec1D(htrue_beam_endZ[cut], evt.true_beam_endZ_SCE, hadana.pitype);//where is FillHistVec1D defined?
-    FillHistVec1D(htrue_beam_endZ_SCE[cut], evt.true_beam_endZ, hadana.pitype);//it seems SCE is reversed?? and I didn't find true_beam_endZ_SCE on wiki
+    FillHistVec1D(htrue_beam_endZ[cut], evt.true_beam_endZ_SCE, hadana.pitype);
+    FillHistVec1D(htrue_beam_endZ_SCE[cut], evt.true_beam_endZ, hadana.pitype); // it seems SCE is reversed? and I didn't find true_beam_endZ_SCE on wiki?
     FillHistVec1D(htrue_sliceID[cut], true_sliceID, hadana.pitype);
     //    if (!evt.reco_beam_calo_wire->empty()){
     FillHistVec1D(hreco_beam_endZ[cut], evt.reco_beam_endZ, hadana.pitype);
@@ -350,10 +350,10 @@ void ThinSlice::FillHistograms(int cut, const anavar & evt){
     FillHistVec2D(hreco_vs_true_sliceID[cut], true_sliceID, reco_sliceID, hadana.pitype);
     FillHistVec2D(hreco_true_vs_true_sliceID[cut], true_sliceID, reco_sliceID - true_sliceID, hadana.pitype);
     
-    // below are some variables not provided by evt directly (calculated in hadana)
+    // below are variables not provided by evt directly (calculated in hadana)
     FillHistVec1D(hmediandEdx[cut], hadana.median_dEdx, hadana.pitype);
     FillHistVec1D(hdaughter_michel_score[cut], hadana.daughter_michel_score, hadana.pitype);
-    if (evt.reco_beam_calo_endZ>300 && hadana.median_dEdx<2.4){//likely to be a cosmic muon?
+    if (evt.reco_beam_calo_endZ>300 && hadana.median_dEdx<2.4){ // likely to be a cosmic muon?
       if (hadana.daughter_michel_score>=0){
         FillHistVec1D(hdaughter_michel_scoreMu[cut], hadana.daughter_michel_score, hadana.pitype);
         //if (!evt.MC) cout<<evt.run<<" "<<evt.subrun<<" "<<evt.event<<" "<<hadana.daughter_michel_score<<" "<<evt.reco_beam_calo_wire->back()<<" "<<evt.reco_beam_calo_tick->back()<<" "<<evt.reco_beam_calo_wire->front()<<" "<<evt.reco_beam_calo_tick->front()<<endl;
@@ -366,7 +366,7 @@ void ThinSlice::FillHistograms(int cut, const anavar & evt){
       }
       if (nhits && michelscore>=0){
         michelscore/=nhits;
-        FillHistVec1D(hdaughter_michel_score2Mu[cut], michelscore, hadana.pitype);//what's PFP and what's difference between hdaughter_michel_scoreMu and hdaughter_michel_score2Mu?
+        FillHistVec1D(hdaughter_michel_score2Mu[cut], michelscore, hadana.pitype); // what's PFP and what's difference between hdaughter_michel_scoreMu and hdaughter_michel_score2Mu?
       }
 //      if (hadana.pitype == kMuon && hadana.daughter_michel_score < 0.01){
 //        cout<<evt.run<<" "<<evt.subrun<<" "<<evt.event<<endl;
@@ -395,10 +395,10 @@ void ThinSlice::FillHistograms(int cut, const anavar & evt){
     FillHistVec1D(hdeltaz[cut], hadana.beam_dz, hadana.pitype);
     FillHistVec1D(hcostheta[cut], hadana.beam_costh, hadana.pitype);
 
-    FillHistVec1D(hreco_trklen[cut], evt.reco_beam_alt_len, hadana.pitype);
+    FillHistVec1D(hreco_trklen[cut], hadana.reco_trklen, hadana.pitype);
     FillHistVec1D(htrue_trklen[cut], hadana.true_trklen, hadana.pitype);
-    FillHistVec1D(hdiff_trklen[cut], evt.reco_beam_alt_len - hadana.true_trklen, hadana.pitype);
-    FillHistVec2D(hreco_vs_true_trklen[cut], hadana.true_trklen, evt.reco_beam_alt_len, hadana.pitype);
+    FillHistVec1D(hdiff_trklen[cut], hadana.reco_trklen - hadana.true_trklen, hadana.pitype);
+    FillHistVec2D(hreco_vs_true_trklen[cut], hadana.true_trklen, hadana.reco_trklen, hadana.pitype);
     
     //$$$temp
     /*if ( hadana.true_trklen>20 && evt.reco_beam_alt_len>20){
@@ -480,12 +480,12 @@ void ThinSlice::CalcXS(const Unfold & uf){
     avg_recoincE[i] = reco_incE[i]->GetMean();
     err_recoincE[i] = reco_incE[i]->GetMeanError();
     reco_trueincE[i] = avg_recoincE[i] - avg_trueincE[i];
-    err_reco_trueincE[i] = sqrt(pow(err_trueincE[i],2)+pow(err_recoincE[i],2));//is it proper to simply use root_sum_square?
+    err_reco_trueincE[i] = sqrt(pow(err_trueincE[i],2)+pow(err_recoincE[i],2)); // is it proper to simply use root_sum_square, since the two seem not independent?
     //std::cout<<i<<" "<<avg_trueincE[i]<<std::endl;
     if (true_incidents[i] && true_interactions[i]){
-      //true_cosangle = true_AngCorr->GetMean();
+      //true_cosangle = true_AngCorr->GetMean(); // no need to include angle correction
       truexs[i] = MAr/(Density*NA*pi::thinslicewidth/true_cosangle)*log(true_incidents[i]/(true_incidents[i]-true_interactions[i]))*1e27;
-      err_truexs[i] = MAr/(Density*NA*pi::thinslicewidth/true_cosangle)*1e27*sqrt(true_interactions[i]+pow(true_interactions[i],2)/true_incidents[i])/true_incidents[i];//so error from true_AngCorr is neglected?
+      err_truexs[i] = MAr/(Density*NA*pi::thinslicewidth/true_cosangle)*1e27*sqrt(true_interactions[i]+pow(true_interactions[i],2)/true_incidents[i])/true_incidents[i];
     }
   }
 
@@ -585,7 +585,7 @@ void ThinSlice::Run(anavar & evt, Unfold & uf){
   SaveHistograms();
 }
 
-void ThinSlice::SetSelectCosmics(bool sc){//for calibration?
+void ThinSlice::SetSelectCosmics(bool sc){
 
   selectCosmics = sc;
 
