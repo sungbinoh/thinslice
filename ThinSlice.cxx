@@ -401,22 +401,39 @@ void ThinSlice::FillHistograms(int cut, const anavar & evt){
     FillHistVec2D(hreco_vs_true_trklen[cut], hadana.true_trklen, hadana.reco_trklen, hadana.pitype);
     
     //$$$temp
-    /*if ( hadana.true_trklen>20 && evt.reco_beam_alt_len>20){
+   /* if ( hadana.true_trklen>20 && evt.reco_beam_alt_len>20){
+      int printout = kFALSE;
+      if ( hadana.true_trklen>250 && abs(evt.reco_beam_alt_len-230)<5 ){
+        cout<<"$$$$$ red bar ("<<cut<<" "<<pi::cutName[cut]<<",\t"<<pi::intTypeName[hadana.pitype]<<")\n";
+        printout = kTRUE;
+      }
       if ( hadana.true_trklen<200 && abs(evt.reco_beam_alt_len-230)<5 ){
-        cout<<"$$$$$ horizontal bar ("<<cut<<" "<<pi::cutName[cut]<<",\t"<<pi::intTypeName[hadana.pitype]<<")\n";
-        cout<<"Run: "<<evt.run<<";\t"
-        <<"SubRun: "<<evt.subrun<<";\t"
-        <<"Event: "<<evt.event<<endl;
-        cout<<"True trklen: "<<hadana.true_trklen<<";\t"
-        <<"Reco trklen: "<<evt.reco_beam_alt_len<<endl;
+        cout<<"$$$$$ blue bar ("<<cut<<" "<<pi::cutName[cut]<<",\t"<<pi::intTypeName[hadana.pitype]<<")\n";
+        printout = kTRUE;
       }
       if ( abs(hadana.true_trklen-evt.reco_beam_alt_len-230)<5 ){
-        cout<<"$$$$$ oblique bar ("<<cut<<" "<<pi::cutName[cut]<<",\t"<<pi::intTypeName[hadana.pitype]<<")\n";
+        cout<<"$$$$$ green bar ("<<cut<<" "<<pi::cutName[cut]<<",\t"<<pi::intTypeName[hadana.pitype]<<")\n";
+        printout = kTRUE;
+      }
+      if (printout == kTRUE){
         cout<<"Run: "<<evt.run<<";\t"
         <<"SubRun: "<<evt.subrun<<";\t"
         <<"Event: "<<evt.event<<endl;
         cout<<"True trklen: "<<hadana.true_trklen<<";\t"
         <<"Reco trklen: "<<evt.reco_beam_alt_len<<endl;
+        cout<<"Start: ("<<evt.reco_beam_calo_startX<<", "<<evt.reco_beam_calo_startY<<", "<<evt.reco_beam_calo_startZ<<");\n";
+        cout<<"End: ("<<evt.reco_beam_calo_endX<<", "<<evt.reco_beam_calo_endY<<", "<<evt.reco_beam_calo_endZ<<")\n";
+      }
+    }*/
+    /*if (!evt.MC){
+      if (hadana.beam_dy>4 && hadana.beam_dy<6){
+        cout<<"$$$$$ delta Y [4,6] ("<<cut<<" "<<pi::cutName[cut]<<",\t"<<pi::intTypeName[hadana.pitype]<<")\n";
+        cout<<"Run: "<<evt.run<<";\t"
+        <<"SubRun: "<<evt.subrun<<";\t"
+        <<"Event: "<<evt.event<<endl;
+        cout<<"Start: ("<<evt.reco_beam_calo_startX<<", "<<evt.reco_beam_calo_startY<<", "<<evt.reco_beam_calo_startZ<<");\t trklen: "<<hadana.reco_trklen<<endl;
+        cout<<"End: ("<<evt.reco_beam_calo_endX<<", "<<evt.reco_beam_calo_endY<<", "<<evt.reco_beam_calo_endZ<<")\n";
+        
       }
     }*/
 

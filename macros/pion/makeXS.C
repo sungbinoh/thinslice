@@ -181,6 +181,7 @@ void makeXS(){
   TCanvas *c5 = new TCanvas("c5", "c5");
   gr_recoxs->SetTitle("Pion Inelastic Cross Section");
   gr_recoxs->GetXaxis()->SetTitle("Pion Kinetic Energy (MeV)");
+  gr_recoxs->GetXaxis()->SetRangeUser(360, 900);
   gr_recoxs->GetYaxis()->SetTitle("#sigma_{inelastic} (mb)");
   gr_recoxs->GetYaxis()->SetRangeUser(400, 900);
   gr_recoxs->SetLineWidth(2);

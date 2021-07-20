@@ -287,6 +287,7 @@ void plot2d(string name, int cut){
   }
 }
 void plot(){
+  gSystem->Exec("mkdir ../plots");
 
   gStyle->SetOptStat(0);
   gErrorIgnoreLevel = kWarning;
