@@ -50,11 +50,11 @@ void ThinSlice::BookHistograms(){
     for (int j = 0; j < pi::nIntTypes+1; ++j){
       htrue_beam_endZ[i][j] = new TH1D(Form("htrue_beam_endZ_%d_%d",i,j),Form("true_beam_endZ, %s, %s;true_beam_endZ (cm)", pi::cutName[i], pi::intTypeName[j]), 70, -100, 600);
       htrue_beam_endZ[i][j]->Sumw2();
-      hreco_beam_endZ[i][j] = new TH1D(Form("hreco_beam_endZ_%d_%d",i,j),Form("reco_beam_endZ, %s, %s;reco_beam_endZ (cm)", pi::cutName[i], pi::intTypeName[j]), 70, -100, 600);
+      hreco_beam_endZ[i][j] = new TH1D(Form("hreco_beam_endZ_%d_%d",i,j),Form("reco_beam_allTrack_endZ, %s, %s;reco_beam_allTrack_endZ (cm)", pi::cutName[i], pi::intTypeName[j]), 70, -100, 600);
       hreco_beam_endZ[i][j]->Sumw2();
-      hreco_true_beam_endZ[i][j] = new TH1D(Form("hreco_true_beam_endZ_%d_%d",i,j), Form("reco_true_beam_endZ, %s, %s;reco_beam_endZ - true_beam_endZ (cm)", pi::cutName[i], pi::intTypeName[j]), 100, -100, 100);
+      hreco_true_beam_endZ[i][j] = new TH1D(Form("hreco_true_beam_endZ_%d_%d",i,j), Form("reco_true_beam_endZ, %s, %s;reco_beam_allTrack_endZ - true_beam_endZ (cm)", pi::cutName[i], pi::intTypeName[j]), 100, -100, 100);
       hreco_true_beam_endZ[i][j]->Sumw2();
-      hreco_vs_true_beam_endZ[i][j]= new TH2D(Form("hreco_vs_true_beam_endZ_%d_%d",i,j), Form("%s, %s;true_beam_endZ (cm);reco_beam_endZ (cm)", pi::cutName[i], pi::intTypeName[j]), 70, -100, 600, 70, -100, 600);
+      hreco_vs_true_beam_endZ[i][j]= new TH2D(Form("hreco_vs_true_beam_endZ_%d_%d",i,j), Form("%s, %s;true_beam_endZ (cm);reco_beam_allTrack_endZ (cm)", pi::cutName[i], pi::intTypeName[j]), 70, -100, 600, 70, -100, 600);
       hreco_true_vs_true_beam_endZ[i][j]= new TH2D(Form("hreco_true_vs_true_beam_endZ_%d_%d",i,j), Form("%s, %s;true_beam_endZ (cm);reco - true_beam_endZ (cm)", pi::cutName[i], pi::intTypeName[j]), 70, -100, 600, 100, -100, 100);
 
       htrue_beam_endZ_SCE[i][j] = new TH1D(Form("htrue_beam_endZ_SCE_%d_%d",i,j),Form("true_beam_endZ_SCE, %s, %s;true_beam_endZ_SCE (cm)", pi::cutName[i], pi::intTypeName[j]), 70, -100, 600);
@@ -195,14 +195,14 @@ void ThinSlice::ProcessEvent(const anavar & evt, Unfold & uf){
         ++true_interactions[true_sliceID]; // count interaction events
       }
       // Reco info
-      if (!(evt.reco_beam_calo_wire->empty()) && evt.reco_beam_true_byE_matched){ // truth matched. so it must be the true track?
+      if (!(evt.reco_beam_calo_wire_allTrack->empty()) && evt.reco_beam_true_byE_matched){ // truth matched. so it must be the true track?
         std::vector<std::vector<double>> vincE(pi::nthinslices);
-        for (size_t i = 0; i<evt.reco_beam_calo_wire->size(); ++i){
+        for (size_t i = 0; i<evt.reco_beam_calo_wire_allTrack->size(); ++i){
           //int this_sliceID = int((*evt.reco_beam_calo_Z)[i]/pi::thinslicewidth);
           int this_sliceID = int((hadana.reco_trklen_accum)[i]/pi::thinslicewidth);
           if (this_sliceID>=pi::nthinslices) continue;
           if (this_sliceID<0) continue;
-          double this_incE = (*evt.reco_beam_incidentEnergies)[i];
+          double this_incE = (*evt.reco_beam_incidentEnergies_allTrack)[i];
           vincE[this_sliceID].push_back(this_incE);
         }
         for (size_t i = 0; i<vincE.size(); ++i){
@@ -214,12 +214,12 @@ void ThinSlice::ProcessEvent(const anavar & evt, Unfold & uf){
             reco_incE[i]->Fill(sum_incE/vincE[i].size());
           }
         }
-        TVector3 pt0(evt.reco_beam_calo_startX,
-                     evt.reco_beam_calo_startY,
-                     evt.reco_beam_calo_startZ);
-        TVector3 pt1(evt.reco_beam_calo_endX,
-                     evt.reco_beam_calo_endY,
-                     evt.reco_beam_calo_endZ);
+        TVector3 pt0(evt.reco_beam_calo_startX_allTrack,
+                     evt.reco_beam_calo_startY_allTrack,
+                     evt.reco_beam_calo_startZ_allTrack);
+        TVector3 pt1(evt.reco_beam_calo_endX_allTrack,
+                     evt.reco_beam_calo_endY_allTrack,
+                     evt.reco_beam_calo_endZ_allTrack);
         TVector3 dir = pt1 - pt0; // direction of the track is determine by the start/end point
         dir = dir.Unit();
         reco_AngCorr->Fill(dir.Z()); // projection to Z of the direction of the track
@@ -258,11 +258,11 @@ void ThinSlice::ProcessEvent(const anavar & evt, Unfold & uf){
     }
   }
 
-  if (!evt.reco_beam_calo_wire->empty()){
-    //reco_sliceID = int(evt.reco_beam_calo_endZ/pi::thinslicewidth);
+  if (!evt.reco_beam_calo_wire_allTrack->empty()){
+    //reco_sliceID = int(evt.reco_beam_calo_endZ_allTrack/pi::thinslicewidth);
     reco_sliceID = int(hadana.reco_trklen/pi::thinslicewidth);
     if (reco_sliceID < 0) reco_sliceID = -1;
-    if (evt.reco_beam_calo_endZ < 0) reco_sliceID = -1;
+    if (evt.reco_beam_calo_endZ_allTrack < 0) reco_sliceID = -1;
     if (reco_sliceID >= pi::nthinslices) reco_sliceID = pi::nthinslices;
   }
 
@@ -334,16 +334,16 @@ void ThinSlice::FillHistograms(int cut, const anavar & evt){
     FillHistVec1D(htrue_beam_endZ[cut], evt.true_beam_endZ_SCE, hadana.pitype);
     FillHistVec1D(htrue_beam_endZ_SCE[cut], evt.true_beam_endZ, hadana.pitype); // it seems SCE is reversed? and I didn't find true_beam_endZ_SCE on wiki?
     FillHistVec1D(htrue_sliceID[cut], true_sliceID, hadana.pitype);
-    //    if (!evt.reco_beam_calo_wire->empty()){
-    FillHistVec1D(hreco_beam_endZ[cut], evt.reco_beam_endZ, hadana.pitype);
-    FillHistVec1D(hreco_true_beam_endZ[cut], evt.reco_beam_endZ - evt.true_beam_endZ_SCE, hadana.pitype);
-    FillHistVec2D(hreco_vs_true_beam_endZ[cut], evt.true_beam_endZ_SCE, evt.reco_beam_endZ, hadana.pitype);
-    FillHistVec2D(hreco_true_vs_true_beam_endZ[cut], evt.true_beam_endZ_SCE, evt.reco_beam_endZ - evt.true_beam_endZ_SCE, hadana.pitype);
+    //    if (!evt.reco_beam_calo_wire_allTrack->empty()){
+    FillHistVec1D(hreco_beam_endZ[cut], evt.reco_beam_allTrack_endZ, hadana.pitype);
+    FillHistVec1D(hreco_true_beam_endZ[cut], evt.reco_beam_allTrack_endZ - evt.true_beam_endZ_SCE, hadana.pitype);
+    FillHistVec2D(hreco_vs_true_beam_endZ[cut], evt.true_beam_endZ_SCE, evt.reco_beam_allTrack_endZ, hadana.pitype);
+    FillHistVec2D(hreco_true_vs_true_beam_endZ[cut], evt.true_beam_endZ_SCE, evt.reco_beam_allTrack_endZ - evt.true_beam_endZ_SCE, hadana.pitype);
     
-    FillHistVec1D(hreco_beam_endZ_SCE[cut], evt.reco_beam_calo_endZ, hadana.pitype);
-    FillHistVec1D(hreco_true_beam_endZ_SCE[cut], evt.reco_beam_calo_endZ - evt.true_beam_endZ, hadana.pitype);
-    FillHistVec2D(hreco_vs_true_beam_endZ_SCE[cut], evt.true_beam_endZ, evt.reco_beam_calo_endZ, hadana.pitype);
-    FillHistVec2D(hreco_true_vs_true_beam_endZ_SCE[cut], evt.true_beam_endZ, evt.reco_beam_calo_endZ - evt.true_beam_endZ, hadana.pitype);
+    FillHistVec1D(hreco_beam_endZ_SCE[cut], evt.reco_beam_calo_endZ_allTrack, hadana.pitype);
+    FillHistVec1D(hreco_true_beam_endZ_SCE[cut], evt.reco_beam_calo_endZ_allTrack - evt.true_beam_endZ, hadana.pitype);
+    FillHistVec2D(hreco_vs_true_beam_endZ_SCE[cut], evt.true_beam_endZ, evt.reco_beam_calo_endZ_allTrack, hadana.pitype);
+    FillHistVec2D(hreco_true_vs_true_beam_endZ_SCE[cut], evt.true_beam_endZ, evt.reco_beam_calo_endZ_allTrack - evt.true_beam_endZ, hadana.pitype);
     
     FillHistVec1D(hreco_sliceID[cut], reco_sliceID, hadana.pitype);
     FillHistVec1D(hreco_true_sliceID[cut], reco_sliceID - true_sliceID, hadana.pitype);
@@ -353,10 +353,10 @@ void ThinSlice::FillHistograms(int cut, const anavar & evt){
     // below are variables not provided by evt directly (calculated in hadana)
     FillHistVec1D(hmediandEdx[cut], hadana.median_dEdx, hadana.pitype);
     FillHistVec1D(hdaughter_michel_score[cut], hadana.daughter_michel_score, hadana.pitype);
-    if (evt.reco_beam_calo_endZ>300 && hadana.median_dEdx<2.4){ // likely to be a cosmic muon?
+    if (evt.reco_beam_calo_endZ_allTrack>300 && hadana.median_dEdx<2.4){ // likely to be a cosmic muon?
       if (hadana.daughter_michel_score>=0){
         FillHistVec1D(hdaughter_michel_scoreMu[cut], hadana.daughter_michel_score, hadana.pitype);
-        //if (!evt.MC) cout<<evt.run<<" "<<evt.subrun<<" "<<evt.event<<" "<<hadana.daughter_michel_score<<" "<<evt.reco_beam_calo_wire->back()<<" "<<evt.reco_beam_calo_tick->back()<<" "<<evt.reco_beam_calo_wire->front()<<" "<<evt.reco_beam_calo_tick->front()<<endl;
+        //if (!evt.MC) cout<<evt.run<<" "<<evt.subrun<<" "<<evt.event<<" "<<hadana.daughter_michel_score<<" "<<evt.reco_beam_calo_wire_allTrack->back()<<" "<<evt.reco_beam_calo_tick->back()<<" "<<evt.reco_beam_calo_wire_allTrack->front()<<" "<<evt.reco_beam_calo_tick->front()<<endl;
       }
       int nhits = 0;
       double michelscore = 0;
@@ -372,9 +372,9 @@ void ThinSlice::FillHistograms(int cut, const anavar & evt){
 //        cout<<evt.run<<" "<<evt.subrun<<" "<<evt.event<<endl;
 //      }
     }
-    if (evt.reco_beam_calo_endZ<100 && hadana.median_dEdx<2.4){
+    if (evt.reco_beam_calo_endZ_allTrack<100 && hadana.median_dEdx<2.4){
       if (hadana.daughter_michel_score>=0){
-        //if (!evt.MC) cout<<evt.run<<" "<<evt.subrun<<" "<<evt.event<<" "<<hadana.daughter_michel_score<<" "<<evt.reco_beam_calo_wire->back()<<" "<<evt.reco_beam_calo_tick->back()<<" "<<evt.reco_beam_calo_wire->front()<<" "<<evt.reco_beam_calo_tick->front()<<endl;
+        //if (!evt.MC) cout<<evt.run<<" "<<evt.subrun<<" "<<evt.event<<" "<<hadana.daughter_michel_score<<" "<<evt.reco_beam_calo_wire_allTrack->back()<<" "<<evt.reco_beam_calo_tick->back()<<" "<<evt.reco_beam_calo_wire_allTrack->front()<<" "<<evt.reco_beam_calo_tick->front()<<endl;
         FillHistVec1D(hdaughter_michel_scorePi[cut], hadana.daughter_michel_score, hadana.pitype);
       }
     }
@@ -386,7 +386,7 @@ void ThinSlice::FillHistograms(int cut, const anavar & evt){
     FillHistVec1D(htrackscore[cut], evt.reco_beam_PFP_trackScore_collection, hadana.pitype);
     FillHistVec1D(hemscore[cut], evt.reco_beam_PFP_emScore_collection, hadana.pitype);
 //    if (cut == kAPA3 && evt.reco_beam_PFP_emScore_collection > 0.9){
-//      cout<<evt.run<<" "<<evt.event<<" "<<evt.reco_beam_PFP_emScore_collection<<" "<<evt.reco_beam_calo_wire->front()<<" "<<evt.reco_beam_calo_tick->back()<<endl;
+//      cout<<evt.run<<" "<<evt.event<<" "<<evt.reco_beam_PFP_emScore_collection<<" "<<evt.reco_beam_calo_wire_allTrack->front()<<" "<<evt.reco_beam_calo_tick->back()<<endl;
 //    }
     FillHistVec1D(hdEdx_5cm[cut], hadana.dEdx_5cm, hadana.pitype);
 
@@ -421,8 +421,8 @@ void ThinSlice::FillHistograms(int cut, const anavar & evt){
         <<"Event: "<<evt.event<<endl;
         cout<<"True trklen: "<<hadana.true_trklen<<";\t"
         <<"Reco trklen: "<<evt.reco_beam_alt_len<<endl;
-        cout<<"Start: ("<<evt.reco_beam_calo_startX<<", "<<evt.reco_beam_calo_startY<<", "<<evt.reco_beam_calo_startZ<<");\n";
-        cout<<"End: ("<<evt.reco_beam_calo_endX<<", "<<evt.reco_beam_calo_endY<<", "<<evt.reco_beam_calo_endZ<<")\n";
+        cout<<"Start: ("<<evt.reco_beam_calo_startX_allTrack<<", "<<evt.reco_beam_calo_startY_allTrack<<", "<<evt.reco_beam_calo_startZ_allTrack<<");\n";
+        cout<<"End: ("<<evt.reco_beam_calo_endX_allTrack<<", "<<evt.reco_beam_calo_endY_allTrack<<", "<<evt.reco_beam_calo_endZ_allTrack<<")\n";
       }
     }*/
     /*if (!evt.MC){
@@ -431,23 +431,23 @@ void ThinSlice::FillHistograms(int cut, const anavar & evt){
         cout<<"Run: "<<evt.run<<";\t"
         <<"SubRun: "<<evt.subrun<<";\t"
         <<"Event: "<<evt.event<<endl;
-        cout<<"Start: ("<<evt.reco_beam_calo_startX<<", "<<evt.reco_beam_calo_startY<<", "<<evt.reco_beam_calo_startZ<<");\t trklen: "<<hadana.reco_trklen<<endl;
-        cout<<"End: ("<<evt.reco_beam_calo_endX<<", "<<evt.reco_beam_calo_endY<<", "<<evt.reco_beam_calo_endZ<<")\n";
+        cout<<"Start: ("<<evt.reco_beam_calo_startX_allTrack<<", "<<evt.reco_beam_calo_startY_allTrack<<", "<<evt.reco_beam_calo_startZ_allTrack<<");\t trklen: "<<hadana.reco_trklen<<endl;
+        cout<<"End: ("<<evt.reco_beam_calo_endX_allTrack<<", "<<evt.reco_beam_calo_endY_allTrack<<", "<<evt.reco_beam_calo_endZ_allTrack<<")\n";
         
       }
     }*/
 
-    FillHistVec1D(hreco_beam_startX_SCE[cut], evt.reco_beam_calo_startX, hadana.pitype);
-    FillHistVec1D(hreco_beam_startY_SCE[cut], evt.reco_beam_calo_startY, hadana.pitype);
-    FillHistVec1D(hreco_beam_startZ_SCE[cut], evt.reco_beam_calo_startZ, hadana.pitype);
+    FillHistVec1D(hreco_beam_startX_SCE[cut], evt.reco_beam_calo_startX_allTrack, hadana.pitype);
+    FillHistVec1D(hreco_beam_startY_SCE[cut], evt.reco_beam_calo_startY_allTrack, hadana.pitype);
+    FillHistVec1D(hreco_beam_startZ_SCE[cut], evt.reco_beam_calo_startZ_allTrack, hadana.pitype);
 
-    if (!evt.reco_beam_calo_wire->empty()){    
-      TVector3 pt0(evt.reco_beam_calo_startX,
-                   evt.reco_beam_calo_startY,
-                   evt.reco_beam_calo_startZ);
-      TVector3 pt1(evt.reco_beam_calo_endX,
-                   evt.reco_beam_calo_endY,
-                   evt.reco_beam_calo_endZ);
+    if (!evt.reco_beam_calo_wire_allTrack->empty()){
+      TVector3 pt0(evt.reco_beam_calo_startX_allTrack,
+                   evt.reco_beam_calo_startY_allTrack,
+                   evt.reco_beam_calo_startZ_allTrack);
+      TVector3 pt1(evt.reco_beam_calo_endX_allTrack,
+                   evt.reco_beam_calo_endY_allTrack,
+                   evt.reco_beam_calo_endZ_allTrack);
       TVector3 dir = pt1 - pt0;
       dir = dir.Unit();
       FillHistVec1D(hreco_beam_dcosX_SCE[cut], dir.X(), hadana.pitype);
@@ -458,7 +458,7 @@ void ThinSlice::FillHistograms(int cut, const anavar & evt){
       FillHistVec1D(hreco_beam_angleZ_SCE[cut], acos(dir.Z())*180/TMath::Pi(), hadana.pitype);
     }
 
-    FillHistVec2D(hreco_beam_startXY_SCE[cut], evt.reco_beam_calo_startX, evt.reco_beam_calo_startY, hadana.pitype);
+    FillHistVec2D(hreco_beam_startXY_SCE[cut], evt.reco_beam_calo_startX_allTrack, evt.reco_beam_calo_startY_allTrack, hadana.pitype);
 
   }
 }
