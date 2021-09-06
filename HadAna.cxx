@@ -161,7 +161,7 @@ int HadAna::GetPParType(const anavar& evt){
 
 bool HadAna::PassPandoraSliceCut(const anavar& evt) const{ // whether recognized by Pandora correctly
 
-  return true;//(evt.reco_beam_type == pandora_slice_pdg);
+  return evt.reco_beam_type > 0;//(evt.reco_beam_type == pandora_slice_pdg);
 }
 
 bool HadAna::PassBeamQualityCut() const{ // cut on beam entrance location and beam angle

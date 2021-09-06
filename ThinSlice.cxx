@@ -48,6 +48,9 @@ void ThinSlice::BookHistograms(){
 
   for (int i = 0; i < pi::nCuts; ++i){
     for (int j = 0; j < pi::nIntTypes+1; ++j){
+      hreco_beam_type[i][j] = new TH1D(Form("hreco_beam_type_%d_%d",i,j),Form("hreco_beam_type, %s, %s;hreco_beam_type", pi::cutName[i], pi::intTypeName[j]), 21, -1, 20);
+      hreco_beam_type[i][j]->Sumw2();
+      
       htrue_beam_endZ[i][j] = new TH1D(Form("htrue_beam_endZ_%d_%d",i,j),Form("true_beam_endZ, %s, %s;true_beam_endZ (cm)", pi::cutName[i], pi::intTypeName[j]), 70, -100, 600);
       htrue_beam_endZ[i][j]->Sumw2();
       hreco_beam_endZ[i][j] = new TH1D(Form("hreco_beam_endZ_%d_%d",i,j),Form("reco_beam_allTrack_endZ, %s, %s;reco_beam_allTrack_endZ (cm)", pi::cutName[i], pi::intTypeName[j]), 70, -100, 600);
@@ -331,6 +334,8 @@ void ThinSlice::ProcessEvent(const anavar & evt, Unfold & uf){
 void ThinSlice::FillHistograms(int cut, const anavar & evt){
   
   if (cut>=0 && cut < pi::nCuts){
+    FillHistVec1D(hreco_beam_type[cut], evt.reco_beam_type, hadana.pitype);
+    
     FillHistVec1D(htrue_beam_endZ[cut], evt.true_beam_endZ_SCE, hadana.pitype);
     FillHistVec1D(htrue_beam_endZ_SCE[cut], evt.true_beam_endZ, hadana.pitype); // it seems SCE is reversed? and I didn't find true_beam_endZ_SCE on wiki?
     FillHistVec1D(htrue_sliceID[cut], true_sliceID, hadana.pitype);

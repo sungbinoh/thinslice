@@ -42,6 +42,8 @@ class ThinSlice {
   double true_interactions[pi::nthinslices];
   double true_incidents[pi::nthinslices];
 
+  TH1D *hreco_beam_type[pi::nCuts][pi::nIntTypes+1];
+  
   TH1D *htrue_beam_endZ[pi::nCuts][pi::nIntTypes+1];
   TH1D *hreco_beam_endZ[pi::nCuts][pi::nIntTypes+1];
   TH1D *hreco_true_beam_endZ[pi::nCuts][pi::nIntTypes+1];
