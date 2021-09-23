@@ -1,8 +1,8 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Sat Sep  4 20:27:11 2021 by ROOT version 6.22/06
+// Wed Sep 22 23:46:18 2021 by ROOT version 6.22/06
 // from TTree beamana/beam analysis tree
-// found on file: ../PDSPAnalyzer/pduneana.root
+// found on file: pduneana.root
 //////////////////////////////////////////////////////////
 
 #ifndef anavar_h
@@ -21,7 +21,6 @@
 #include "string"
 
 using namespace std; // need to add this line manually
-
 class anavar {
 public :
    TTree          *fChain;   //!pointer to the analyzed TTree or TChain
@@ -34,6 +33,7 @@ public :
    Int_t           subrun;
    Int_t           event;
    Int_t           MC;
+   Bool_t          reco_reconstructable_beam_event;
    Int_t           reco_beam_type;
    Double_t        reco_beam_startX;
    Double_t        reco_beam_startY;
@@ -203,11 +203,9 @@ public :
    vector<double>  *reco_daughter_allTrack_endX;
    vector<double>  *reco_daughter_allTrack_endY;
    vector<double>  *reco_daughter_allTrack_endZ;
-   vector<double>  *reco_daughter_allTrack_dR;
    vector<vector<double> > *reco_daughter_allTrack_calo_X;
    vector<vector<double> > *reco_daughter_allTrack_calo_Y;
    vector<vector<double> > *reco_daughter_allTrack_calo_Z;
-   vector<double>  *reco_daughter_allTrack_to_vertex;
    vector<double>  *reco_daughter_allTrack_vertex_michel_score;
    vector<int>     *reco_daughter_allTrack_vertex_nHits;
    vector<int>     *reco_daughter_allShower_ID;
@@ -429,6 +427,7 @@ public :
    vector<double>  *g4rw_full_primary_plus_sigma_weight;
    vector<double>  *g4rw_full_primary_minus_sigma_weight;
    vector<vector<double> > *g4rw_full_grid_weights;
+   vector<vector<double> > *g4rw_full_grid_coeffs;
    vector<vector<double> > *g4rw_full_grid_piplus_weights;
    vector<vector<double> > *g4rw_full_grid_piplus_weights_fake_data;
    vector<vector<double> > *g4rw_full_grid_piminus_weights;
@@ -441,6 +440,7 @@ public :
    TBranch        *b_subrun;   //!
    TBranch        *b_event;   //!
    TBranch        *b_MC;   //!
+   TBranch        *b_reco_reconstructable_beam_event;   //!
    TBranch        *b_reco_beam_type;   //!
    TBranch        *b_reco_beam_startX;   //!
    TBranch        *b_reco_beam_startY;   //!
@@ -610,11 +610,9 @@ public :
    TBranch        *b_reco_daughter_allTrack_endX;   //!
    TBranch        *b_reco_daughter_allTrack_endY;   //!
    TBranch        *b_reco_daughter_allTrack_endZ;   //!
-   TBranch        *b_reco_daughter_allTrack_dR;   //!
    TBranch        *b_reco_daughter_allTrack_calo_X;   //!
    TBranch        *b_reco_daughter_allTrack_calo_Y;   //!
    TBranch        *b_reco_daughter_allTrack_calo_Z;   //!
-   TBranch        *b_reco_daughter_allTrack_to_vertex;   //!
    TBranch        *b_reco_daughter_allTrack_vertex_michel_score;   //!
    TBranch        *b_reco_daughter_allTrack_vertex_nHits;   //!
    TBranch        *b_reco_daughter_allShower_ID;   //!
@@ -836,6 +834,7 @@ public :
    TBranch        *b_g4rw_full_primary_plus_sigma_weight;   //!
    TBranch        *b_g4rw_full_primary_minus_sigma_weight;   //!
    TBranch        *b_g4rw_full_grid_weights;   //!
+   TBranch        *b_g4rw_full_grid_coeffs;   //!
    TBranch        *b_g4rw_full_grid_piplus_weights;   //!
    TBranch        *b_g4rw_full_grid_piplus_weights_fake_data;   //!
    TBranch        *b_g4rw_full_grid_piminus_weights;   //!
@@ -862,11 +861,11 @@ anavar::anavar(TTree *tree) : fChain(0)
 // if parameter tree is not specified (or zero), connect the file
 // used to generate this class and read the Tree.
    if (tree == 0) {
-      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("../PDSPAnalyzer/pduneana.root");
+      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("pduneana.root");
       if (!f || !f->IsOpen()) {
-         f = new TFile("../PDSPAnalyzer/pduneana.root");
+         f = new TFile("pduneana.root");
       }
-      TDirectory * dir = (TDirectory*)f->Get("../PDSPAnalyzer/pduneana.root:/pduneana");
+      TDirectory * dir = (TDirectory*)f->Get("pduneana.root:/pduneana");
       dir->GetObject("beamana",tree);
 
    }
@@ -1015,11 +1014,9 @@ void anavar::Init(TTree *tree)
    reco_daughter_allTrack_endX = 0;
    reco_daughter_allTrack_endY = 0;
    reco_daughter_allTrack_endZ = 0;
-   reco_daughter_allTrack_dR = 0;
    reco_daughter_allTrack_calo_X = 0;
    reco_daughter_allTrack_calo_Y = 0;
    reco_daughter_allTrack_calo_Z = 0;
-   reco_daughter_allTrack_to_vertex = 0;
    reco_daughter_allTrack_vertex_michel_score = 0;
    reco_daughter_allTrack_vertex_nHits = 0;
    reco_daughter_allShower_ID = 0;
@@ -1153,6 +1150,7 @@ void anavar::Init(TTree *tree)
    g4rw_full_primary_plus_sigma_weight = 0;
    g4rw_full_primary_minus_sigma_weight = 0;
    g4rw_full_grid_weights = 0;
+   g4rw_full_grid_coeffs = 0;
    g4rw_full_grid_piplus_weights = 0;
    g4rw_full_grid_piplus_weights_fake_data = 0;
    g4rw_full_grid_piminus_weights = 0;
@@ -1169,6 +1167,7 @@ void anavar::Init(TTree *tree)
    fChain->SetBranchAddress("subrun", &subrun, &b_subrun);
    fChain->SetBranchAddress("event", &event, &b_event);
    fChain->SetBranchAddress("MC", &MC, &b_MC);
+   fChain->SetBranchAddress("reco_reconstructable_beam_event", &reco_reconstructable_beam_event, &b_reco_reconstructable_beam_event);
    fChain->SetBranchAddress("reco_beam_type", &reco_beam_type, &b_reco_beam_type);
    fChain->SetBranchAddress("reco_beam_startX", &reco_beam_startX, &b_reco_beam_startX);
    fChain->SetBranchAddress("reco_beam_startY", &reco_beam_startY, &b_reco_beam_startY);
@@ -1338,11 +1337,9 @@ void anavar::Init(TTree *tree)
    fChain->SetBranchAddress("reco_daughter_allTrack_endX", &reco_daughter_allTrack_endX, &b_reco_daughter_allTrack_endX);
    fChain->SetBranchAddress("reco_daughter_allTrack_endY", &reco_daughter_allTrack_endY, &b_reco_daughter_allTrack_endY);
    fChain->SetBranchAddress("reco_daughter_allTrack_endZ", &reco_daughter_allTrack_endZ, &b_reco_daughter_allTrack_endZ);
-   fChain->SetBranchAddress("reco_daughter_allTrack_dR", &reco_daughter_allTrack_dR, &b_reco_daughter_allTrack_dR);
    fChain->SetBranchAddress("reco_daughter_allTrack_calo_X", &reco_daughter_allTrack_calo_X, &b_reco_daughter_allTrack_calo_X);
    fChain->SetBranchAddress("reco_daughter_allTrack_calo_Y", &reco_daughter_allTrack_calo_Y, &b_reco_daughter_allTrack_calo_Y);
    fChain->SetBranchAddress("reco_daughter_allTrack_calo_Z", &reco_daughter_allTrack_calo_Z, &b_reco_daughter_allTrack_calo_Z);
-   fChain->SetBranchAddress("reco_daughter_allTrack_to_vertex", &reco_daughter_allTrack_to_vertex, &b_reco_daughter_allTrack_to_vertex);
    fChain->SetBranchAddress("reco_daughter_allTrack_vertex_michel_score", &reco_daughter_allTrack_vertex_michel_score, &b_reco_daughter_allTrack_vertex_michel_score);
    fChain->SetBranchAddress("reco_daughter_allTrack_vertex_nHits", &reco_daughter_allTrack_vertex_nHits, &b_reco_daughter_allTrack_vertex_nHits);
    fChain->SetBranchAddress("reco_daughter_allShower_ID", &reco_daughter_allShower_ID, &b_reco_daughter_allShower_ID);
@@ -1564,6 +1561,7 @@ void anavar::Init(TTree *tree)
    fChain->SetBranchAddress("g4rw_full_primary_plus_sigma_weight", &g4rw_full_primary_plus_sigma_weight, &b_g4rw_full_primary_plus_sigma_weight);
    fChain->SetBranchAddress("g4rw_full_primary_minus_sigma_weight", &g4rw_full_primary_minus_sigma_weight, &b_g4rw_full_primary_minus_sigma_weight);
    fChain->SetBranchAddress("g4rw_full_grid_weights", &g4rw_full_grid_weights, &b_g4rw_full_grid_weights);
+   fChain->SetBranchAddress("g4rw_full_grid_coeffs", &g4rw_full_grid_coeffs, &b_g4rw_full_grid_coeffs);
    fChain->SetBranchAddress("g4rw_full_grid_piplus_weights", &g4rw_full_grid_piplus_weights, &b_g4rw_full_grid_piplus_weights);
    fChain->SetBranchAddress("g4rw_full_grid_piplus_weights_fake_data", &g4rw_full_grid_piplus_weights_fake_data, &b_g4rw_full_grid_piplus_weights_fake_data);
    fChain->SetBranchAddress("g4rw_full_grid_piminus_weights", &g4rw_full_grid_piminus_weights, &b_g4rw_full_grid_piminus_weights);

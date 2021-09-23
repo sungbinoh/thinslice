@@ -122,6 +122,8 @@ void ThinSlice::BookHistograms(){
       hcostheta[i][j] = new TH1D(Form("hcostheta_%d_%d",i,j), Form("costheta, %s, %s;cos#theta", pi::cutName[i], pi::intTypeName[j]), 100, 0.9, 1);
       hcostheta[i][j]->Sumw2();
 
+      hreco_beam_true_byE_matched[i][j] = new TH1D(Form("hreco_beam_true_byE_matched_%d_%d",i,j), Form("reco_beam_true_byE_matched, %s, %s;Truth matched", pi::cutName[i], pi::intTypeName[j]), 2, 0, 2);
+      hreco_beam_true_byE_matched[i][j]->Sumw2();
       hreco_trklen[i][j] = new TH1D(Form("hreco_trklen_%d_%d",i,j), Form("reco_trklen, %s, %s;Track length (cm)", pi::cutName[i], pi::intTypeName[j]), 61, -10, 600);
       hreco_trklen[i][j]->Sumw2();
       htrue_trklen[i][j] = new TH1D(Form("htrue_trklen_%d_%d",i,j), Form("true_trklen, %s, %s;Track length (cm)", pi::cutName[i], pi::intTypeName[j]), 61, -10, 600);
@@ -400,6 +402,7 @@ void ThinSlice::FillHistograms(int cut, const anavar & evt){
     FillHistVec1D(hdeltaz[cut], hadana.beam_dz, hadana.pitype);
     FillHistVec1D(hcostheta[cut], hadana.beam_costh, hadana.pitype);
 
+    FillHistVec1D(hreco_beam_true_byE_matched[cut], evt.reco_beam_true_byE_matched, hadana.pitype);
     FillHistVec1D(hreco_trklen[cut], hadana.reco_trklen, hadana.pitype);
     FillHistVec1D(htrue_trklen[cut], hadana.true_trklen, hadana.pitype);
     FillHistVec1D(hdiff_trklen[cut], hadana.reco_trklen - hadana.true_trklen, hadana.pitype);
