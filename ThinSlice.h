@@ -43,6 +43,7 @@ class ThinSlice {
   double true_incidents[pi::nthinslices];
 
   TH1D *hreco_beam_type[pi::nCuts][pi::nIntTypes+1];
+  TH1D *hreco_reconstructable_beam_event[pi::nCuts][pi::nIntTypes+1];
   
   TH1D *htrue_beam_endZ[pi::nCuts][pi::nIntTypes+1];
   TH1D *hreco_beam_endZ[pi::nCuts][pi::nIntTypes+1];
@@ -97,6 +98,8 @@ class ThinSlice {
   TH1D *hreco_beam_angleZ_SCE[pi::nCuts][pi::nIntTypes+1];
 
   TH2D *hreco_beam_startXY_SCE[pi::nCuts][pi::nIntTypes+1];
+  
+  TH1D *htrklen_csda_proton[pi::nCuts][pi::nIntTypes+1];
 
   std::string fOutputFileName;
   TFile *outputFile;

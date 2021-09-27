@@ -4,6 +4,7 @@
 #include "EventType.h"
 #include "EventSelection.h"
 #include "SliceParams.h"
+#include "TGraph.h"
 
 class anavar;
 
@@ -61,6 +62,8 @@ class HadAna{
   double reco_trklen;
   std::vector<double> true_trklen_accum;
   std::vector<double> reco_trklen_accum;
+  
+  double trklen_csda_proton;
 
  private:
   
@@ -72,7 +75,10 @@ class HadAna{
   double beamcut_dz_min, beamcut_dz_max;
   double beamcut_dxy_min, beamcut_dxy_max;
   double beamcut_costh_min, beamcut_costh_max;
-
+  
+  bool fProtonCSDACheck = true;
+  bool fAllTrackCheck = false;
+  TGraph *csda_range_vs_mom_sm;
 };
 
 #endif

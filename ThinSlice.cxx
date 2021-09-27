@@ -50,6 +50,8 @@ void ThinSlice::BookHistograms(){
     for (int j = 0; j < pi::nIntTypes+1; ++j){
       hreco_beam_type[i][j] = new TH1D(Form("hreco_beam_type_%d_%d",i,j),Form("hreco_beam_type, %s, %s;hreco_beam_type", pi::cutName[i], pi::intTypeName[j]), 21, -1, 20);
       hreco_beam_type[i][j]->Sumw2();
+      hreco_reconstructable_beam_event[i][j] = new TH1D(Form("hreco_reconstructable_beam_event_%d_%d",i,j),Form("hreco_reconstructable_beam_event, %s, %s;hreco_reconstructable_beam_event", pi::cutName[i], pi::intTypeName[j]), 21, -1, 20);
+      hreco_reconstructable_beam_event[i][j]->Sumw2();
       
       htrue_beam_endZ[i][j] = new TH1D(Form("htrue_beam_endZ_%d_%d",i,j),Form("true_beam_endZ, %s, %s;true_beam_endZ (cm)", pi::cutName[i], pi::intTypeName[j]), 70, -100, 600);
       htrue_beam_endZ[i][j]->Sumw2();
@@ -160,6 +162,9 @@ void ThinSlice::BookHistograms(){
       hreco_beam_angleZ_SCE[i][j]->Sumw2();
 
       hreco_beam_startXY_SCE[i][j] = new TH2D(Form("hreco_beam_startXY_SCE_%d_%d",i,j), Form("reco_beam_startXY_SCE, %s, %s;reco_beam_startX_SCE (cm);reco_beam_startY_SCE (cm)", pi::cutName[i], pi::intTypeName[j]), 1000, -360, 360, 1000, 0, 700);
+      
+      htrklen_csda_proton[i][j] = new TH1D(Form("htrklen_csda_proton_%d_%d",i,j), Form("trklen_csda_proton, %s, %s;Track length / CSDA", pi::cutName[i], pi::intTypeName[j]), 61, -0.05, 3);
+      htrklen_csda_proton[i][j]->Sumw2();
 
     }
   }
@@ -337,6 +342,8 @@ void ThinSlice::FillHistograms(int cut, const anavar & evt){
   
   if (cut>=0 && cut < pi::nCuts){
     FillHistVec1D(hreco_beam_type[cut], evt.reco_beam_type, hadana.pitype);
+    FillHistVec1D(htrklen_csda_proton[cut], hadana.trklen_csda_proton, hadana.pitype);
+    FillHistVec1D(hreco_reconstructable_beam_event[cut], evt.reco_reconstructable_beam_event, hadana.pitype);
     
     FillHistVec1D(htrue_beam_endZ[cut], evt.true_beam_endZ_SCE, hadana.pitype);
     FillHistVec1D(htrue_beam_endZ_SCE[cut], evt.true_beam_endZ, hadana.pitype); // it seems SCE is reversed? and I didn't find true_beam_endZ_SCE on wiki?

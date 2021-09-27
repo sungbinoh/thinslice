@@ -5,6 +5,10 @@
 #include <iostream>
 
 HadAna::HadAna(){
+  if (fProtonCSDACheck) {
+    TFile *file_mom2csda = new TFile("/dune/app/users/yinrui/thinslice/files/proton_mom_csda_converter.root");
+    csda_range_vs_mom_sm = (TGraph *)file_mom2csda->Get("csda_range_vs_mom_sm");
+  }
 }
 
 void HadAna::InitPi(){
@@ -33,6 +37,7 @@ void HadAna::AddTruePDG(int pdg){
 };
 
 bool HadAna::isSelectedPart(const anavar& evt) const{
+  if (evt.reco_reconstructable_beam_event == 0) return false;
   if (evt.MC){
     for (size_t i = 0; i<truepdglist.size(); ++i){
       if (evt.true_beam_PDG == truepdglist[i]) return true; // truth matched
@@ -402,5 +407,8 @@ void HadAna::ProcessEvent(const anavar& evt){
   }
   //cout<<"$$$"<<evt.reco_beam_alt_len<<"\t"<<reco_trklen<<endl;//the two are the same
   // reco_trklen = evt.reco_beam_alt_len; // they should be the same
+  if (fProtonCSDACheck)
+    trklen_csda_proton = reco_trklen / csda_range_vs_mom_sm->Eval(evt.beam_inst_P);
+  else
+    trklen_csda_proton = -999;
 }
-
