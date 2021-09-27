@@ -64,6 +64,7 @@ class HadAna{
   std::vector<double> reco_trklen_accum;
   
   double trklen_csda_proton;
+  bool fAllTrackCheck = false;
 
  private:
   
@@ -77,7 +78,6 @@ class HadAna{
   double beamcut_costh_min, beamcut_costh_max;
   
   bool fProtonCSDACheck = true;
-  bool fAllTrackCheck = false;
   TGraph *csda_range_vs_mom_sm;
 };
 
