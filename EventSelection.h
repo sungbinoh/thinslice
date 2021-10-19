@@ -8,18 +8,18 @@ namespace pi{
                                     "PandoraSlice",
                                     "CaloSize",
                                     "BeamQuality",
-                                    "APA3",
+                                    "MediandEdx",
                                     "MichelScore",
-                                    "MediandEdx"};
+                                    "APA3"};
   
   enum cut{
     kNocut = 0,
     kPandoraSlice,
     kCaloSize,
     kBeamQuality,
-    kAPA3,
+    kMediandEdx,
     kMichelScore,
-    kMediandEdx
+    kAPA3,
   };
 }
 

@@ -163,7 +163,7 @@ void ThinSlice::BookHistograms(){
 
       hreco_beam_startXY_SCE[i][j] = new TH2D(Form("hreco_beam_startXY_SCE_%d_%d",i,j), Form("reco_beam_startXY_SCE, %s, %s;reco_beam_startX_SCE (cm);reco_beam_startY_SCE (cm)", pi::cutName[i], pi::intTypeName[j]), 1000, -360, 360, 1000, 0, 700);
       
-      htrklen_csda_proton[i][j] = new TH1D(Form("htrklen_csda_proton_%d_%d",i,j), Form("trklen_csda_proton, %s, %s;Track length / CSDA", pi::cutName[i], pi::intTypeName[j]), 61, -0.05, 3);
+      htrklen_csda_proton[i][j] = new TH1D(Form("htrklen_csda_proton_%d_%d",i,j), Form("trklen_csda_proton, %s, %s;Track length / CSDA", pi::cutName[i], pi::intTypeName[j]), 61, -0.1, 6);
       htrklen_csda_proton[i][j]->Sumw2();
 
     }
@@ -778,25 +778,12 @@ void ThinSlice::Run(anavar & evt, Unfold & uf){
         FillHistograms(pi::kCaloSize, evt);
         if (hadana.PassBeamQualityCut()){
           FillHistograms(pi::kBeamQuality, evt);
-          if (hadana.PassAPA3Cut(evt)){
-            FillHistograms(pi::kAPA3, evt);
-            /*
-            if (evt.GetParType() == kPiInel && hadana.daughter_michel_score > 0.99){
-              std::cout<<evt.run<<" "<<evt.subrun<<" "<<evt.event<<std::endl;
-              if (!evt.reco_daughter_PFP_michelScore_collection->empty()){
-                for (size_t i = 0; i<evt.reco_daughter_PFP_michelScore_collection->size(); ++i){
-                  std::cout<<i<<" "<<(*evt.reco_daughter_PFP_michelScore_collection)[i]<<" "<<(*evt.reco_daughter_PFP_nHits_collection)[i]<<std::endl;
-                }
-              }
-            }
-            */
-//            if (selectCosmics && hadana.median_dEdx > 3){
-//              std::cout<<evt.run<<" "<<evt.subrun<<" "<<evt.event<<std::endl;
-//            }
+          if (hadana.PassMediandEdxCut()){
+            FillHistograms(pi::kMediandEdx, evt);
             if (hadana.PassMichelScoreCut()){
               FillHistograms(pi::kMichelScore, evt);
-              if (hadana.PassMediandEdxCut()){
-                FillHistograms(pi::kMediandEdx, evt);
+              if (hadana.PassAPA3Cut(evt)){
+                FillHistograms(pi::kAPA3, evt);
               }
             }
           }
