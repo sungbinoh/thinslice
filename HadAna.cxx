@@ -564,6 +564,15 @@ void HadAna::ProcessEvent(const anavar& evt){
       //cout<<i<<"\t"<<reco_trklen_accum[i]<<endl;
     }
   }
+  energy_calorimetry_SCE = 0; //MeV
+  for (int i=0; i<evt.reco_beam_calibrated_dEdX_SCE->size(); i++){
+    energy_calorimetry_SCE += (*evt.reco_beam_calibrated_dEdX_SCE)[i]*(*evt.reco_beam_TrkPitch_SCE)[i];
+  }
+  //cout<<evt.beam_particle_scores->size()<<"\t"<<(*evt.beam_particle_scores)[0]<<endl;
+  if (evt.beam_particle_scores->size())
+    beam_score = (*evt.beam_particle_scores)[0];
+  else
+    beam_score = -999.;
   //cout<<"$$$"<<evt.reco_beam_alt_len<<"\t"<<reco_trklen<<endl;//the two are the same
   // reco_trklen = evt.reco_beam_alt_len; // they should be the same
   if (fProtonCSDACheck)

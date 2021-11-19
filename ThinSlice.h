@@ -66,6 +66,7 @@ class ThinSlice {
 
   TH1D *hmediandEdx[pi::nCuts][pi::nIntTypes+1];
   TH1D *hdaughter_michel_score[pi::nCuts][pi::nIntTypes+1];
+  TH1D *henergy_calorimetry_SCE[pi::nCuts][pi::nIntTypes+1];
   TH1D *hdaughter_michel_scoreMu[pi::nCuts][pi::nIntTypes+1];
   TH1D *hdaughter_michel_scorePi[pi::nCuts][pi::nIntTypes+1];
   TH1D *hdaughter_michel_score2Mu[pi::nCuts][pi::nIntTypes+1];
@@ -86,6 +87,8 @@ class ThinSlice {
   TH1D *htrue_trklen[pi::nCuts][pi::nIntTypes+1];
   TH1D *hdiff_trklen[pi::nCuts][pi::nIntTypes+1];
   TH2D *hreco_vs_true_trklen[pi::nCuts][pi::nIntTypes+1];
+  TH1D *hbeam_score[pi::nCuts][pi::nIntTypes+1];
+  TH2D *beam_score_vs_hreco_trklen[pi::nCuts][pi::nIntTypes+1];
 
   TH1D *hreco_beam_startX_SCE[pi::nCuts][pi::nIntTypes+1];
   TH1D *hreco_beam_startY_SCE[pi::nCuts][pi::nIntTypes+1];

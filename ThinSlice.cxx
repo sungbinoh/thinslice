@@ -85,6 +85,9 @@ void ThinSlice::BookHistograms(){
 
       hdaughter_michel_score[i][j] = new TH1D(Form("hdaughter_michel_score_%d_%d",i,j), Form("daughter_michel_score, %s, %s;Michel score", pi::cutName[i], pi::intTypeName[j]), 110, -0.1, 1);
       hdaughter_michel_score[i][j]->Sumw2();
+      
+      henergy_calorimetry_SCE[i][j] = new TH1D(Form("henergy_calorimetry_SCE_%d_%d",i,j), Form("Energy_calorimetry_SCE_corrected, %s, %s;Energy (MeV)", pi::cutName[i], pi::intTypeName[j]), 100, 0, 1500);
+      henergy_calorimetry_SCE[i][j]->Sumw2();
 
       hdaughter_michel_scoreMu[i][j] = new TH1D(Form("hdaughter_michel_scoreMu_%d_%d",i,j), Form("daughter_michel_scoreMu, %s, %s;Michel score", pi::cutName[i], pi::intTypeName[j]), 10, 0, 1);
       hdaughter_michel_scoreMu[i][j]->Sumw2();
@@ -126,13 +129,17 @@ void ThinSlice::BookHistograms(){
 
       hreco_beam_true_byE_matched[i][j] = new TH1D(Form("hreco_beam_true_byE_matched_%d_%d",i,j), Form("reco_beam_true_byE_matched, %s, %s;Truth matched", pi::cutName[i], pi::intTypeName[j]), 2, 0, 2);
       hreco_beam_true_byE_matched[i][j]->Sumw2();
-      hreco_trklen[i][j] = new TH1D(Form("hreco_trklen_%d_%d",i,j), Form("reco_trklen, %s, %s;Track length (cm)", pi::cutName[i], pi::intTypeName[j]), 61, -10, 600);
+      const double xbins[25] = {-10.,0.,10.,20.,30.,40.,50.,60.,70.,80.,90.,100.,110.,120.,130.,140.,150.,160.,170.,180.,190.,200.,210.,220.,600}; // a user-defined binning
+      hreco_trklen[i][j] = new TH1D(Form("hreco_trklen_%d_%d",i,j), Form("reco_trklen, %s, %s;Track length (cm)", pi::cutName[i], pi::intTypeName[j]), 24, xbins);
       hreco_trklen[i][j]->Sumw2();
       htrue_trklen[i][j] = new TH1D(Form("htrue_trklen_%d_%d",i,j), Form("true_trklen, %s, %s;Track length (cm)", pi::cutName[i], pi::intTypeName[j]), 61, -10, 600);
       htrue_trklen[i][j]->Sumw2();
       hdiff_trklen[i][j] = new TH1D(Form("hdiff_trklen_%d_%d",i,j), Form("diff_trklen, %s, %s;Track length (cm)", pi::cutName[i], pi::intTypeName[j]), 60, -600, 600);
       hdiff_trklen[i][j]->Sumw2();
       hreco_vs_true_trklen[i][j]= new TH2D(Form("hreco_vs_true_trklen_%d_%d",i,j), Form("%s, %s;true_trklen (cm);reco_trklen (cm)", pi::cutName[i], pi::intTypeName[j]), 61, -10, 600, 61, -10, 600);
+      hbeam_score[i][j] = new TH1D(Form("hbeam_score_%d_%d",i,j), Form("Beam_score, %s, %s;Beam score", pi::cutName[i], pi::intTypeName[j]), 140, -0.23, 0.12);
+      hbeam_score[i][j]->Sumw2();
+      beam_score_vs_hreco_trklen[i][j]= new TH2D(Form("beam_score_vs_hreco_trklen_%d_%d",i,j), Form("%s, %s;reco trklen (cm);beam_score", pi::cutName[i], pi::intTypeName[j]), 50, -100, 400, 140, -0.23, 0.12);
 
       hreco_beam_startX_SCE[i][j] = new TH1D(Form("hreco_beam_startX_SCE_%d_%d",i,j), Form("reco_beam_startX_SCE, %s, %s; reco_beam_startX_SCE (cm)", pi::cutName[i], pi::intTypeName[j]), 100, -80, 20);
       hreco_beam_startX_SCE[i][j]->Sumw2();
@@ -180,9 +187,7 @@ void ThinSlice::BookHistograms(){
 }
 
 void ThinSlice::ProcessEvent(const anavar & evt, Unfold & uf){
-
   hadana.ProcessEvent(evt);
-
   reco_sliceID = -1;
   true_sliceID = -1;
 
@@ -559,6 +564,7 @@ void ThinSlice::FillHistograms(int cut, const anavar & evt){
       // below are variables not provided by evt directly (calculated in hadana)
       FillHistVec1D(hmediandEdx[cut], hadana.median_dEdx, hadana.pitype);
       FillHistVec1D(hdaughter_michel_score[cut], hadana.daughter_michel_score, hadana.pitype);
+      FillHistVec1D(henergy_calorimetry_SCE[cut], hadana.energy_calorimetry_SCE, hadana.pitype);
       if (evt.reco_beam_calo_endZ>300 && hadana.median_dEdx<2.4){ // likely to be a cosmic muon?
         if (hadana.daughter_michel_score>=0){
           FillHistVec1D(hdaughter_michel_scoreMu[cut], hadana.daughter_michel_score, hadana.pitype);
@@ -606,6 +612,8 @@ void ThinSlice::FillHistograms(int cut, const anavar & evt){
       FillHistVec1D(htrue_trklen[cut], hadana.true_trklen, hadana.pitype);
       FillHistVec1D(hdiff_trklen[cut], hadana.reco_trklen - hadana.true_trklen, hadana.pitype);
       FillHistVec2D(hreco_vs_true_trklen[cut], hadana.true_trklen, hadana.reco_trklen, hadana.pitype);
+      FillHistVec1D(hbeam_score[cut], hadana.beam_score, hadana.pitype);
+      FillHistVec2D(beam_score_vs_hreco_trklen[cut], hadana.reco_trklen, hadana.beam_score, hadana.pitype);
       
       //$$$temp
      /* if ( hadana.true_trklen>20 && evt.reco_beam_alt_len>20){

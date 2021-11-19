@@ -64,6 +64,8 @@ class HadAna{
   std::vector<double> reco_trklen_accum;
   
   double trklen_csda_proton;
+  double beam_score;
+  double energy_calorimetry_SCE;
   bool fAllTrackCheck = false;
 
  private:
