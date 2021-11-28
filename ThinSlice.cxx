@@ -86,7 +86,7 @@ void ThinSlice::BookHistograms(){
       hdaughter_michel_score[i][j] = new TH1D(Form("hdaughter_michel_score_%d_%d",i,j), Form("daughter_michel_score, %s, %s;Michel score", pi::cutName[i], pi::intTypeName[j]), 110, -0.1, 1);
       hdaughter_michel_score[i][j]->Sumw2();
       
-      henergy_calorimetry_SCE[i][j] = new TH1D(Form("henergy_calorimetry_SCE_%d_%d",i,j), Form("Energy_calorimetry_SCE_corrected, %s, %s;Energy (MeV)", pi::cutName[i], pi::intTypeName[j]), 100, 0, 1500);
+      henergy_calorimetry_SCE[i][j] = new TH1D(Form("henergy_calorimetry_SCE_%d_%d",i,j), Form("Energy_calorimetry_SCE_corrected, %s, %s;Energy (MeV)", pi::cutName[i], pi::intTypeName[j]), 100, 0, 500);
       henergy_calorimetry_SCE[i][j]->Sumw2();
 
       hdaughter_michel_scoreMu[i][j] = new TH1D(Form("hdaughter_michel_scoreMu_%d_%d",i,j), Form("daughter_michel_scoreMu, %s, %s;Michel score", pi::cutName[i], pi::intTypeName[j]), 10, 0, 1);

@@ -1,8 +1,8 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Wed Sep 22 23:46:18 2021 by ROOT version 6.22/06
+// Mon Nov 22 11:18:28 2021 by ROOT version 6.22/08
 // from TTree beamana/beam analysis tree
-// found on file: pduneana.root
+// found on file: pduneana_data.root
 //////////////////////////////////////////////////////////
 
 #ifndef anavar_h
@@ -19,8 +19,8 @@
 #include "vector"
 #include "vector"
 #include "string"
-
-using namespace std; // need to add this line manually
+#include "vector"
+using namespace std;
 class anavar {
 public :
    TTree          *fChain;   //!pointer to the analyzed TTree or TChain
@@ -41,6 +41,7 @@ public :
    Double_t        reco_beam_endX;
    Double_t        reco_beam_endY;
    Double_t        reco_beam_endZ;
+   Double_t        true_beam_len;
    Double_t        reco_beam_len;
    Double_t        reco_beam_alt_len;
    Double_t        reco_beam_alt_len_allTrack;
@@ -72,6 +73,8 @@ public :
    Double_t        reco_beam_vertex_michel_score;
    Int_t           reco_beam_vertex_nHits_allTrack;
    Double_t        reco_beam_vertex_michel_score_allTrack;
+   Double_t        reco_beam_vertex_michel_score_weight_by_charge;
+   Double_t        reco_beam_vertex_michel_score_weight_by_charge_allTrack;
    Int_t           reco_beam_trackID;
    Int_t           n_beam_slices;
    Int_t           n_beam_particles;
@@ -352,6 +355,10 @@ public :
    Double_t        reco_beam_true_byHits_purity;
    vector<string>  *true_beam_processes;
    Double_t        beam_inst_P;
+   Int_t           beam_inst_C0;
+   Int_t           beam_inst_C1;
+   Double_t        beam_inst_C0_pressure;
+   Double_t        beam_inst_C1_pressure;
    vector<double>  *beam_inst_TOF;
    vector<int>     *beam_inst_TOF_Chan;
    Double_t        beam_inst_X;
@@ -432,6 +439,7 @@ public :
    vector<vector<double> > *g4rw_full_grid_piplus_weights_fake_data;
    vector<vector<double> > *g4rw_full_grid_piminus_weights;
    vector<vector<double> > *g4rw_full_grid_proton_weights;
+   vector<vector<double> > *g4rw_full_grid_proton_coeffs;
    vector<vector<double> > *g4rw_primary_grid_weights;
    vector<double>  *g4rw_primary_grid_pair_weights;
 
@@ -448,6 +456,7 @@ public :
    TBranch        *b_reco_beam_endX;   //!
    TBranch        *b_reco_beam_endY;   //!
    TBranch        *b_reco_beam_endZ;   //!
+   TBranch        *b_true_beam_len;   //!
    TBranch        *b_reco_beam_len;   //!
    TBranch        *b_reco_beam_alt_len;   //!
    TBranch        *b_reco_beam_alt_len_allTrack;   //!
@@ -479,6 +488,8 @@ public :
    TBranch        *b_reco_beam_vertex_michel_score;   //!
    TBranch        *b_reco_beam_vertex_nHits_allTrack;   //!
    TBranch        *b_reco_beam_vertex_michel_score_allTrack;   //!
+   TBranch        *b_reco_beam_vertex_michel_score_weight_by_charge;   //!
+   TBranch        *b_reco_beam_vertex_michel_score_weight_by_charge_allTrack;   //!
    TBranch        *b_reco_beam_trackID;   //!
    TBranch        *b_n_beam_slices;   //!
    TBranch        *b_n_beam_particles;   //!
@@ -759,6 +770,10 @@ public :
    TBranch        *b_reco_beam_true_byHits_purity;   //!
    TBranch        *b_true_beam_processes;   //!
    TBranch        *b_beam_inst_P;   //!
+   TBranch        *b_beam_inst_C0;   //!
+   TBranch        *b_beam_inst_C1;   //!
+   TBranch        *b_beam_inst_C0_pressure;   //!
+   TBranch        *b_beam_inst_C1_pressure;   //!
    TBranch        *b_beam_inst_TOF;   //!
    TBranch        *b_beam_inst_TOF_Chan;   //!
    TBranch        *b_beam_inst_X;   //!
@@ -839,6 +854,7 @@ public :
    TBranch        *b_g4rw_full_grid_piplus_weights_fake_data;   //!
    TBranch        *b_g4rw_full_grid_piminus_weights;   //!
    TBranch        *b_g4rw_full_grid_proton_weights;   //!
+   TBranch        *b_g4rw_full_grid_proton_coeffs;   //!
    TBranch        *b_g4rw_primary_grid_weights;   //!
    TBranch        *b_g4rw_primary_grid_pair_weights;   //!
 
@@ -861,11 +877,11 @@ anavar::anavar(TTree *tree) : fChain(0)
 // if parameter tree is not specified (or zero), connect the file
 // used to generate this class and read the Tree.
    if (tree == 0) {
-      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("pduneana.root");
+      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("pduneana_data.root");
       if (!f || !f->IsOpen()) {
-         f = new TFile("pduneana.root");
+         f = new TFile("pduneana_data.root");
       }
-      TDirectory * dir = (TDirectory*)f->Get("pduneana.root:/pduneana");
+      TDirectory * dir = (TDirectory*)f->Get("pduneana_data.root:/pduneana");
       dir->GetObject("beamana",tree);
 
    }
@@ -1155,6 +1171,7 @@ void anavar::Init(TTree *tree)
    g4rw_full_grid_piplus_weights_fake_data = 0;
    g4rw_full_grid_piminus_weights = 0;
    g4rw_full_grid_proton_weights = 0;
+   g4rw_full_grid_proton_coeffs = 0;
    g4rw_primary_grid_weights = 0;
    g4rw_primary_grid_pair_weights = 0;
    // Set branch addresses and branch pointers
@@ -1175,6 +1192,7 @@ void anavar::Init(TTree *tree)
    fChain->SetBranchAddress("reco_beam_endX", &reco_beam_endX, &b_reco_beam_endX);
    fChain->SetBranchAddress("reco_beam_endY", &reco_beam_endY, &b_reco_beam_endY);
    fChain->SetBranchAddress("reco_beam_endZ", &reco_beam_endZ, &b_reco_beam_endZ);
+   fChain->SetBranchAddress("true_beam_len", &true_beam_len, &b_true_beam_len);
    fChain->SetBranchAddress("reco_beam_len", &reco_beam_len, &b_reco_beam_len);
    fChain->SetBranchAddress("reco_beam_alt_len", &reco_beam_alt_len, &b_reco_beam_alt_len);
    fChain->SetBranchAddress("reco_beam_alt_len_allTrack", &reco_beam_alt_len_allTrack, &b_reco_beam_alt_len_allTrack);
@@ -1206,6 +1224,8 @@ void anavar::Init(TTree *tree)
    fChain->SetBranchAddress("reco_beam_vertex_michel_score", &reco_beam_vertex_michel_score, &b_reco_beam_vertex_michel_score);
    fChain->SetBranchAddress("reco_beam_vertex_nHits_allTrack", &reco_beam_vertex_nHits_allTrack, &b_reco_beam_vertex_nHits_allTrack);
    fChain->SetBranchAddress("reco_beam_vertex_michel_score_allTrack", &reco_beam_vertex_michel_score_allTrack, &b_reco_beam_vertex_michel_score_allTrack);
+   fChain->SetBranchAddress("reco_beam_vertex_michel_score_weight_by_charge", &reco_beam_vertex_michel_score_weight_by_charge, &b_reco_beam_vertex_michel_score_weight_by_charge);
+   fChain->SetBranchAddress("reco_beam_vertex_michel_score_weight_by_charge_allTrack", &reco_beam_vertex_michel_score_weight_by_charge_allTrack, &b_reco_beam_vertex_michel_score_weight_by_charge_allTrack);
    fChain->SetBranchAddress("reco_beam_trackID", &reco_beam_trackID, &b_reco_beam_trackID);
    fChain->SetBranchAddress("n_beam_slices", &n_beam_slices, &b_n_beam_slices);
    fChain->SetBranchAddress("n_beam_particles", &n_beam_particles, &b_n_beam_particles);
@@ -1486,6 +1506,10 @@ void anavar::Init(TTree *tree)
    fChain->SetBranchAddress("reco_beam_true_byHits_purity", &reco_beam_true_byHits_purity, &b_reco_beam_true_byHits_purity);
    fChain->SetBranchAddress("true_beam_processes", &true_beam_processes, &b_true_beam_processes);
    fChain->SetBranchAddress("beam_inst_P", &beam_inst_P, &b_beam_inst_P);
+   fChain->SetBranchAddress("beam_inst_C0", &beam_inst_C0, &b_beam_inst_C0);
+   fChain->SetBranchAddress("beam_inst_C1", &beam_inst_C1, &b_beam_inst_C1);
+   fChain->SetBranchAddress("beam_inst_C0_pressure", &beam_inst_C0_pressure, &b_beam_inst_C0_pressure);
+   fChain->SetBranchAddress("beam_inst_C1_pressure", &beam_inst_C1_pressure, &b_beam_inst_C1_pressure);
    fChain->SetBranchAddress("beam_inst_TOF", &beam_inst_TOF, &b_beam_inst_TOF);
    fChain->SetBranchAddress("beam_inst_TOF_Chan", &beam_inst_TOF_Chan, &b_beam_inst_TOF_Chan);
    fChain->SetBranchAddress("beam_inst_X", &beam_inst_X, &b_beam_inst_X);
@@ -1566,6 +1590,7 @@ void anavar::Init(TTree *tree)
    fChain->SetBranchAddress("g4rw_full_grid_piplus_weights_fake_data", &g4rw_full_grid_piplus_weights_fake_data, &b_g4rw_full_grid_piplus_weights_fake_data);
    fChain->SetBranchAddress("g4rw_full_grid_piminus_weights", &g4rw_full_grid_piminus_weights, &b_g4rw_full_grid_piminus_weights);
    fChain->SetBranchAddress("g4rw_full_grid_proton_weights", &g4rw_full_grid_proton_weights, &b_g4rw_full_grid_proton_weights);
+   fChain->SetBranchAddress("g4rw_full_grid_proton_coeffs", &g4rw_full_grid_proton_coeffs, &b_g4rw_full_grid_proton_coeffs);
    fChain->SetBranchAddress("g4rw_primary_grid_weights", &g4rw_primary_grid_weights, &b_g4rw_primary_grid_weights);
    fChain->SetBranchAddress("g4rw_primary_grid_pair_weights", &g4rw_primary_grid_pair_weights, &b_g4rw_primary_grid_pair_weights);
    Notify();
