@@ -76,6 +76,7 @@ class ThinSlice {
 
   TH1D *hmediandEdxSlice[pi::nthinslices][pi::nCuts][pi::nIntTypes+1];
   TH1D *hdaughter_michel_scoreSlice[pi::nthinslices][pi::nCuts][pi::nIntTypes+1];
+  TH1D *hcosthetaSlice[pi::nthinslices][pi::nCuts][pi::nIntTypes+1];
 
   TH1D *hdeltax[pi::nCuts][pi::nIntTypes+1];
   TH1D *hdeltay[pi::nCuts][pi::nIntTypes+1];
@@ -103,6 +104,7 @@ class ThinSlice {
   TH2D *hreco_beam_startXY_SCE[pi::nCuts][pi::nIntTypes+1];
   
   TH1D *htrklen_csda_proton[pi::nCuts][pi::nIntTypes+1];
+  TH1D *hChi2_proton[pi::nCuts][pi::nIntTypes+1];
 
   std::string fOutputFileName;
   TFile *outputFile;

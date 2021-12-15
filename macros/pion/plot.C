@@ -300,6 +300,7 @@ void plot(){
 
   for (int i = 0; i<pi::nCuts; ++i){
     plot1d("hmediandEdx", i, "Median dE/dx (MeV/cm)", "Events");
+    plot1d("hChi2_proton", i, "Chi2/Ndof", "Events");
     plot1d("hdaughter_michel_score", i, "Daughter Michel Score", "Events");
     plot1d("hdaughter_michel_scoreMu", i, "Muon Daughter Michel Score", "Events");
     plot1d("hdaughter_michel_score2Mu", i, "Muon Daughter Michel Score2", "Events");
@@ -333,6 +334,7 @@ void plot(){
 
   plot1dslice("hmediandEdxSlice", 6, "Median dE/dx (MeV/cm)", "Events");
   plot1dslice("hdaughter_michel_scoreSlice", 6, "Median dE/dx (MeV/cm)", "Events");
+  plot1dslice("hcosthetaSlice", 6, "Cos(theta)", "Events");
 
   PrintEvents("hreco_beam_endZ_SCE");
 

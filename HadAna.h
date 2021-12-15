@@ -54,6 +54,7 @@ class HadAna{
   int pitype;
   int ptype;
   double median_dEdx;
+  double chi2_proton;
   double daughter_michel_score;
   double dEdx_5cm;
   double beam_dx, beam_dy, beam_dz, beam_dxy, beam_costh;

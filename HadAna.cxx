@@ -231,7 +231,7 @@ bool HadAna::PassMichelScoreCut() const{ // further veto muon tracks according t
 
 bool HadAna::PassMediandEdxCut() const{ // to remove proton background
 
-  return median_dEdx < 2.4;
+  return chi2_proton > 80; //median_dEdx < 2.4;
 }
 
 bool HadAna::PassPiCuts(const anavar& evt) const{
@@ -255,6 +255,7 @@ void HadAna::ProcessEvent(const anavar& evt){
   ptype = GetPParType(evt);
 
   median_dEdx = -1;
+  chi2_proton = -1;
   daughter_michel_score = -999;
 
   if (fAllTrackCheck) {
@@ -413,6 +414,7 @@ void HadAna::ProcessEvent(const anavar& evt){
   
   else {
     if (!evt.reco_beam_calo_wire->empty()){
+      chi2_proton = evt.reco_beam_Chi2_proton/evt.reco_beam_Chi2_ndof;
       median_dEdx = TMath::Median(evt.reco_beam_calibrated_dEdX_SCE->size(), &(*evt.reco_beam_calibrated_dEdX_SCE)[0]);//TMath::Median(evt.reco_beam_calibrated_dEdX_SCE->size(), &(*evt.reco_beam_calibrated_dEdX_SCE)[0]);
   //    daughter_michel_score = 0;
   //    int nhits = 0;
