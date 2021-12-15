@@ -193,9 +193,9 @@ void makeXS(){
   total_inel_KE->Draw("c");
   TLegend *leg5 = new TLegend(0.3,0.65,0.8,0.9);
   leg5->SetFillStyle(0);
-  leg5->AddEntry(gr_recoxs, "MC with reco information", "pe");
-  leg5->AddEntry(gr_truexs, "MC with truth information", "pe");
-  leg5->AddEntry(total_inel_KE, "Geant4 v4_10_6_p01c", "l");
+  leg5->AddEntry(gr_recoxs, "MC with reconstruction", "pe");
+  leg5->AddEntry(gr_truexs, "MC truth", "pe");
+  leg5->AddEntry(total_inel_KE, "Geant4 (theory prediction)", "l");
   leg5->Draw();
 
   c1->Print("plots/xs_sliceidinc_reco.pdf");

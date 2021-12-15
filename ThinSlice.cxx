@@ -779,6 +779,7 @@ void ThinSlice::Run(anavar & evt, Unfold & uf){
       if (!hadana.isSelectedPart(evt)) continue;
     }
     ProcessEvent(evt, uf);
+    // can change order of cuts
     FillHistograms(pi::kNocut, evt);
     if (hadana.PassPandoraSliceCut(evt)){
       FillHistograms(pi::kPandoraSlice, evt);
