@@ -139,7 +139,7 @@ void plot1d(string name, int cut, string xtitle, string ytitle){
   pad2->SetGridy();
   pad2->Draw();
   pad2->cd();
-
+  
   TH1D *hratio = (TH1D*)hdata[cut]->Clone(Form("hratio_%d",nc));
   hratio->SetTitle("");
   hratio->Divide(htotmc);
@@ -158,6 +158,29 @@ void plot1d(string name, int cut, string xtitle, string ytitle){
     //  }
   hratio->GetYaxis()->SetNdivisions(505);
   hratio->Draw();
+  
+  /*TH1D *hpull = (TH1D*)hdata[cut]->Clone(Form("hpull_%d",nc));
+  hpull->SetTitle("");
+  for (int ii=1; ii<hdata[cut]->GetNbinsX(); ii++) {
+    double dataerr = hdata[cut]->GetBinError(ii);
+    if (dataerr == 0) dataerr = 1;
+    double pull = (hdata[cut]->GetBinContent(ii)-htotmc->GetBinContent(ii)) / dataerr;
+    hpull->SetBinContent(ii, pull); // why there is error even I set it as constant
+  }
+  hpull->GetYaxis()->SetTitle("Pull");
+  hpull->GetXaxis()->SetLabelSize(0.15);
+  hpull->GetXaxis()->SetTitleSize(0.15);
+  hpull->GetXaxis()->SetTitleOffset(1.);
+  hpull->GetYaxis()->SetLabelSize(0.15);
+  hpull->GetYaxis()->SetTitleSize(0.15);
+  hpull->GetYaxis()->SetTitleOffset(.3);
+  double upp = 5;
+  double low = -5;
+  //if (upp < hpull->GetMaximum()) upp = hpull->GetMaximum();
+  //if (low > hpull->GetMinimum()) low = hpull->GetMinimum();
+  hpull->GetYaxis()->SetRangeUser(low, upp);
+  hpull->GetYaxis()->SetNdivisions(505);
+  hpull->Draw();*/
 
   can->Print(Form("../plots/can_%s_%d_%s.png", name.c_str(), cut, pi::cutName[cut]));
   can->Print(Form("../plots/can_%s_%d_%s.pdf", name.c_str(), cut, pi::cutName[cut]));
@@ -255,6 +278,29 @@ void plot1dslice(string name, int cut, string xtitle, string ytitle){
     hratio->GetYaxis()->SetRangeUser(0,5);
     hratio->GetYaxis()->SetNdivisions(505);
     hratio->Draw();
+    
+    /*TH1D *hpull = (TH1D*)hdata[j][cut]->Clone(Form("hpull_%d",nc));
+    hpull->SetTitle("");
+    for (int ii=1; ii<hdata[j][cut]->GetNbinsX(); ii++) {
+      double dataerr = hdata[j][cut]->GetBinError(ii);
+      if (dataerr == 0) dataerr = 1;
+      double pull = (hdata[j][cut]->GetBinContent(ii)-htotmc->GetBinContent(ii)) / dataerr;
+      hpull->SetBinContent(ii, pull); // why there is error even I set it as constant
+    }
+    hpull->GetYaxis()->SetTitle("Pull");
+    hpull->GetXaxis()->SetLabelSize(0.12);
+    hpull->GetXaxis()->SetTitleSize(0.12);
+    hpull->GetXaxis()->SetTitleOffset(1.);
+    hpull->GetYaxis()->SetLabelSize(0.12);
+    hpull->GetYaxis()->SetTitleSize(0.12);
+    hpull->GetYaxis()->SetTitleOffset(.3);
+    double upp = 5;
+    double low = -5;
+    //if (upp < hpull->GetMaximum()) upp = hpull->GetMaximum();
+    //if (low > hpull->GetMinimum()) low = hpull->GetMinimum();
+    hpull->GetYaxis()->SetRangeUser(low, upp);
+    hpull->GetYaxis()->SetNdivisions(505);
+    hpull->Draw();*/
     
     can->Print(Form("../plots/can_%s_%d_%s_%02d.png", name.c_str(), cut, pi::cutName[cut], j));
     can->Print(Form("../plots/can_%s_%d_%s_%02d.pdf", name.c_str(), cut, pi::cutName[cut], j));
