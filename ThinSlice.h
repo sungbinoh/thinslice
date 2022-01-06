@@ -42,6 +42,9 @@ class ThinSlice {
   double true_interactions[pi::nthinslices];
   double true_incidents[pi::nthinslices];
 
+  TH1D *hreco_beam_type[pi::nCuts][pi::nIntTypes+1];
+  TH1D *hreco_reconstructable_beam_event[pi::nCuts][pi::nIntTypes+1];
+  
   TH1D *htrue_beam_endZ[pi::nCuts][pi::nIntTypes+1];
   TH1D *hreco_beam_endZ[pi::nCuts][pi::nIntTypes+1];
   TH1D *hreco_true_beam_endZ[pi::nCuts][pi::nIntTypes+1];
@@ -63,6 +66,7 @@ class ThinSlice {
 
   TH1D *hmediandEdx[pi::nCuts][pi::nIntTypes+1];
   TH1D *hdaughter_michel_score[pi::nCuts][pi::nIntTypes+1];
+  TH1D *henergy_calorimetry_SCE[pi::nCuts][pi::nIntTypes+1];
   TH1D *hdaughter_michel_scoreMu[pi::nCuts][pi::nIntTypes+1];
   TH1D *hdaughter_michel_scorePi[pi::nCuts][pi::nIntTypes+1];
   TH1D *hdaughter_michel_score2Mu[pi::nCuts][pi::nIntTypes+1];
@@ -72,16 +76,20 @@ class ThinSlice {
 
   TH1D *hmediandEdxSlice[pi::nthinslices][pi::nCuts][pi::nIntTypes+1];
   TH1D *hdaughter_michel_scoreSlice[pi::nthinslices][pi::nCuts][pi::nIntTypes+1];
+  TH1D *hcosthetaSlice[pi::nthinslices][pi::nCuts][pi::nIntTypes+1];
 
   TH1D *hdeltax[pi::nCuts][pi::nIntTypes+1];
   TH1D *hdeltay[pi::nCuts][pi::nIntTypes+1];
   TH1D *hdeltaz[pi::nCuts][pi::nIntTypes+1];
   TH1D *hcostheta[pi::nCuts][pi::nIntTypes+1];
 
+  TH1D *hreco_beam_true_byE_matched[pi::nCuts][pi::nIntTypes+1];
   TH1D *hreco_trklen[pi::nCuts][pi::nIntTypes+1];
   TH1D *htrue_trklen[pi::nCuts][pi::nIntTypes+1];
   TH1D *hdiff_trklen[pi::nCuts][pi::nIntTypes+1];
   TH2D *hreco_vs_true_trklen[pi::nCuts][pi::nIntTypes+1];
+  TH1D *hbeam_score[pi::nCuts][pi::nIntTypes+1];
+  TH2D *beam_score_vs_hreco_trklen[pi::nCuts][pi::nIntTypes+1];
 
   TH1D *hreco_beam_startX_SCE[pi::nCuts][pi::nIntTypes+1];
   TH1D *hreco_beam_startY_SCE[pi::nCuts][pi::nIntTypes+1];
@@ -94,6 +102,9 @@ class ThinSlice {
   TH1D *hreco_beam_angleZ_SCE[pi::nCuts][pi::nIntTypes+1];
 
   TH2D *hreco_beam_startXY_SCE[pi::nCuts][pi::nIntTypes+1];
+  
+  TH1D *htrklen_csda_proton[pi::nCuts][pi::nIntTypes+1];
+  TH1D *hChi2_proton[pi::nCuts][pi::nIntTypes+1];
 
   std::string fOutputFileName;
   TFile *outputFile;

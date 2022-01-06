@@ -4,22 +4,25 @@
 namespace pi{
   const unsigned int nCuts = 7;
 
-  const char cutName[nCuts][100] = {"Nocut",
-                                    "PandoraSlice",
-                                    "CaloSize",
-                                    "BeamQuality",
-                                    "APA3",
-                                    "MichelScore",
-                                    "MediandEdx"};
+  // can change order of cuts
+  const char cutName[nCuts][100] = {
+    "Nocut",
+    "PandoraSlice",
+    "CaloSize",
+    "BeamQuality",
+    "MediandEdx",
+    "MichelScore",
+    "APA3",
+  };
   
   enum cut{
     kNocut = 0,
     kPandoraSlice,
     kCaloSize,
     kBeamQuality,
-    kAPA3,
+    kMediandEdx,
     kMichelScore,
-    kMediandEdx
+    kAPA3,
   };
 }
 

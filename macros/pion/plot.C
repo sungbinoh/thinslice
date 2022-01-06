@@ -139,7 +139,7 @@ void plot1d(string name, int cut, string xtitle, string ytitle){
   pad2->SetGridy();
   pad2->Draw();
   pad2->cd();
-
+  
   TH1D *hratio = (TH1D*)hdata[cut]->Clone(Form("hratio_%d",nc));
   hratio->SetTitle("");
   hratio->Divide(htotmc);
@@ -158,14 +158,37 @@ void plot1d(string name, int cut, string xtitle, string ytitle){
     //  }
   hratio->GetYaxis()->SetNdivisions(505);
   hratio->Draw();
+  
+  /*TH1D *hpull = (TH1D*)hdata[cut]->Clone(Form("hpull_%d",nc));
+  hpull->SetTitle("");
+  for (int ii=1; ii<hdata[cut]->GetNbinsX(); ii++) {
+    double dataerr = hdata[cut]->GetBinError(ii);
+    if (dataerr == 0) dataerr = 1;
+    double pull = (hdata[cut]->GetBinContent(ii)-htotmc->GetBinContent(ii)) / dataerr;
+    hpull->SetBinContent(ii, pull); // why there is error even I set it as constant
+  }
+  hpull->GetYaxis()->SetTitle("Pull");
+  hpull->GetXaxis()->SetLabelSize(0.15);
+  hpull->GetXaxis()->SetTitleSize(0.15);
+  hpull->GetXaxis()->SetTitleOffset(1.);
+  hpull->GetYaxis()->SetLabelSize(0.15);
+  hpull->GetYaxis()->SetTitleSize(0.15);
+  hpull->GetYaxis()->SetTitleOffset(.3);
+  double upp = 5;
+  double low = -5;
+  //if (upp < hpull->GetMaximum()) upp = hpull->GetMaximum();
+  //if (low > hpull->GetMinimum()) low = hpull->GetMinimum();
+  hpull->GetYaxis()->SetRangeUser(low, upp);
+  hpull->GetYaxis()->SetNdivisions(505);
+  hpull->Draw();*/
 
-  can->Print(Form("plots/can_%s_%d_%s.png", name.c_str(), cut, pi::cutName[cut]));
-  can->Print(Form("plots/can_%s_%d_%s.pdf", name.c_str(), cut, pi::cutName[cut]));
+  can->Print(Form("../plots/can_%s_%d_%s.png", name.c_str(), cut, pi::cutName[cut]));
+  can->Print(Form("../plots/can_%s_%d_%s.pdf", name.c_str(), cut, pi::cutName[cut]));
   hs->SetMaximum(8*max);
   hs->SetMinimum(1);
   pad1->SetLogy();
-  can->Print(Form("plots/canlog_%s_%d_%s.png", name.c_str(), cut, pi::cutName[cut]));
-  can->Print(Form("plots/canlog_%s_%d_%s.pdf", name.c_str(), cut, pi::cutName[cut]));
+  can->Print(Form("../plots/canlog_%s_%d_%s.png", name.c_str(), cut, pi::cutName[cut]));
+  can->Print(Form("../plots/canlog_%s_%d_%s.pdf", name.c_str(), cut, pi::cutName[cut]));
 
   ++nc;
 }
@@ -256,13 +279,36 @@ void plot1dslice(string name, int cut, string xtitle, string ytitle){
     hratio->GetYaxis()->SetNdivisions(505);
     hratio->Draw();
     
-    can->Print(Form("plots/can_%s_%d_%s_%02d.png", name.c_str(), cut, pi::cutName[cut], j));
-    can->Print(Form("plots/can_%s_%d_%s_%02d.pdf", name.c_str(), cut, pi::cutName[cut], j));
+    /*TH1D *hpull = (TH1D*)hdata[j][cut]->Clone(Form("hpull_%d",nc));
+    hpull->SetTitle("");
+    for (int ii=1; ii<hdata[j][cut]->GetNbinsX(); ii++) {
+      double dataerr = hdata[j][cut]->GetBinError(ii);
+      if (dataerr == 0) dataerr = 1;
+      double pull = (hdata[j][cut]->GetBinContent(ii)-htotmc->GetBinContent(ii)) / dataerr;
+      hpull->SetBinContent(ii, pull); // why there is error even I set it as constant
+    }
+    hpull->GetYaxis()->SetTitle("Pull");
+    hpull->GetXaxis()->SetLabelSize(0.12);
+    hpull->GetXaxis()->SetTitleSize(0.12);
+    hpull->GetXaxis()->SetTitleOffset(1.);
+    hpull->GetYaxis()->SetLabelSize(0.12);
+    hpull->GetYaxis()->SetTitleSize(0.12);
+    hpull->GetYaxis()->SetTitleOffset(.3);
+    double upp = 5;
+    double low = -5;
+    //if (upp < hpull->GetMaximum()) upp = hpull->GetMaximum();
+    //if (low > hpull->GetMinimum()) low = hpull->GetMinimum();
+    hpull->GetYaxis()->SetRangeUser(low, upp);
+    hpull->GetYaxis()->SetNdivisions(505);
+    hpull->Draw();*/
+    
+    can->Print(Form("../plots/can_%s_%d_%s_%02d.png", name.c_str(), cut, pi::cutName[cut], j));
+    can->Print(Form("../plots/can_%s_%d_%s_%02d.pdf", name.c_str(), cut, pi::cutName[cut], j));
     hs->SetMaximum(8*max);
     hs->SetMinimum(1);
     pad1->SetLogy();
-    can->Print(Form("plots/canlog_%s_%d_%s_%02d.png", name.c_str(), cut, pi::cutName[cut], j));
-    can->Print(Form("plots/canlog_%s_%d_%s_%02d.pdf", name.c_str(), cut, pi::cutName[cut], j));
+    can->Print(Form("../plots/canlog_%s_%d_%s_%02d.png", name.c_str(), cut, pi::cutName[cut], j));
+    can->Print(Form("../plots/canlog_%s_%d_%s_%02d.pdf", name.c_str(), cut, pi::cutName[cut], j));
     
     ++nc;
     
@@ -281,23 +327,26 @@ void plot2d(string name, int cut){
   for (int i = 1; i<=4; ++i){
     TCanvas *can = new TCanvas(Form("can_%d",nc), Form("can_%d",nc));
     h[cut][i]->Draw("colz");
-    can->Print(Form("plots/can_%s_%s_%s.png",name.c_str(), pi::cutName[cut], pi::intTypeName[i]));
-    can->Print(Form("plots/can_%s_%s_%s.pdf",name.c_str(), pi::cutName[cut], pi::intTypeName[i]));
+    can->Print(Form("../plots/can_%s_%s_%s.png",name.c_str(), pi::cutName[cut], pi::intTypeName[i]));
+    can->Print(Form("../plots/can_%s_%s_%s.pdf",name.c_str(), pi::cutName[cut], pi::intTypeName[i]));
     ++nc;
   }
 }
 void plot(){
+  gSystem->Exec("rm -rf ../plots");
+  gSystem->Exec("mkdir ../plots");
 
   gStyle->SetOptStat(0);
   gErrorIgnoreLevel = kWarning;
 
-  fmc = TFile::Open("../../install/bin/mcprod4a.root");
+  fmc = TFile::Open("../../build/mcprod4a.root");
   //fdata = TFile::Open("../install/bin/mcprod4a.root");
-  fdata = TFile::Open("../../install/bin/data.root");
-  fcosmics = TFile::Open("../../install/bin/cosmics.root");
+  fdata = TFile::Open("../../build/data.root");
+  fcosmics = TFile::Open("../../build/cosmics.root");
 
   for (int i = 0; i<pi::nCuts; ++i){
     plot1d("hmediandEdx", i, "Median dE/dx (MeV/cm)", "Events");
+    plot1d("hChi2_proton", i, "Chi2/Ndof", "Events");
     plot1d("hdaughter_michel_score", i, "Daughter Michel Score", "Events");
     plot1d("hdaughter_michel_scoreMu", i, "Muon Daughter Michel Score", "Events");
     plot1d("hdaughter_michel_score2Mu", i, "Muon Daughter Michel Score2", "Events");
@@ -329,8 +378,9 @@ void plot(){
     plot1d("hreco_beam_angleZ_SCE", i, "angleZ", "Events");
   }
 
-  plot1dslice("hmediandEdxSlice", 4, "Median dE/dx (MeV/cm)", "Events");
-  plot1dslice("hdaughter_michel_scoreSlice", 4, "Median dE/dx (MeV/cm)", "Events");
+  plot1dslice("hmediandEdxSlice", 6, "Median dE/dx (MeV/cm)", "Events");
+  plot1dslice("hdaughter_michel_scoreSlice", 6, "Median dE/dx (MeV/cm)", "Events");
+  plot1dslice("hcosthetaSlice", 6, "Cos(theta)", "Events");
 
   PrintEvents("hreco_beam_endZ_SCE");
 

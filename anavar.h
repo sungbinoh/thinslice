@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Fri Jul  9 21:04:38 2021 by ROOT version 6.18/04
+// Mon Nov 22 11:18:28 2021 by ROOT version 6.22/08
 // from TTree beamana/beam analysis tree
 // found on file: pduneana_data.root
 //////////////////////////////////////////////////////////
@@ -19,9 +19,8 @@
 #include "vector"
 #include "vector"
 #include "string"
-
+#include "vector"
 using namespace std;
-
 class anavar {
 public :
    TTree          *fChain;   //!pointer to the analyzed TTree or TChain
@@ -34,6 +33,7 @@ public :
    Int_t           subrun;
    Int_t           event;
    Int_t           MC;
+   Bool_t          reco_reconstructable_beam_event;
    Int_t           reco_beam_type;
    Double_t        reco_beam_startX;
    Double_t        reco_beam_startY;
@@ -41,14 +41,22 @@ public :
    Double_t        reco_beam_endX;
    Double_t        reco_beam_endY;
    Double_t        reco_beam_endZ;
+   Double_t        true_beam_len;
    Double_t        reco_beam_len;
    Double_t        reco_beam_alt_len;
+   Double_t        reco_beam_alt_len_allTrack;
    Double_t        reco_beam_calo_startX;
    Double_t        reco_beam_calo_startY;
    Double_t        reco_beam_calo_startZ;
    Double_t        reco_beam_calo_endX;
    Double_t        reco_beam_calo_endY;
    Double_t        reco_beam_calo_endZ;
+   Double_t        reco_beam_calo_startX_allTrack;
+   Double_t        reco_beam_calo_startY_allTrack;
+   Double_t        reco_beam_calo_startZ_allTrack;
+   Double_t        reco_beam_calo_endX_allTrack;
+   Double_t        reco_beam_calo_endY_allTrack;
+   Double_t        reco_beam_calo_endZ_allTrack;
    vector<double>  *reco_beam_calo_startDirX;
    vector<double>  *reco_beam_calo_startDirY;
    vector<double>  *reco_beam_calo_startDirZ;
@@ -63,6 +71,10 @@ public :
    Double_t        reco_beam_trackEndDirZ;
    Int_t           reco_beam_vertex_nHits;
    Double_t        reco_beam_vertex_michel_score;
+   Int_t           reco_beam_vertex_nHits_allTrack;
+   Double_t        reco_beam_vertex_michel_score_allTrack;
+   Double_t        reco_beam_vertex_michel_score_weight_by_charge;
+   Double_t        reco_beam_vertex_michel_score_weight_by_charge_allTrack;
    Int_t           reco_beam_trackID;
    Int_t           n_beam_slices;
    Int_t           n_beam_particles;
@@ -73,12 +85,16 @@ public :
    vector<double>  *reco_beam_calo_X;
    vector<double>  *reco_beam_calo_Y;
    vector<double>  *reco_beam_calo_Z;
+   vector<double>  *reco_beam_calo_X_allTrack;
+   vector<double>  *reco_beam_calo_Y_allTrack;
+   vector<double>  *reco_beam_calo_Z_allTrack;
    vector<double>  *reco_beam_dQ;
    vector<double>  *reco_beam_dEdX_SCE;
    vector<double>  *reco_beam_calibrated_dEdX_SCE;
    vector<double>  *reco_beam_calibrated_dQdX_SCE;
    vector<double>  *reco_beam_resRange_SCE;
    vector<double>  *reco_beam_TrkPitch_SCE;
+   vector<double>  *reco_beam_TrkPitch_SCE_allTrack;
    vector<double>  *reco_beam_dQdX_NoSCE;
    vector<double>  *reco_beam_dQ_NoSCE;
    vector<double>  *reco_beam_dEdX_NoSCE;
@@ -86,6 +102,7 @@ public :
    vector<double>  *reco_beam_resRange_NoSCE;
    vector<double>  *reco_beam_TrkPitch_NoSCE;
    vector<double>  *reco_beam_calo_wire;
+   vector<double>  *reco_beam_calo_wire_allTrack;
    vector<double>  *reco_beam_calo_wire_z;
    vector<double>  *reco_beam_calo_wire_NoSCE;
    vector<double>  *reco_beam_calo_wire_z_NoSCE;
@@ -189,11 +206,9 @@ public :
    vector<double>  *reco_daughter_allTrack_endX;
    vector<double>  *reco_daughter_allTrack_endY;
    vector<double>  *reco_daughter_allTrack_endZ;
-   vector<double>  *reco_daughter_allTrack_dR;
    vector<vector<double> > *reco_daughter_allTrack_calo_X;
    vector<vector<double> > *reco_daughter_allTrack_calo_Y;
    vector<vector<double> > *reco_daughter_allTrack_calo_Z;
-   vector<double>  *reco_daughter_allTrack_to_vertex;
    vector<double>  *reco_daughter_allTrack_vertex_michel_score;
    vector<int>     *reco_daughter_allTrack_vertex_nHits;
    vector<int>     *reco_daughter_allShower_ID;
@@ -340,6 +355,10 @@ public :
    Double_t        reco_beam_true_byHits_purity;
    vector<string>  *true_beam_processes;
    Double_t        beam_inst_P;
+   Int_t           beam_inst_C0;
+   Int_t           beam_inst_C1;
+   Double_t        beam_inst_C0_pressure;
+   Double_t        beam_inst_C1_pressure;
    vector<double>  *beam_inst_TOF;
    vector<int>     *beam_inst_TOF_Chan;
    Double_t        beam_inst_X;
@@ -388,6 +407,8 @@ public :
    Double_t        reco_beam_true_byHits_startP;
    vector<double>  *reco_beam_incidentEnergies;
    Double_t        reco_beam_interactingEnergy;
+   vector<double>  *reco_beam_incidentEnergies_allTrack;
+   Double_t        reco_beam_interactingEnergy_allTrack;
    vector<double>  *true_beam_incidentEnergies;
    Double_t        true_beam_interactingEnergy;
    vector<int>     *true_beam_slices;
@@ -413,10 +434,12 @@ public :
    vector<double>  *g4rw_full_primary_plus_sigma_weight;
    vector<double>  *g4rw_full_primary_minus_sigma_weight;
    vector<vector<double> > *g4rw_full_grid_weights;
+   vector<vector<double> > *g4rw_full_grid_coeffs;
    vector<vector<double> > *g4rw_full_grid_piplus_weights;
    vector<vector<double> > *g4rw_full_grid_piplus_weights_fake_data;
    vector<vector<double> > *g4rw_full_grid_piminus_weights;
    vector<vector<double> > *g4rw_full_grid_proton_weights;
+   vector<vector<double> > *g4rw_full_grid_proton_coeffs;
    vector<vector<double> > *g4rw_primary_grid_weights;
    vector<double>  *g4rw_primary_grid_pair_weights;
 
@@ -425,6 +448,7 @@ public :
    TBranch        *b_subrun;   //!
    TBranch        *b_event;   //!
    TBranch        *b_MC;   //!
+   TBranch        *b_reco_reconstructable_beam_event;   //!
    TBranch        *b_reco_beam_type;   //!
    TBranch        *b_reco_beam_startX;   //!
    TBranch        *b_reco_beam_startY;   //!
@@ -432,14 +456,22 @@ public :
    TBranch        *b_reco_beam_endX;   //!
    TBranch        *b_reco_beam_endY;   //!
    TBranch        *b_reco_beam_endZ;   //!
+   TBranch        *b_true_beam_len;   //!
    TBranch        *b_reco_beam_len;   //!
    TBranch        *b_reco_beam_alt_len;   //!
+   TBranch        *b_reco_beam_alt_len_allTrack;   //!
    TBranch        *b_reco_beam_calo_startX;   //!
    TBranch        *b_reco_beam_calo_startY;   //!
    TBranch        *b_reco_beam_calo_startZ;   //!
    TBranch        *b_reco_beam_calo_endX;   //!
    TBranch        *b_reco_beam_calo_endY;   //!
    TBranch        *b_reco_beam_calo_endZ;   //!
+   TBranch        *b_reco_beam_calo_startX_allTrack;   //!
+   TBranch        *b_reco_beam_calo_startY_allTrack;   //!
+   TBranch        *b_reco_beam_calo_startZ_allTrack;   //!
+   TBranch        *b_reco_beam_calo_endX_allTrack;   //!
+   TBranch        *b_reco_beam_calo_endY_allTrack;   //!
+   TBranch        *b_reco_beam_calo_endZ_allTrack;   //!
    TBranch        *b_reco_beam_calo_startDirX;   //!
    TBranch        *b_reco_beam_calo_startDirY;   //!
    TBranch        *b_reco_beam_calo_startDirZ;   //!
@@ -454,6 +486,10 @@ public :
    TBranch        *b_reco_beam_trackEndDirZ;   //!
    TBranch        *b_reco_beam_vertex_nHits;   //!
    TBranch        *b_reco_beam_vertex_michel_score;   //!
+   TBranch        *b_reco_beam_vertex_nHits_allTrack;   //!
+   TBranch        *b_reco_beam_vertex_michel_score_allTrack;   //!
+   TBranch        *b_reco_beam_vertex_michel_score_weight_by_charge;   //!
+   TBranch        *b_reco_beam_vertex_michel_score_weight_by_charge_allTrack;   //!
    TBranch        *b_reco_beam_trackID;   //!
    TBranch        *b_n_beam_slices;   //!
    TBranch        *b_n_beam_particles;   //!
@@ -464,12 +500,16 @@ public :
    TBranch        *b_reco_beam_calo_X;   //!
    TBranch        *b_reco_beam_calo_Y;   //!
    TBranch        *b_reco_beam_calo_Z;   //!
+   TBranch        *b_reco_beam_calo_X_allTrack;   //!
+   TBranch        *b_reco_beam_calo_Y_allTrack;   //!
+   TBranch        *b_reco_beam_calo_Z_allTrack;   //!
    TBranch        *b_reco_beam_dQ;   //!
    TBranch        *b_reco_beam_dEdX_SCE;   //!
    TBranch        *b_reco_beam_calibrated_dEdX_SCE;   //!
    TBranch        *b_reco_beam_calibrated_dQdX_SCE;   //!
    TBranch        *b_reco_beam_resRange_SCE;   //!
    TBranch        *b_reco_beam_TrkPitch_SCE;   //!
+   TBranch        *b_reco_beam_TrkPitch_SCE_allTrack;   //!
    TBranch        *b_reco_beam_dQdX_NoSCE;   //!
    TBranch        *b_reco_beam_dQ_NoSCE;   //!
    TBranch        *b_reco_beam_dEdX_NoSCE;   //!
@@ -477,6 +517,7 @@ public :
    TBranch        *b_reco_beam_resRange_NoSCE;   //!
    TBranch        *b_reco_beam_TrkPitch_NoSCE;   //!
    TBranch        *b_reco_beam_calo_wire;   //!
+   TBranch        *b_reco_beam_calo_wire_allTrack;   //!
    TBranch        *b_reco_beam_calo_wire_z;   //!
    TBranch        *b_reco_beam_calo_wire_NoSCE;   //!
    TBranch        *b_reco_beam_calo_wire_z_NoSCE;   //!
@@ -580,11 +621,9 @@ public :
    TBranch        *b_reco_daughter_allTrack_endX;   //!
    TBranch        *b_reco_daughter_allTrack_endY;   //!
    TBranch        *b_reco_daughter_allTrack_endZ;   //!
-   TBranch        *b_reco_daughter_allTrack_dR;   //!
    TBranch        *b_reco_daughter_allTrack_calo_X;   //!
    TBranch        *b_reco_daughter_allTrack_calo_Y;   //!
    TBranch        *b_reco_daughter_allTrack_calo_Z;   //!
-   TBranch        *b_reco_daughter_allTrack_to_vertex;   //!
    TBranch        *b_reco_daughter_allTrack_vertex_michel_score;   //!
    TBranch        *b_reco_daughter_allTrack_vertex_nHits;   //!
    TBranch        *b_reco_daughter_allShower_ID;   //!
@@ -731,6 +770,10 @@ public :
    TBranch        *b_reco_beam_true_byHits_purity;   //!
    TBranch        *b_true_beam_processes;   //!
    TBranch        *b_beam_inst_P;   //!
+   TBranch        *b_beam_inst_C0;   //!
+   TBranch        *b_beam_inst_C1;   //!
+   TBranch        *b_beam_inst_C0_pressure;   //!
+   TBranch        *b_beam_inst_C1_pressure;   //!
    TBranch        *b_beam_inst_TOF;   //!
    TBranch        *b_beam_inst_TOF_Chan;   //!
    TBranch        *b_beam_inst_X;   //!
@@ -779,6 +822,8 @@ public :
    TBranch        *b_reco_beam_true_byHits_startP;   //!
    TBranch        *b_reco_beam_incidentEnergies;   //!
    TBranch        *b_reco_beam_interactingEnergy;   //!
+   TBranch        *b_reco_beam_incidentEnergies_allTrack;   //!
+   TBranch        *b_reco_beam_interactingEnergy_allTrack;   //!
    TBranch        *b_true_beam_incidentEnergies;   //!
    TBranch        *b_true_beam_interactingEnergy;   //!
    TBranch        *b_true_beam_slices;   //!
@@ -804,10 +849,12 @@ public :
    TBranch        *b_g4rw_full_primary_plus_sigma_weight;   //!
    TBranch        *b_g4rw_full_primary_minus_sigma_weight;   //!
    TBranch        *b_g4rw_full_grid_weights;   //!
+   TBranch        *b_g4rw_full_grid_coeffs;   //!
    TBranch        *b_g4rw_full_grid_piplus_weights;   //!
    TBranch        *b_g4rw_full_grid_piplus_weights_fake_data;   //!
    TBranch        *b_g4rw_full_grid_piminus_weights;   //!
    TBranch        *b_g4rw_full_grid_proton_weights;   //!
+   TBranch        *b_g4rw_full_grid_proton_coeffs;   //!
    TBranch        *b_g4rw_primary_grid_weights;   //!
    TBranch        *b_g4rw_primary_grid_pair_weights;   //!
 
@@ -825,7 +872,7 @@ public :
 #endif
 
 #ifdef anavar_cxx
-anavar::anavar(TTree *tree) : fChain(0)
+anavar::anavar(TTree *tree) : fChain(0) 
 {
 // if parameter tree is not specified (or zero), connect the file
 // used to generate this class and read the Tree.
@@ -890,12 +937,16 @@ void anavar::Init(TTree *tree)
    reco_beam_calo_X = 0;
    reco_beam_calo_Y = 0;
    reco_beam_calo_Z = 0;
+   reco_beam_calo_X_allTrack = 0;
+   reco_beam_calo_Y_allTrack = 0;
+   reco_beam_calo_Z_allTrack = 0;
    reco_beam_dQ = 0;
    reco_beam_dEdX_SCE = 0;
    reco_beam_calibrated_dEdX_SCE = 0;
    reco_beam_calibrated_dQdX_SCE = 0;
    reco_beam_resRange_SCE = 0;
    reco_beam_TrkPitch_SCE = 0;
+   reco_beam_TrkPitch_SCE_allTrack = 0;
    reco_beam_dQdX_NoSCE = 0;
    reco_beam_dQ_NoSCE = 0;
    reco_beam_dEdX_NoSCE = 0;
@@ -903,6 +954,7 @@ void anavar::Init(TTree *tree)
    reco_beam_resRange_NoSCE = 0;
    reco_beam_TrkPitch_NoSCE = 0;
    reco_beam_calo_wire = 0;
+   reco_beam_calo_wire_allTrack = 0;
    reco_beam_calo_wire_z = 0;
    reco_beam_calo_wire_NoSCE = 0;
    reco_beam_calo_wire_z_NoSCE = 0;
@@ -978,11 +1030,9 @@ void anavar::Init(TTree *tree)
    reco_daughter_allTrack_endX = 0;
    reco_daughter_allTrack_endY = 0;
    reco_daughter_allTrack_endZ = 0;
-   reco_daughter_allTrack_dR = 0;
    reco_daughter_allTrack_calo_X = 0;
    reco_daughter_allTrack_calo_Y = 0;
    reco_daughter_allTrack_calo_Z = 0;
-   reco_daughter_allTrack_to_vertex = 0;
    reco_daughter_allTrack_vertex_michel_score = 0;
    reco_daughter_allTrack_vertex_nHits = 0;
    reco_daughter_allShower_ID = 0;
@@ -1092,6 +1142,7 @@ void anavar::Init(TTree *tree)
    reco_daughter_allTrack_momByRange_alt_proton = 0;
    reco_daughter_allTrack_momByRange_alt_muon = 0;
    reco_beam_incidentEnergies = 0;
+   reco_beam_incidentEnergies_allTrack = 0;
    true_beam_incidentEnergies = 0;
    true_beam_slices = 0;
    true_beam_slices_found = 0;
@@ -1115,10 +1166,12 @@ void anavar::Init(TTree *tree)
    g4rw_full_primary_plus_sigma_weight = 0;
    g4rw_full_primary_minus_sigma_weight = 0;
    g4rw_full_grid_weights = 0;
+   g4rw_full_grid_coeffs = 0;
    g4rw_full_grid_piplus_weights = 0;
    g4rw_full_grid_piplus_weights_fake_data = 0;
    g4rw_full_grid_piminus_weights = 0;
    g4rw_full_grid_proton_weights = 0;
+   g4rw_full_grid_proton_coeffs = 0;
    g4rw_primary_grid_weights = 0;
    g4rw_primary_grid_pair_weights = 0;
    // Set branch addresses and branch pointers
@@ -1131,6 +1184,7 @@ void anavar::Init(TTree *tree)
    fChain->SetBranchAddress("subrun", &subrun, &b_subrun);
    fChain->SetBranchAddress("event", &event, &b_event);
    fChain->SetBranchAddress("MC", &MC, &b_MC);
+   fChain->SetBranchAddress("reco_reconstructable_beam_event", &reco_reconstructable_beam_event, &b_reco_reconstructable_beam_event);
    fChain->SetBranchAddress("reco_beam_type", &reco_beam_type, &b_reco_beam_type);
    fChain->SetBranchAddress("reco_beam_startX", &reco_beam_startX, &b_reco_beam_startX);
    fChain->SetBranchAddress("reco_beam_startY", &reco_beam_startY, &b_reco_beam_startY);
@@ -1138,14 +1192,22 @@ void anavar::Init(TTree *tree)
    fChain->SetBranchAddress("reco_beam_endX", &reco_beam_endX, &b_reco_beam_endX);
    fChain->SetBranchAddress("reco_beam_endY", &reco_beam_endY, &b_reco_beam_endY);
    fChain->SetBranchAddress("reco_beam_endZ", &reco_beam_endZ, &b_reco_beam_endZ);
+   fChain->SetBranchAddress("true_beam_len", &true_beam_len, &b_true_beam_len);
    fChain->SetBranchAddress("reco_beam_len", &reco_beam_len, &b_reco_beam_len);
    fChain->SetBranchAddress("reco_beam_alt_len", &reco_beam_alt_len, &b_reco_beam_alt_len);
+   fChain->SetBranchAddress("reco_beam_alt_len_allTrack", &reco_beam_alt_len_allTrack, &b_reco_beam_alt_len_allTrack);
    fChain->SetBranchAddress("reco_beam_calo_startX", &reco_beam_calo_startX, &b_reco_beam_calo_startX);
    fChain->SetBranchAddress("reco_beam_calo_startY", &reco_beam_calo_startY, &b_reco_beam_calo_startY);
    fChain->SetBranchAddress("reco_beam_calo_startZ", &reco_beam_calo_startZ, &b_reco_beam_calo_startZ);
    fChain->SetBranchAddress("reco_beam_calo_endX", &reco_beam_calo_endX, &b_reco_beam_calo_endX);
    fChain->SetBranchAddress("reco_beam_calo_endY", &reco_beam_calo_endY, &b_reco_beam_calo_endY);
    fChain->SetBranchAddress("reco_beam_calo_endZ", &reco_beam_calo_endZ, &b_reco_beam_calo_endZ);
+   fChain->SetBranchAddress("reco_beam_calo_startX_allTrack", &reco_beam_calo_startX_allTrack, &b_reco_beam_calo_startX_allTrack);
+   fChain->SetBranchAddress("reco_beam_calo_startY_allTrack", &reco_beam_calo_startY_allTrack, &b_reco_beam_calo_startY_allTrack);
+   fChain->SetBranchAddress("reco_beam_calo_startZ_allTrack", &reco_beam_calo_startZ_allTrack, &b_reco_beam_calo_startZ_allTrack);
+   fChain->SetBranchAddress("reco_beam_calo_endX_allTrack", &reco_beam_calo_endX_allTrack, &b_reco_beam_calo_endX_allTrack);
+   fChain->SetBranchAddress("reco_beam_calo_endY_allTrack", &reco_beam_calo_endY_allTrack, &b_reco_beam_calo_endY_allTrack);
+   fChain->SetBranchAddress("reco_beam_calo_endZ_allTrack", &reco_beam_calo_endZ_allTrack, &b_reco_beam_calo_endZ_allTrack);
    fChain->SetBranchAddress("reco_beam_calo_startDirX", &reco_beam_calo_startDirX, &b_reco_beam_calo_startDirX);
    fChain->SetBranchAddress("reco_beam_calo_startDirY", &reco_beam_calo_startDirY, &b_reco_beam_calo_startDirY);
    fChain->SetBranchAddress("reco_beam_calo_startDirZ", &reco_beam_calo_startDirZ, &b_reco_beam_calo_startDirZ);
@@ -1160,6 +1222,10 @@ void anavar::Init(TTree *tree)
    fChain->SetBranchAddress("reco_beam_trackEndDirZ", &reco_beam_trackEndDirZ, &b_reco_beam_trackEndDirZ);
    fChain->SetBranchAddress("reco_beam_vertex_nHits", &reco_beam_vertex_nHits, &b_reco_beam_vertex_nHits);
    fChain->SetBranchAddress("reco_beam_vertex_michel_score", &reco_beam_vertex_michel_score, &b_reco_beam_vertex_michel_score);
+   fChain->SetBranchAddress("reco_beam_vertex_nHits_allTrack", &reco_beam_vertex_nHits_allTrack, &b_reco_beam_vertex_nHits_allTrack);
+   fChain->SetBranchAddress("reco_beam_vertex_michel_score_allTrack", &reco_beam_vertex_michel_score_allTrack, &b_reco_beam_vertex_michel_score_allTrack);
+   fChain->SetBranchAddress("reco_beam_vertex_michel_score_weight_by_charge", &reco_beam_vertex_michel_score_weight_by_charge, &b_reco_beam_vertex_michel_score_weight_by_charge);
+   fChain->SetBranchAddress("reco_beam_vertex_michel_score_weight_by_charge_allTrack", &reco_beam_vertex_michel_score_weight_by_charge_allTrack, &b_reco_beam_vertex_michel_score_weight_by_charge_allTrack);
    fChain->SetBranchAddress("reco_beam_trackID", &reco_beam_trackID, &b_reco_beam_trackID);
    fChain->SetBranchAddress("n_beam_slices", &n_beam_slices, &b_n_beam_slices);
    fChain->SetBranchAddress("n_beam_particles", &n_beam_particles, &b_n_beam_particles);
@@ -1170,12 +1236,16 @@ void anavar::Init(TTree *tree)
    fChain->SetBranchAddress("reco_beam_calo_X", &reco_beam_calo_X, &b_reco_beam_calo_X);
    fChain->SetBranchAddress("reco_beam_calo_Y", &reco_beam_calo_Y, &b_reco_beam_calo_Y);
    fChain->SetBranchAddress("reco_beam_calo_Z", &reco_beam_calo_Z, &b_reco_beam_calo_Z);
+   fChain->SetBranchAddress("reco_beam_calo_X_allTrack", &reco_beam_calo_X_allTrack, &b_reco_beam_calo_X_allTrack);
+   fChain->SetBranchAddress("reco_beam_calo_Y_allTrack", &reco_beam_calo_Y_allTrack, &b_reco_beam_calo_Y_allTrack);
+   fChain->SetBranchAddress("reco_beam_calo_Z_allTrack", &reco_beam_calo_Z_allTrack, &b_reco_beam_calo_Z_allTrack);
    fChain->SetBranchAddress("reco_beam_dQ", &reco_beam_dQ, &b_reco_beam_dQ);
    fChain->SetBranchAddress("reco_beam_dEdX_SCE", &reco_beam_dEdX_SCE, &b_reco_beam_dEdX_SCE);
    fChain->SetBranchAddress("reco_beam_calibrated_dEdX_SCE", &reco_beam_calibrated_dEdX_SCE, &b_reco_beam_calibrated_dEdX_SCE);
    fChain->SetBranchAddress("reco_beam_calibrated_dQdX_SCE", &reco_beam_calibrated_dQdX_SCE, &b_reco_beam_calibrated_dQdX_SCE);
    fChain->SetBranchAddress("reco_beam_resRange_SCE", &reco_beam_resRange_SCE, &b_reco_beam_resRange_SCE);
    fChain->SetBranchAddress("reco_beam_TrkPitch_SCE", &reco_beam_TrkPitch_SCE, &b_reco_beam_TrkPitch_SCE);
+   fChain->SetBranchAddress("reco_beam_TrkPitch_SCE_allTrack", &reco_beam_TrkPitch_SCE_allTrack, &b_reco_beam_TrkPitch_SCE_allTrack);
    fChain->SetBranchAddress("reco_beam_dQdX_NoSCE", &reco_beam_dQdX_NoSCE, &b_reco_beam_dQdX_NoSCE);
    fChain->SetBranchAddress("reco_beam_dQ_NoSCE", &reco_beam_dQ_NoSCE, &b_reco_beam_dQ_NoSCE);
    fChain->SetBranchAddress("reco_beam_dEdX_NoSCE", &reco_beam_dEdX_NoSCE, &b_reco_beam_dEdX_NoSCE);
@@ -1183,6 +1253,7 @@ void anavar::Init(TTree *tree)
    fChain->SetBranchAddress("reco_beam_resRange_NoSCE", &reco_beam_resRange_NoSCE, &b_reco_beam_resRange_NoSCE);
    fChain->SetBranchAddress("reco_beam_TrkPitch_NoSCE", &reco_beam_TrkPitch_NoSCE, &b_reco_beam_TrkPitch_NoSCE);
    fChain->SetBranchAddress("reco_beam_calo_wire", &reco_beam_calo_wire, &b_reco_beam_calo_wire);
+   fChain->SetBranchAddress("reco_beam_calo_wire_allTrack", &reco_beam_calo_wire_allTrack, &b_reco_beam_calo_wire_allTrack);
    fChain->SetBranchAddress("reco_beam_calo_wire_z", &reco_beam_calo_wire_z, &b_reco_beam_calo_wire_z);
    fChain->SetBranchAddress("reco_beam_calo_wire_NoSCE", &reco_beam_calo_wire_NoSCE, &b_reco_beam_calo_wire_NoSCE);
    fChain->SetBranchAddress("reco_beam_calo_wire_z_NoSCE", &reco_beam_calo_wire_z_NoSCE, &b_reco_beam_calo_wire_z_NoSCE);
@@ -1286,11 +1357,9 @@ void anavar::Init(TTree *tree)
    fChain->SetBranchAddress("reco_daughter_allTrack_endX", &reco_daughter_allTrack_endX, &b_reco_daughter_allTrack_endX);
    fChain->SetBranchAddress("reco_daughter_allTrack_endY", &reco_daughter_allTrack_endY, &b_reco_daughter_allTrack_endY);
    fChain->SetBranchAddress("reco_daughter_allTrack_endZ", &reco_daughter_allTrack_endZ, &b_reco_daughter_allTrack_endZ);
-   fChain->SetBranchAddress("reco_daughter_allTrack_dR", &reco_daughter_allTrack_dR, &b_reco_daughter_allTrack_dR);
    fChain->SetBranchAddress("reco_daughter_allTrack_calo_X", &reco_daughter_allTrack_calo_X, &b_reco_daughter_allTrack_calo_X);
    fChain->SetBranchAddress("reco_daughter_allTrack_calo_Y", &reco_daughter_allTrack_calo_Y, &b_reco_daughter_allTrack_calo_Y);
    fChain->SetBranchAddress("reco_daughter_allTrack_calo_Z", &reco_daughter_allTrack_calo_Z, &b_reco_daughter_allTrack_calo_Z);
-   fChain->SetBranchAddress("reco_daughter_allTrack_to_vertex", &reco_daughter_allTrack_to_vertex, &b_reco_daughter_allTrack_to_vertex);
    fChain->SetBranchAddress("reco_daughter_allTrack_vertex_michel_score", &reco_daughter_allTrack_vertex_michel_score, &b_reco_daughter_allTrack_vertex_michel_score);
    fChain->SetBranchAddress("reco_daughter_allTrack_vertex_nHits", &reco_daughter_allTrack_vertex_nHits, &b_reco_daughter_allTrack_vertex_nHits);
    fChain->SetBranchAddress("reco_daughter_allShower_ID", &reco_daughter_allShower_ID, &b_reco_daughter_allShower_ID);
@@ -1437,6 +1506,10 @@ void anavar::Init(TTree *tree)
    fChain->SetBranchAddress("reco_beam_true_byHits_purity", &reco_beam_true_byHits_purity, &b_reco_beam_true_byHits_purity);
    fChain->SetBranchAddress("true_beam_processes", &true_beam_processes, &b_true_beam_processes);
    fChain->SetBranchAddress("beam_inst_P", &beam_inst_P, &b_beam_inst_P);
+   fChain->SetBranchAddress("beam_inst_C0", &beam_inst_C0, &b_beam_inst_C0);
+   fChain->SetBranchAddress("beam_inst_C1", &beam_inst_C1, &b_beam_inst_C1);
+   fChain->SetBranchAddress("beam_inst_C0_pressure", &beam_inst_C0_pressure, &b_beam_inst_C0_pressure);
+   fChain->SetBranchAddress("beam_inst_C1_pressure", &beam_inst_C1_pressure, &b_beam_inst_C1_pressure);
    fChain->SetBranchAddress("beam_inst_TOF", &beam_inst_TOF, &b_beam_inst_TOF);
    fChain->SetBranchAddress("beam_inst_TOF_Chan", &beam_inst_TOF_Chan, &b_beam_inst_TOF_Chan);
    fChain->SetBranchAddress("beam_inst_X", &beam_inst_X, &b_beam_inst_X);
@@ -1485,6 +1558,8 @@ void anavar::Init(TTree *tree)
    fChain->SetBranchAddress("reco_beam_true_byHits_startP", &reco_beam_true_byHits_startP, &b_reco_beam_true_byHits_startP);
    fChain->SetBranchAddress("reco_beam_incidentEnergies", &reco_beam_incidentEnergies, &b_reco_beam_incidentEnergies);
    fChain->SetBranchAddress("reco_beam_interactingEnergy", &reco_beam_interactingEnergy, &b_reco_beam_interactingEnergy);
+   fChain->SetBranchAddress("reco_beam_incidentEnergies_allTrack", &reco_beam_incidentEnergies_allTrack, &b_reco_beam_incidentEnergies_allTrack);
+   fChain->SetBranchAddress("reco_beam_interactingEnergy_allTrack", &reco_beam_interactingEnergy_allTrack, &b_reco_beam_interactingEnergy_allTrack);
    fChain->SetBranchAddress("true_beam_incidentEnergies", &true_beam_incidentEnergies, &b_true_beam_incidentEnergies);
    fChain->SetBranchAddress("true_beam_interactingEnergy", &true_beam_interactingEnergy, &b_true_beam_interactingEnergy);
    fChain->SetBranchAddress("true_beam_slices", &true_beam_slices, &b_true_beam_slices);
@@ -1510,10 +1585,12 @@ void anavar::Init(TTree *tree)
    fChain->SetBranchAddress("g4rw_full_primary_plus_sigma_weight", &g4rw_full_primary_plus_sigma_weight, &b_g4rw_full_primary_plus_sigma_weight);
    fChain->SetBranchAddress("g4rw_full_primary_minus_sigma_weight", &g4rw_full_primary_minus_sigma_weight, &b_g4rw_full_primary_minus_sigma_weight);
    fChain->SetBranchAddress("g4rw_full_grid_weights", &g4rw_full_grid_weights, &b_g4rw_full_grid_weights);
+   fChain->SetBranchAddress("g4rw_full_grid_coeffs", &g4rw_full_grid_coeffs, &b_g4rw_full_grid_coeffs);
    fChain->SetBranchAddress("g4rw_full_grid_piplus_weights", &g4rw_full_grid_piplus_weights, &b_g4rw_full_grid_piplus_weights);
    fChain->SetBranchAddress("g4rw_full_grid_piplus_weights_fake_data", &g4rw_full_grid_piplus_weights_fake_data, &b_g4rw_full_grid_piplus_weights_fake_data);
    fChain->SetBranchAddress("g4rw_full_grid_piminus_weights", &g4rw_full_grid_piminus_weights, &b_g4rw_full_grid_piminus_weights);
    fChain->SetBranchAddress("g4rw_full_grid_proton_weights", &g4rw_full_grid_proton_weights, &b_g4rw_full_grid_proton_weights);
+   fChain->SetBranchAddress("g4rw_full_grid_proton_coeffs", &g4rw_full_grid_proton_coeffs, &b_g4rw_full_grid_proton_coeffs);
    fChain->SetBranchAddress("g4rw_primary_grid_weights", &g4rw_primary_grid_weights, &b_g4rw_primary_grid_weights);
    fChain->SetBranchAddress("g4rw_primary_grid_pair_weights", &g4rw_primary_grid_pair_weights, &b_g4rw_primary_grid_pair_weights);
    Notify();

@@ -5,6 +5,10 @@
 #include <iostream>
 
 HadAna::HadAna(){
+  if (fProtonCSDACheck) {
+    TFile *file_mom2csda = new TFile("/dune/app/users/yinrui/thinslice/files/proton_mom_csda_converter.root");
+    csda_range_vs_mom_sm = (TGraph *)file_mom2csda->Get("csda_range_vs_mom_sm");
+  }
 }
 
 void HadAna::InitPi(){
@@ -33,6 +37,7 @@ void HadAna::AddTruePDG(int pdg){
 };
 
 bool HadAna::isSelectedPart(const anavar& evt) const{
+  if (evt.reco_reconstructable_beam_event == 0) return false; // remove empty events first
   if (evt.MC){
     for (size_t i = 0; i<truepdglist.size(); ++i){
       if (evt.true_beam_PDG == truepdglist[i]) return true; // truth matched
@@ -44,7 +49,7 @@ bool HadAna::isSelectedPart(const anavar& evt) const{
     if (evt.beam_inst_nMomenta != 1 || evt.beam_inst_nTracks != 1) return false;
     for (size_t i = 0; i<truepdglist.size(); ++i){
       for (size_t j = 0; j<evt.beam_inst_PDG_candidates->size(); ++j){
-        if ((*evt.beam_inst_PDG_candidates)[j] == truepdglist[i]) return true;
+        if ((*evt.beam_inst_PDG_candidates)[j] == truepdglist[i]) return true; // what's this used for?
       }
     }
     return false;
@@ -88,7 +93,7 @@ int HadAna::GetPiParType(const anavar& evt){
     if (evt.reco_beam_true_byE_origin == 2) {
       return pi::kMIDcosmic;
     }
-    else if (std::abs(evt.reco_beam_true_byE_PDG) == 211){
+    else if (std::abs(evt.reco_beam_true_byE_PDG) == 211){ // mistakenly recognized as pion
       return pi::kMIDpi;
     }
     else if (evt.reco_beam_true_byE_PDG == 2212){
@@ -161,34 +166,45 @@ int HadAna::GetPParType(const anavar& evt){
 
 bool HadAna::PassPandoraSliceCut(const anavar& evt) const{ // whether recognized by Pandora correctly
 
-  return (evt.reco_beam_type == pandora_slice_pdg);
+  if (fAllTrackCheck) return evt.reco_beam_type > 0;
+  else return (evt.reco_beam_type == pandora_slice_pdg);
 }
 
 bool HadAna::PassBeamQualityCut() const{ // cut on beam entrance location and beam angle
 
   if (beamcut_dx_min<beamcut_dx_max){
-    if (beam_dx<beamcut_dx_min) return false;
-    if (beam_dx>beamcut_dx_max) return false;
+    if (beam_dx<beamcut_dx_min)
+      return false;
+    if (beam_dx>beamcut_dx_max)
+      return false;
   }
 
   if (beamcut_dy_min<beamcut_dy_max){
-    if (beam_dy<beamcut_dy_min) return false;
-    if (beam_dy>beamcut_dy_max) return false;
+    if (beam_dy<beamcut_dy_min)
+      return false;
+    if (beam_dy>beamcut_dy_max)
+      return false;
   }
 
   if (beamcut_dz_min<beamcut_dz_max){
-    if (beam_dz<beamcut_dz_min) return false;
-    if (beam_dz>beamcut_dz_max) return false;
+    if (beam_dz<beamcut_dz_min)
+      return false;
+    if (beam_dz>beamcut_dz_max)
+      return false;
   }
 
   if (beamcut_dxy_min<beamcut_dxy_max){
-    if (beam_dxy<beamcut_dxy_min) return false;
-    if (beam_dxy>beamcut_dxy_max) return false;
+    if (beam_dxy<beamcut_dxy_min)
+      return false;
+    if (beam_dxy>beamcut_dxy_max)
+      return false;
   }
 
   if (beamcut_costh_min<beamcut_costh_max){
-    if (beam_costh<beamcut_costh_min) return false;
-    if (beam_costh>beamcut_costh_max) return false;
+    if (beam_costh<beamcut_costh_min)
+      return false;
+    if (beam_costh>beamcut_costh_max)
+      return false;
   }
 
   return true;
@@ -197,13 +213,15 @@ bool HadAna::PassBeamQualityCut() const{ // cut on beam entrance location and be
 bool HadAna::PassAPA3Cut(const anavar& evt) const{ // only use track in the first TPC
 
   double cutAPA3_Z = 220.;
-
-  return evt.reco_beam_calo_endZ < cutAPA3_Z;
+  
+  if (fAllTrackCheck) return evt.reco_beam_calo_endZ_allTrack < cutAPA3_Z;
+  else return evt.reco_beam_calo_endZ < cutAPA3_Z;
 }
 
 bool HadAna::PassCaloSizeCut(const anavar& evt) const{ // Require hits information in collection plane
   
-  return !(evt.reco_beam_calo_wire->empty());
+  if (fAllTrackCheck) return !(evt.reco_beam_calo_wire_allTrack->empty());
+  else return !(evt.reco_beam_calo_wire->empty());
 }
 
 bool HadAna::PassMichelScoreCut() const{ // further veto muon tracks according to Michel score
@@ -213,7 +231,7 @@ bool HadAna::PassMichelScoreCut() const{ // further veto muon tracks according t
 
 bool HadAna::PassMediandEdxCut() const{ // to remove proton background
 
-  return median_dEdx < 2.4;
+  return chi2_proton > 80; //median_dEdx < 2.4;
 }
 
 bool HadAna::PassPiCuts(const anavar& evt) const{
@@ -237,136 +255,330 @@ void HadAna::ProcessEvent(const anavar& evt){
   ptype = GetPParType(evt);
 
   median_dEdx = -1;
+  chi2_proton = -1;
   daughter_michel_score = -999;
 
-  if (!evt.reco_beam_calo_wire->empty()){
-    median_dEdx = TMath::Median(evt.reco_beam_calibrated_dEdX_SCE->size(), &(*evt.reco_beam_calibrated_dEdX_SCE)[0]);
-//    daughter_michel_score = 0;
-//    int nhits = 0;
-//    for (size_t i = 0; i<reco_daughter_PFP_michelScore_collection->size(); ++i){
-//      nhits += (*reco_daughter_PFP_nHits_collection)[i];
-//      daughter_michel_score += (*reco_daughter_PFP_michelScore_collection)[0] * (*reco_daughter_PFP_nHits_collection)[i];
-//    }
-//    if (nhits) daughter_michel_score/=nhits;
-//    else daughter_michel_score = -999;
-    if (evt.reco_beam_vertex_nHits) daughter_michel_score = evt.reco_beam_vertex_michel_score/evt.reco_beam_vertex_nHits;
-  }
-
-  beam_dx = -999;
-  beam_dy = -999;
-  beam_dz = -999;
-  beam_dxy = -999;
-  beam_costh = -999;
-
-  if (!evt.reco_beam_calo_wire->empty()){
-
-    TVector3 pt0(evt.reco_beam_calo_startX,
-                 evt.reco_beam_calo_startY,
-                 evt.reco_beam_calo_startZ);
-    TVector3 pt1(evt.reco_beam_calo_endX,
-                 evt.reco_beam_calo_endY,
-                 evt.reco_beam_calo_endZ);
-    TVector3 dir = pt1 - pt0;
-    dir = dir.Unit();
-
-    if (evt.MC){
-      beam_dx = (evt.reco_beam_calo_startX - beam_startX_mc)/beam_startX_rms_mc;
-      beam_dy = (evt.reco_beam_calo_startY - beam_startY_mc)/beam_startY_rms_mc;
-      beam_dz = (evt.reco_beam_calo_startZ - beam_startZ_mc)/beam_startZ_rms_mc;
-      beam_dxy = sqrt(pow(beam_dx,2) + pow(beam_dy,2));
-      TVector3 beamdir(cos(beam_angleX_mc*TMath::Pi()/180),
-                       cos(beam_angleY_mc*TMath::Pi()/180),
-                       cos(beam_angleZ_mc*TMath::Pi()/180));
-      beamdir = beamdir.Unit();
-      beam_costh = dir.Dot(beamdir);
+  if (fAllTrackCheck) {
+    if (!evt.reco_beam_calo_wire_allTrack->empty()){
+      median_dEdx = TMath::Median(evt.reco_beam_allTrack_calibrated_dEdX->size(), &(*evt.reco_beam_allTrack_calibrated_dEdX)[0]);//TMath::Median(evt.reco_beam_allTrack_calibrated_dEdX->size(), &(*evt.reco_beam_allTrack_calibrated_dEdX)[0]);
+  //    daughter_michel_score = 0;
+  //    int nhits = 0;
+  //    for (size_t i = 0; i<reco_daughter_PFP_michelScore_collection->size(); ++i){
+  //      nhits += (*reco_daughter_PFP_nHits_collection)[i];
+  //      daughter_michel_score += (*reco_daughter_PFP_michelScore_collection)[0] * (*reco_daughter_PFP_nHits_collection)[i];
+  //    }
+  //    if (nhits) daughter_michel_score/=nhits;
+  //    else daughter_michel_score = -999;
+      if (evt.reco_beam_vertex_nHits_allTrack) daughter_michel_score = evt.reco_beam_vertex_michel_score_allTrack/evt.reco_beam_vertex_nHits_allTrack;//evt.reco_beam_vertex_michel_score/evt.reco_beam_vertex_nHits;
     }
-    else{
-      beam_dx = (evt.reco_beam_calo_startX - beam_startX_data)/beam_startX_rms_data;
-      beam_dy = (evt.reco_beam_calo_startY - beam_startY_data)/beam_startY_rms_data;
-      beam_dz = (evt.reco_beam_calo_startZ - beam_startZ_data)/beam_startZ_rms_data;
-      beam_dxy = sqrt(pow(beam_dx,2) + pow(beam_dy,2));
-      TVector3 beamdir(cos(beam_angleX_data*TMath::Pi()/180),
-                       cos(beam_angleY_data*TMath::Pi()/180),
-                       cos(beam_angleZ_data*TMath::Pi()/180));
-      beamdir = beamdir.Unit();
-      beam_costh = dir.Dot(beamdir);
-    }
-  }
 
-  dEdx_5cm = -1;
-  /*
-  if (!reco_beam_allTrack_calibrated_dEdX->empty()){
-    dEdx_5cm = 0;
-    int nhits = 0;
-    for (int i = 0; i<reco_beam_allTrack_calibrated_dEdX->size(); ++i){
-      std::cout<<i<<" "<<reco_beam_allTrack_resRange->back()-(*reco_beam_allTrack_resRange)[i]<<" "<<(*reco_beam_allTrack_calibrated_dEdX)[i]<<endl;
-      if (std::abs(reco_beam_allTrack_resRange->back()-(*reco_beam_allTrack_resRange)[i])<5){
-        dEdx_5cm += (*reco_beam_allTrack_calibrated_dEdX)[i];
-        ++nhits;
+    beam_dx = -999;
+    beam_dy = -999;
+    beam_dz = -999;
+    beam_dxy = -999;
+    beam_costh = -999;
+
+    if (!evt.reco_beam_calo_wire_allTrack->empty()){
+
+      /*TVector3 pt0(evt.reco_beam_calo_startX,
+                   evt.reco_beam_calo_startY,
+                   evt.reco_beam_calo_startZ);
+      TVector3 pt1(evt.reco_beam_calo_endX,
+                   evt.reco_beam_calo_endY,
+                   evt.reco_beam_calo_endZ);
+      TVector3 dir = pt1 - pt0;
+      dir = dir.Unit();*/
+      //forced track info
+      TVector3 pt0(evt.reco_beam_calo_startX_allTrack,
+                   evt.reco_beam_calo_startY_allTrack,
+                   evt.reco_beam_calo_startZ_allTrack);
+      TVector3 pt1(evt.reco_beam_calo_endX_allTrack,
+                   evt.reco_beam_calo_endY_allTrack,
+                   evt.reco_beam_calo_endZ_allTrack);
+      TVector3 dir = pt1 - pt0;
+      dir = dir.Unit();
+
+      if (evt.MC){
+        TVector3 beamdir(cos(beam_angleX_mc*TMath::Pi()/180),
+                         cos(beam_angleY_mc*TMath::Pi()/180),
+                         cos(beam_angleZ_mc*TMath::Pi()/180));
+        beamdir = beamdir.Unit();
+        /*beam_dx = (evt.reco_beam_calo_startX - beam_startX_mc)/beam_startX_rms_mc;
+        beam_dy = (evt.reco_beam_calo_startY - beam_startY_mc)/beam_startY_rms_mc;
+        beam_dz = (evt.reco_beam_calo_startZ - beam_startZ_mc)/beam_startZ_rms_mc;
+        beam_dxy = sqrt(pow(beam_dx,2) + pow(beam_dy,2));
+        beam_costh = dir.Dot(beamdir);*/
+        //forced track info
+        beam_dx = (evt.reco_beam_calo_startX_allTrack - beam_startX_mc)/beam_startX_rms_mc;
+        beam_dy = (evt.reco_beam_calo_startY_allTrack - beam_startY_mc)/beam_startY_rms_mc;
+        beam_dz = (evt.reco_beam_calo_startZ_allTrack - beam_startZ_mc)/beam_startZ_rms_mc;
+        beam_dxy = sqrt(pow(beam_dx,2) + pow(beam_dy,2));
+        beam_costh = dir.Dot(beamdir);
+      }
+      else{
+        TVector3 beamdir(cos(beam_angleX_data*TMath::Pi()/180),
+                         cos(beam_angleY_data*TMath::Pi()/180),
+                         cos(beam_angleZ_data*TMath::Pi()/180));
+        beamdir = beamdir.Unit();
+        /*beam_dx = (evt.reco_beam_calo_startX - beam_startX_data)/beam_startX_rms_data;
+        beam_dy = (evt.reco_beam_calo_startY - beam_startY_data)/beam_startY_rms_data;
+        beam_dz = (evt.reco_beam_calo_startZ - beam_startZ_data)/beam_startZ_rms_data;
+        beam_dxy = sqrt(pow(beam_dx,2) + pow(beam_dy,2));
+        beam_costh = dir.Dot(beamdir);*/
+        //forced track info
+        beam_dx = (evt.reco_beam_calo_startX_allTrack - beam_startX_data)/beam_startX_rms_data;
+        beam_dy = (evt.reco_beam_calo_startY_allTrack - beam_startY_data)/beam_startY_rms_data;
+        beam_dz = (evt.reco_beam_calo_startZ_allTrack - beam_startZ_data)/beam_startZ_rms_data;
+        beam_dxy = sqrt(pow(beam_dx,2) + pow(beam_dy,2));
+        beam_costh = dir.Dot(beamdir);
       }
     }
-    if (nhits) dEdx_5cm/=nhits;
-    else dEdx_5cm = -1;
-  }
-  */
 
-  //if (event == 78467) cout<<reco_beam_calibrated_dEdX_SCE->size()<<endl;
-  //cout<<reco_beam_allTrack_calibrated_dEdX->size()<<endl;
-  if (!evt.reco_beam_calibrated_dEdX_SCE->empty()){
-    //dEdx_5cm = 0;
-    //int nhits = 0;
-    std::vector<double> vdEdx;
-    for (int i = 0; i<evt.reco_beam_calibrated_dEdX_SCE->size(); ++i){
-      //std::cout<<i<<" "<<reco_beam_resRange_SCE->back()-(*reco_beam_resRange_SCE)[i]<<" "<<(*reco_beam_calibrated_dEdX_SCE)[i]<<endl;
-      //if (event == 78467) cout<<(*reco_beam_resRange_SCE)[i]<<" "<<(*reco_beam_calo_Z)[i]<<" "<<(*reco_beam_calibrated_dEdX_SCE)[i]<<endl;
-      if ((*evt.reco_beam_resRange_SCE)[i]<5){
-        vdEdx.push_back((*evt.reco_beam_calibrated_dEdX_SCE)[i]);
-        //dEdx_5cm += (*reco_beam_calibrated_dEdX_SCE)[i];
-        //++nhits;
+    dEdx_5cm = -1;
+    /*
+    if (!reco_beam_allTrack_calibrated_dEdX->empty()){
+      dEdx_5cm = 0;
+      int nhits = 0;
+      for (int i = 0; i<reco_beam_allTrack_calibrated_dEdX->size(); ++i){
+        std::cout<<i<<" "<<reco_beam_allTrack_resRange->back()-(*reco_beam_allTrack_resRange)[i]<<" "<<(*reco_beam_allTrack_calibrated_dEdX)[i]<<endl;
+        if (std::abs(reco_beam_allTrack_resRange->back()-(*reco_beam_allTrack_resRange)[i])<5){
+          dEdx_5cm += (*reco_beam_allTrack_calibrated_dEdX)[i];
+          ++nhits;
+        }
+      }
+      if (nhits) dEdx_5cm/=nhits;
+      else dEdx_5cm = -1;
+    }
+    */
+
+    //if (event == 78467) cout<<reco_beam_allTrack_calibrated_dEdX->size()<<endl;
+    //cout<<reco_beam_allTrack_calibrated_dEdX->size()<<endl;
+    if (!evt.reco_beam_allTrack_calibrated_dEdX->empty()){ // what's this used for?
+      //dEdx_5cm = 0;
+      //int nhits = 0;
+      std::vector<double> vdEdx;
+      for (int i = 0; i<evt.reco_beam_allTrack_calibrated_dEdX->size(); ++i){
+        //std::cout<<i<<" "<<reco_beam_allTrack_resRange->back()-(*reco_beam_allTrack_resRange)[i]<<" "<<(*reco_beam_allTrack_calibrated_dEdX)[i]<<endl;
+        //if (event == 78467) cout<<(*reco_beam_allTrack_resRange)[i]<<" "<<(*reco_beam_calo_Z)[i]<<" "<<(*reco_beam_allTrack_calibrated_dEdX)[i]<<endl;
+        if ((*evt.reco_beam_allTrack_resRange)[i]<5){
+          vdEdx.push_back((*evt.reco_beam_allTrack_calibrated_dEdX)[i]);
+          //dEdx_5cm += (*reco_beam_allTrack_calibrated_dEdX)[i];
+          //++nhits;
+        }
+      }
+      //if (nhits) dEdx_5cm/=nhits;
+      //else dEdx_5cm = -1;
+      if (!vdEdx.empty()){
+        dEdx_5cm = TMath::Median(vdEdx.size(), &vdEdx[0]);
       }
     }
-    //if (nhits) dEdx_5cm/=nhits;
-    //else dEdx_5cm = -1;
-    if (!vdEdx.empty()){
-      dEdx_5cm = TMath::Median(vdEdx.size(), &vdEdx[0]);
-    }
-  }
-//  if (!MC && reco_beam_PFP_trackScore_collection>=0 && reco_beam_PFP_trackScore_collection<0.01){
-//    cout<<run<<" "<<event<<endl;
-//  }
+  //  if (!MC && reco_beam_PFP_trackScore_collection>=0 && reco_beam_PFP_trackScore_collection<0.01){
+  //    cout<<run<<" "<<event<<endl;
+  //  }
 
-  // calculate true track length
-  double temp = 999;
-  int start_idx = 0;
-  true_trklen_accum.reserve(evt.true_beam_traj_Z->size()); // initialize true_trklen_accum
-  for (int i=0; i<evt.true_beam_traj_Z->size(); i++){
-    if (abs((*evt.true_beam_traj_Z)[i]) < temp){
-      temp = abs((*evt.true_beam_traj_Z)[i]);
-      start_idx = i; // find the point where the beam enters the TPC (find the smallest abs(Z))
+    // calculate true track length
+    double temp = 999;
+    int start_idx = 0;
+    true_trklen_accum.reserve(evt.true_beam_traj_Z->size()); // initialize true_trklen_accum
+    for (int i=0; i<evt.true_beam_traj_Z->size(); i++){
+      if (abs((*evt.true_beam_traj_Z)[i]) < temp){
+        temp = abs((*evt.true_beam_traj_Z)[i]);
+        start_idx = i; // find the point where the beam enters the TPC (find the smallest abs(Z))
+      }
+      true_trklen_accum[i] = 0.; // initialize true_trklen_accum
     }
-    true_trklen_accum[i] = 0.; // initialize true_trklen_accum
-  }
-  true_trklen = -1999; // initialize
-  for (int i=start_idx+1; i<evt.true_beam_traj_Z->size(); i++){
-    if (i == start_idx+1) true_trklen = 0;
-    true_trklen += sqrt( pow( (*evt.true_beam_traj_X)[i]-(*evt.true_beam_traj_X)[i-1], 2)
-                        + pow( (*evt.true_beam_traj_Y)[i]-(*evt.true_beam_traj_Y)[i-1], 2)
-                        + pow( (*evt.true_beam_traj_Z)[i]-(*evt.true_beam_traj_Z)[i-1], 2)
-                        );
-    true_trklen_accum[i] = true_trklen;
+    true_trklen = -1999; // initialize
+    for (int i=start_idx+1; i<evt.true_beam_traj_Z->size(); i++){
+      if (i == start_idx+1) true_trklen = 0;
+      true_trklen += sqrt( pow( (*evt.true_beam_traj_X)[i]-(*evt.true_beam_traj_X)[i-1], 2)
+                          + pow( (*evt.true_beam_traj_Y)[i]-(*evt.true_beam_traj_Y)[i-1], 2)
+                          + pow( (*evt.true_beam_traj_Z)[i]-(*evt.true_beam_traj_Z)[i-1], 2)
+                          );
+      true_trklen_accum[i] = true_trklen;
+      //cout<<i<<"\t"<<true_trklen_accum[i]<<endl;
+    }
+
+    // calculate reco track length
+    reco_trklen_accum.reserve(evt.reco_beam_calo_Z_allTrack->size());
+    reco_trklen = -1999;
+    for (int i=1; i<evt.reco_beam_calo_Z_allTrack->size(); i++){
+      if (i == 1) reco_trklen = 0;
+      reco_trklen += sqrt( pow( (*evt.reco_beam_calo_X_allTrack)[i]-(*evt.reco_beam_calo_X_allTrack)[i-1], 2)
+                          + pow( (*evt.reco_beam_calo_Y_allTrack)[i]-(*evt.reco_beam_calo_Y_allTrack)[i-1], 2)
+                          + pow( (*evt.reco_beam_calo_Z_allTrack)[i]-(*evt.reco_beam_calo_Z_allTrack)[i-1], 2)
+                          );
+      reco_trklen_accum[i] = reco_trklen;
+      //cout<<i<<"\t"<<reco_trklen_accum[i]<<endl;
+    }
   }
   
-  // calculate reco track length
-  reco_trklen_accum.reserve(evt.reco_beam_calo_Z->size());
-  reco_trklen = -1999;
-  for (int i=1; i<evt.reco_beam_calo_Z->size(); i++){
-    if (i == 1) reco_trklen = 0;
-    reco_trklen += sqrt( pow( (*evt.reco_beam_calo_X)[i]-(*evt.reco_beam_calo_X)[i-1], 2)
-                        + pow( (*evt.reco_beam_calo_Y)[i]-(*evt.reco_beam_calo_Y)[i-1], 2)
-                        + pow( (*evt.reco_beam_calo_Z)[i]-(*evt.reco_beam_calo_Z)[i-1], 2)
-                        );
-    reco_trklen_accum[i] = reco_trklen;
-  }
-  // reco_trklen = evt.reco_beam_alt_len; // they should be the same
-}
+  else {
+    if (!evt.reco_beam_calo_wire->empty()){
+      chi2_proton = evt.reco_beam_Chi2_proton/evt.reco_beam_Chi2_ndof;
+      median_dEdx = TMath::Median(evt.reco_beam_calibrated_dEdX_SCE->size(), &(*evt.reco_beam_calibrated_dEdX_SCE)[0]);//TMath::Median(evt.reco_beam_calibrated_dEdX_SCE->size(), &(*evt.reco_beam_calibrated_dEdX_SCE)[0]);
+  //    daughter_michel_score = 0;
+  //    int nhits = 0;
+  //    for (size_t i = 0; i<reco_daughter_PFP_michelScore_collection->size(); ++i){
+  //      nhits += (*reco_daughter_PFP_nHits_collection)[i];
+  //      daughter_michel_score += (*reco_daughter_PFP_michelScore_collection)[0] * (*reco_daughter_PFP_nHits_collection)[i];
+  //    }
+  //    if (nhits) daughter_michel_score/=nhits;
+  //    else daughter_michel_score = -999;
+      if (evt.reco_beam_vertex_nHits) daughter_michel_score = evt.reco_beam_vertex_michel_score_weight_by_charge;//evt.reco_beam_vertex_michel_score/evt.reco_beam_vertex_nHits;
+    }
 
+    beam_dx = -999;
+    beam_dy = -999;
+    beam_dz = -999;
+    beam_dxy = -999;
+    beam_costh = -999;
+
+    if (!evt.reco_beam_calo_wire->empty()){
+
+      /*TVector3 pt0(evt.reco_beam_calo_startX,
+                   evt.reco_beam_calo_startY,
+                   evt.reco_beam_calo_startZ);
+      TVector3 pt1(evt.reco_beam_calo_endX,
+                   evt.reco_beam_calo_endY,
+                   evt.reco_beam_calo_endZ);
+      TVector3 dir = pt1 - pt0;
+      dir = dir.Unit();*/
+      //forced track info
+      TVector3 pt0(evt.reco_beam_calo_startX,
+                   evt.reco_beam_calo_startY,
+                   evt.reco_beam_calo_startZ);
+      TVector3 pt1(evt.reco_beam_calo_endX,
+                   evt.reco_beam_calo_endY,
+                   evt.reco_beam_calo_endZ);
+      TVector3 dir = pt1 - pt0;
+      dir = dir.Unit();
+
+      if (evt.MC){
+        TVector3 beamdir(cos(beam_angleX_mc*TMath::Pi()/180),
+                         cos(beam_angleY_mc*TMath::Pi()/180),
+                         cos(beam_angleZ_mc*TMath::Pi()/180));
+        beamdir = beamdir.Unit();
+        /*beam_dx = (evt.reco_beam_calo_startX - beam_startX_mc)/beam_startX_rms_mc;
+        beam_dy = (evt.reco_beam_calo_startY - beam_startY_mc)/beam_startY_rms_mc;
+        beam_dz = (evt.reco_beam_calo_startZ - beam_startZ_mc)/beam_startZ_rms_mc;
+        beam_dxy = sqrt(pow(beam_dx,2) + pow(beam_dy,2));
+        beam_costh = dir.Dot(beamdir);*/
+        //forced track info
+        beam_dx = (evt.reco_beam_calo_startX - beam_startX_mc)/beam_startX_rms_mc;
+        beam_dy = (evt.reco_beam_calo_startY - beam_startY_mc)/beam_startY_rms_mc;
+        beam_dz = (evt.reco_beam_calo_startZ - beam_startZ_mc)/beam_startZ_rms_mc;
+        beam_dxy = sqrt(pow(beam_dx,2) + pow(beam_dy,2));
+        beam_costh = dir.Dot(beamdir);
+      }
+      else{
+        TVector3 beamdir(cos(beam_angleX_data*TMath::Pi()/180),
+                         cos(beam_angleY_data*TMath::Pi()/180),
+                         cos(beam_angleZ_data*TMath::Pi()/180));
+        beamdir = beamdir.Unit();
+        /*beam_dx = (evt.reco_beam_calo_startX - beam_startX_data)/beam_startX_rms_data;
+        beam_dy = (evt.reco_beam_calo_startY - beam_startY_data)/beam_startY_rms_data;
+        beam_dz = (evt.reco_beam_calo_startZ - beam_startZ_data)/beam_startZ_rms_data;
+        beam_dxy = sqrt(pow(beam_dx,2) + pow(beam_dy,2));
+        beam_costh = dir.Dot(beamdir);*/
+        //forced track info
+        beam_dx = (evt.reco_beam_calo_startX - beam_startX_data)/beam_startX_rms_data;
+        beam_dy = (evt.reco_beam_calo_startY - beam_startY_data)/beam_startY_rms_data;
+        beam_dz = (evt.reco_beam_calo_startZ - beam_startZ_data)/beam_startZ_rms_data;
+        beam_dxy = sqrt(pow(beam_dx,2) + pow(beam_dy,2));
+        beam_costh = dir.Dot(beamdir);
+      }
+    }
+
+    dEdx_5cm = -1;
+    /*
+    if (!reco_beam_calibrated_dEdX_SCE->empty()){
+      dEdx_5cm = 0;
+      int nhits = 0;
+      for (int i = 0; i<reco_beam_calibrated_dEdX_SCE->size(); ++i){
+        std::cout<<i<<" "<<reco_beam_resRange->back()-(*reco_beam_resRange)[i]<<" "<<(*reco_beam_calibrated_dEdX_SCE)[i]<<endl;
+        if (std::abs(reco_beam_resRange->back()-(*reco_beam_resRange)[i])<5){
+          dEdx_5cm += (*reco_beam_calibrated_dEdX_SCE)[i];
+          ++nhits;
+        }
+      }
+      if (nhits) dEdx_5cm/=nhits;
+      else dEdx_5cm = -1;
+    }
+    */
+
+    //if (event == 78467) cout<<reco_beam_calibrated_dEdX_SCE->size()<<endl;
+    //cout<<reco_beam_calibrated_dEdX_SCE->size()<<endl;
+    if (!evt.reco_beam_calibrated_dEdX_SCE->empty()){ // what's this used for?
+      //dEdx_5cm = 0;
+      //int nhits = 0;
+      std::vector<double> vdEdx;
+      for (int i = 0; i<evt.reco_beam_calibrated_dEdX_SCE->size(); ++i){
+        //std::cout<<i<<" "<<reco_beam_resRange->back()-(*reco_beam_resRange)[i]<<" "<<(*reco_beam_calibrated_dEdX_SCE)[i]<<endl;
+        //if (event == 78467) cout<<(*reco_beam_resRange)[i]<<" "<<(*reco_beam_calo_Z)[i]<<" "<<(*reco_beam_calibrated_dEdX_SCE)[i]<<endl;
+        if ((*evt.reco_beam_resRange_SCE)[i]<5){
+          vdEdx.push_back((*evt.reco_beam_calibrated_dEdX_SCE)[i]);
+          //dEdx_5cm += (*reco_beam_calibrated_dEdX_SCE)[i];
+          //++nhits;
+        }
+      }
+      //if (nhits) dEdx_5cm/=nhits;
+      //else dEdx_5cm = -1;
+      if (!vdEdx.empty()){
+        dEdx_5cm = TMath::Median(vdEdx.size(), &vdEdx[0]);
+      }
+    }
+  //  if (!MC && reco_beam_PFP_trackScore_collection>=0 && reco_beam_PFP_trackScore_collection<0.01){
+  //    cout<<run<<" "<<event<<endl;
+  //  }
+
+    // calculate true track length
+    double temp = 999;
+    int start_idx = 0;
+    true_trklen_accum.reserve(evt.true_beam_traj_Z->size()); // initialize true_trklen_accum
+    for (int i=0; i<evt.true_beam_traj_Z->size(); i++){
+      if (abs((*evt.true_beam_traj_Z)[i]) < temp){
+        temp = abs((*evt.true_beam_traj_Z)[i]);
+        start_idx = i; // find the point where the beam enters the TPC (find the smallest abs(Z))
+      }
+      true_trklen_accum[i] = 0.; // initialize true_trklen_accum
+    }
+    true_trklen = -1999; // initialize
+    for (int i=start_idx+1; i<evt.true_beam_traj_Z->size(); i++){
+      if (i == start_idx+1) true_trklen = 0;
+      true_trklen += sqrt( pow( (*evt.true_beam_traj_X)[i]-(*evt.true_beam_traj_X)[i-1], 2)
+                          + pow( (*evt.true_beam_traj_Y)[i]-(*evt.true_beam_traj_Y)[i-1], 2)
+                          + pow( (*evt.true_beam_traj_Z)[i]-(*evt.true_beam_traj_Z)[i-1], 2)
+                          );
+      true_trklen_accum[i] = true_trklen;
+      //cout<<i<<"\t"<<true_trklen_accum[i]<<endl;
+    }
+
+    // calculate reco track length
+    reco_trklen_accum.reserve(evt.reco_beam_calo_Z->size());
+    reco_trklen = -1999;
+    for (int i=1; i<evt.reco_beam_calo_Z->size(); i++){
+      if (i == 1) reco_trklen = 0;
+      reco_trklen += sqrt( pow( (*evt.reco_beam_calo_X)[i]-(*evt.reco_beam_calo_X)[i-1], 2)
+                          + pow( (*evt.reco_beam_calo_Y)[i]-(*evt.reco_beam_calo_Y)[i-1], 2)
+                          + pow( (*evt.reco_beam_calo_Z)[i]-(*evt.reco_beam_calo_Z)[i-1], 2)
+                          );
+      reco_trklen_accum[i] = reco_trklen;
+      //cout<<i<<"\t"<<reco_trklen_accum[i]<<endl;
+    }
+  }
+  energy_calorimetry_SCE = 0; //MeV
+  for (int i=0; i<evt.reco_beam_calibrated_dEdX_SCE->size(); i++){
+    energy_calorimetry_SCE += (*evt.reco_beam_calibrated_dEdX_SCE)[i]*(*evt.reco_beam_TrkPitch_SCE)[i];
+  }
+  //cout<<evt.beam_particle_scores->size()<<"\t"<<(*evt.beam_particle_scores)[0]<<endl;
+  if (evt.beam_particle_scores->size())
+    beam_score = (*evt.beam_particle_scores)[0];
+  else
+    beam_score = -999.;
+  //cout<<"$$$"<<evt.reco_beam_alt_len<<"\t"<<reco_trklen<<endl;//the two are the same
+  // reco_trklen = evt.reco_beam_alt_len; // they should be the same
+  if (fProtonCSDACheck)
+    trklen_csda_proton = reco_trklen / csda_range_vs_mom_sm->Eval(evt.beam_inst_P);
+  else
+    trklen_csda_proton = -999;
+}
