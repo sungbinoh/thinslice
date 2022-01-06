@@ -26,18 +26,18 @@ int main(){
 
   ThinSlice mcths;
   mcths.SetOutputFileName("mcprod4a.root");
-  mcths.Run(mcevt, uf);
+  mcths.Run(mcevt, uf, -1);
 
   anavar dataevt(datachain);
 
   ThinSlice dataths;
   dataths.SetOutputFileName("data.root");
-  dataths.Run(dataevt, uf);
+  dataths.Run(dataevt, uf, -1);
 
   ThinSlice cosmicsths;
   cosmicsths.SetSelectCosmics(true);
   cosmicsths.SetOutputFileName("cosmics.root");
-  cosmicsths.Run(dataevt, uf);
+  cosmicsths.Run(dataevt, uf, -1);
 
   return 0;
 

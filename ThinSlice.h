@@ -116,7 +116,7 @@ class ThinSlice {
   void ProcessEvent(const anavar & evt, Unfold & uf);
   void CalcXS(const Unfold & uf);
 
-  void Run(anavar & evt, Unfold & uf);
+  void Run(anavar & evt, Unfold & uf, Long64_t nentries);
 
   void SetSelectCosmics(bool sc);
 

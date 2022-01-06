@@ -764,12 +764,12 @@ void ThinSlice::CalcXS(const Unfold & uf){
 
 }
 
-void ThinSlice::Run(anavar & evt, Unfold & uf){
+void ThinSlice::Run(anavar & evt, Unfold & uf, Long64_t nentries=-1){
 
   BookHistograms();
 
   //Long64_t nentries = evt.fChain->GetEntriesFast();
-  Long64_t nentries = evt.fChain->GetEntries();
+  if (nentries == -1) nentries = evt.fChain->GetEntries();
   
   Long64_t nbytes = 0, nb = 0;
   for (Long64_t jentry=0; jentry<nentries;jentry++) {
