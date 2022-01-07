@@ -6,7 +6,7 @@
 
 HadAna::HadAna(){
   if (fProtonCSDACheck) {
-    TFile *file_mom2csda = new TFile("/dune/app/users/yinrui/thinslice/files/proton_mom_csda_converter.root");
+    TFile *file_mom2csda = TFile::Open("root://fndca1.fnal.gov:1094/pnfs/fnal.gov/usr/dune/archive/sam_managed_users/tjyang/data/e/1/4/6/f52abbdc-f3f1-4b1e-9b05-0e25fd4bd232-whole_mc.root");
     csda_range_vs_mom_sm = (TGraph *)file_mom2csda->Get("csda_range_vs_mom_sm");
   }
 }
