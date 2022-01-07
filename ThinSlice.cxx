@@ -198,7 +198,7 @@ void ThinSlice::ProcessEvent(const anavar & evt, Unfold & uf){
   isTestSample = (hadana.pitype == pi::kData); // fake data
   //if (evt.MC && evt.event%2 == 0) isTestSample = false;
 
-  if (hadana.fAllTrackCheck) {
+  if (hadana.fAllTrackCheck) {//using all-track reconstruction
     if (evt.MC){
       //true_sliceID = int(evt.true_beam_endZ/pi::thinslicewidth);
       true_sliceID = int(hadana.true_trklen/pi::thinslicewidth);
@@ -286,7 +286,7 @@ void ThinSlice::ProcessEvent(const anavar & evt, Unfold & uf){
       if (reco_sliceID >= pi::nthinslices) reco_sliceID = pi::nthinslices;
     }
   }
-  else {
+  else {//not using all track reconstruction
     if (evt.MC){
       //true_sliceID = int(evt.true_beam_endZ/pi::thinslicewidth);
       true_sliceID = int(hadana.true_trklen/pi::thinslicewidth);
