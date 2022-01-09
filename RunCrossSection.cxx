@@ -3,10 +3,41 @@
 #include "EventType.h"
 #include "EventSelection.h"
 #include "TChain.h"
+#include "json/json.h"
+#include <fstream>
 #include <iostream>
+#include <string>
 
-int main(){
+using namespace std;
 
+int main(int argc, char ** argv){
+
+  bool found_config = false;
+
+  string config_file;
+
+  for (int iArg = 1; iArg < argc; iArg++) {
+    if (!strcasecmp(argv[iArg],"-c")) {
+     config_file = argv[++iArg];
+     found_config = true;
+    }
+    if (!strcasecmp(argv[iArg],"-h")) {
+      std::cout << "Usage: RunCrossSection " <<
+                   "-c config.json " << std::endl;
+      return 1;
+    }
+  }
+
+  if (!found_config){
+    cout<<"Error: no configuration file was provided! Please provide with '-i'" <<endl;
+    return 1;
+  }
+
+  Json::Value root;
+  ifstream file(config_file);
+  file >> root;
+  cout<<root<<endl;
+  //cout<<root["mcfile"].asString()<<endl;
 
   TChain *mcchain = new TChain();
 
@@ -14,29 +45,29 @@ int main(){
   //chain->Add("/data/tjyang/dune/pduneana_Prod4_1GeV_5_8_21.root/pduneana/beamana");
 
   //mcchain->Add("pduneana_mc.root/pduneana/beamana"); // test
-  mcchain->Add("root://fndca1.fnal.gov:1094/pnfs/fnal.gov/usr/dune/archive/sam_managed_users/tjyang/data/e/1/4/6/f52abbdc-f3f1-4b1e-9b05-0e25fd4bd232-whole_mc.root/pduneana/beamana");
+  mcchain->Add(Form("%s/pduneana/beamana", root["mcfile"].asString().c_str()));
 
   TChain *datachain = new TChain();
   //datachain->Add("pduneana.root/pduneana/beamana"); // test
-  datachain->Add("root://fndca1.fnal.gov:1094/pnfs/fnal.gov/usr/dune/archive/sam_managed_users/tjyang/data/9/f/5/1/102e32ac-8d8d-44c6-8df0-6a0eb76ba1b4-whole_data.root/pduneana/beamana");
+  datachain->Add(Form("%s/pduneana/beamana", root["datafile"].asString().c_str()));
 
   Unfold uf(pi::nthinslices+2, -1, pi::nthinslices+1);
 
   anavar mcevt(mcchain);
 
   ThinSlice mcths;
-  mcths.SetOutputFileName("mcprod4a.root");
+  mcths.SetOutputFileName(root["mcoutfile"].asString());
   mcths.Run(mcevt, uf, -1);
 
   anavar dataevt(datachain);
 
   ThinSlice dataths;
-  dataths.SetOutputFileName("data.root");
+  dataths.SetOutputFileName(root["dataoutfile"].asString());
   dataths.Run(dataevt, uf, -1);
 
   ThinSlice cosmicsths;
   cosmicsths.SetSelectCosmics(true);
-  cosmicsths.SetOutputFileName("cosmics.root");
+  cosmicsths.SetOutputFileName(root["cosmicsoutfile"].asString());
   cosmicsths.Run(dataevt, uf, -1);
 
   return 0;

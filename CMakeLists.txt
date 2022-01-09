@@ -4,7 +4,7 @@
 # Otherwise, you must tell the build system where to look for ROOT,
 # for example by passing `-DROOT_DIR="/path/to/root/installation` at CMake configuration time.
 
-  cmake_minimum_required(VERSION 3.1 FATAL_ERROR)
+  cmake_minimum_required(VERSION 3.19.6 FATAL_ERROR)
   project(thinslice)
 
 # Locate the ROOT package and define a number of useful targets and variables.
@@ -17,15 +17,24 @@
 # Locate the RooUnfold package
   find_package(RooUnfold CONFIG REQUIRED)  
 
+  find_package(PkgConfig REQUIRED)
+  list(APPEND CMAKE_PREFIX_PATH $ENV{JSONCPP_FQ_DIR})
+#  message(STATUS "CMAKE_PREFIX_PATH: ${CMAKE_PREFIX_PATH}")
+
+  pkg_check_modules(JSONCPP jsoncpp)
+
 # require C++11
   set (CMAKE_CXX_STANDARD 17)
 
   include_directories(${ROOT_INCLUDE_DIRS})
   include_directories(${RooUnfold_INCLUDE_DIRS})
+  include_directories(${JSONCPP_INCLUDE_DIRS})
 #   include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 #   ROOT_GENERATE_DICTIONARY(G__Event Event.h LINKDEF EventLinkDef.h)
 
   link_directories(${RooUnfold_LIBRARY_DIRS})
+  link_directories(${JSONCPP_LIBRARY_DIRS})
+#  message(STATUS "JSONCPP_LIBRARY_DIRS: ${JSONCPP_LIBRARY_DIRS}")
 
   SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
   set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
@@ -40,7 +49,7 @@
 # Note: To ensure compatibility with Cling, targets *must* be compiled using the
 # same C++ standard as ROOT was compiled with.
   add_library(Event SHARED anavar.C HadAna.cxx ThinSlice.cxx ProtonInel.cxx util.cxx Unfold.cxx TemplateFitter.cxx)
-  target_link_libraries(Event PUBLIC ${ROOT_LIBRARIES} ${RooUnfold_LIBRARIES})
+  target_link_libraries(Event PUBLIC ${ROOT_LIBRARIES} ${RooUnfold_LIBRARIES} ${JSONCPP_LIBRARIES})
 #   target_compile_options(Event INTERFACE ${CMAKE_REQUIRED_FLAGS})
 # Create the main program using the library.
   add_executable(RunCrossSection RunCrossSection.cxx)
