@@ -424,7 +424,8 @@ void HadAna::ProcessEvent(const anavar& evt){
   //    }
   //    if (nhits) daughter_michel_score/=nhits;
   //    else daughter_michel_score = -999;
-      if (evt.reco_beam_vertex_nHits) daughter_michel_score = evt.reco_beam_vertex_michel_score_weight_by_charge;//evt.reco_beam_vertex_michel_score/evt.reco_beam_vertex_nHits;
+      //if (evt.reco_beam_vertex_nHits) daughter_michel_score = evt.reco_beam_vertex_michel_score_weight_by_charge;//evt.reco_beam_vertex_michel_score/evt.reco_beam_vertex_nHits;
+      if (evt.reco_beam_vertex_nHits) daughter_michel_score = evt.reco_beam_vertex_michel_score/evt.reco_beam_vertex_nHits;
     }
 
     beam_dx = -999;
