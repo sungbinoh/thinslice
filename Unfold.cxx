@@ -54,8 +54,11 @@ void Unfold::SaveHistograms(){
 
   TH2D *hint = (TH2D*)response_SliceID_Int.Hresponse();
   hint->SetTitle("Interactions;Reco Slice ID;True Slice ID");
-  hint->Write("response_SliceID_Int");
+  hint->Write("hresponse_SliceID_Int");
   TH2D *hinc = (TH2D*)response_SliceID_Inc.Hresponse();
   hinc->SetTitle("Incidents; Reco Slice ID; True Slice ID");
-  hinc->Write("response_SliceID_Inc");
+  hinc->Write("hresponse_SliceID_Inc");
+
+  response_SliceID_Int.Write("response_SliceID_Int");
+  response_SliceID_Inc.Write("response_SliceID_Inc");
 }
