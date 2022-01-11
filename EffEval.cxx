@@ -61,7 +61,7 @@ void EffEval::FillHistograms(const anavar & evt){
         }
       }
       if (foundreco){
-        double reco_KE = (8/(1-0.37))*pow(tracklength,1-0.37);
+        double reco_KE = GetPionKE(tracklength);
         double reco_mom = sqrt(pow(reco_KE+139.57,2)-pow(139.57,2));
         double res_mom = (reco_mom - true_mom)/true_mom;
         h_true_Ppi_sel->Fill(true_mom);

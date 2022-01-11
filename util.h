@@ -11,4 +11,6 @@ void FillHistVec2D(TH2D *hist[pi::nIntTypes+1], const double &value1, const doub
 
 void FillHist1D(TH1D *hist, const double &value, const double &wei);
 
+double GetPionKE(double length);
+
 #endif

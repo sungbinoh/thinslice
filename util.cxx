@@ -1,4 +1,7 @@
 #include "util.h"
+#include <iostream>
+
+using namespace std;
 
 void FillHistVec1D(TH1D *hist[pi::nIntTypes+1], const double &value, const int &partype){
   //hist[0]->Fill(value);
@@ -40,3 +43,13 @@ void FillHist1D(TH1D *hist, const double &value, const double &wei){
   }
 }
 
+double GetPionKE(double length){
+  if (length>0){
+    // https://arxiv.org/abs/1306.1712
+    return (8/(1-0.37))*pow(length,1-0.37);
+  }
+  else{
+    cout<<"Invalid length "<<length<<endl;
+    return -1;
+  }
+}
