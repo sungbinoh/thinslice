@@ -1,4 +1,6 @@
 #include "util.h"
+#include "TVector3.h"
+#include "TMath.h"
 #include <iostream>
 
 using namespace std;
@@ -49,7 +51,51 @@ double GetPionKE(double length){
     return (8/(1-0.37))*pow(length,1-0.37);
   }
   else{
-    cout<<"Invalid length "<<length<<endl;
+    cout<<"Invalid length "<<length<<", returning -1"<<endl;
     return -1;
+  }
+}
+
+double GetTheta(double x, double y, double z){
+  TVector3 v(x,y,z);
+  if (!v.Mag()){
+    cout<<"Empty vector, returning -1"<<endl;
+    return -1;
+  }
+  else{
+    return v.Theta()*180/TMath::Pi();
+  }
+}
+
+double GetPhi(double x, double y, double z){
+  TVector3 v(x,y,z);
+  if (!v.Mag()){
+    cout<<"Empty vector, returning -1"<<endl;
+    return -1;
+  }
+  else{
+    return v.Phi()*180/TMath::Pi();
+  }
+}
+
+double GetThetaxz(double x, double y, double z){
+  TVector3 v(x,y,z);
+  if (!v.Mag()){
+    cout<<"Empty vector, returning -1"<<endl;
+    return -1;
+  }
+  else{
+    return atan2(v.X(), v.Z())*180/TMath::Pi();
+  }
+}
+
+double GetThetayz(double x, double y, double z){
+  TVector3 v(x,y,z);
+  if (!v.Mag()){
+    cout<<"Empty vector, returning -1"<<endl;
+    return -1;
+  }
+  else{
+    return atan2(v.Y(), v.Z())*180/TMath::Pi();
   }
 }

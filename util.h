@@ -13,4 +13,12 @@ void FillHist1D(TH1D *hist, const double &value, const double &wei);
 
 double GetPionKE(double length);
 
+double GetTheta(double x, double y, double z);
+
+double GetPhi(double x, double y, double z);
+
+double GetThetaxz(double x, double y, double z);
+
+double GetThetayz(double x, double y, double z);
+
 #endif
