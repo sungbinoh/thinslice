@@ -19,15 +19,20 @@ void EffEval::BookHistograms(){
   outputFile = TFile::Open(fOutputFileName.c_str(), "recreate"); // why c_str?
   h_true_Ppi_all = new TH1D("h_true_Ppi_all","All;True p_{#pi} (MeV/c);Events",120,0,1200);
   h_true_Ppi_all->Sumw2();
+
   h_true_Ppi_sel = new TH1D("h_true_Ppi_sel","Selected;True p_{#pi} (MeV/c);Events",120,0,1200);
   h_true_Ppi_sel->Sumw2();
+  h_reco_true_Ppi_sel = new TH2D("h_reco_true_Ppi_sel","Selected;True p_{#pi} (MeV/c); Reco/True -1", 120,0,1200,40,-1,1);
+  h_res_Ppi_sel = new TH1D("h_res_Ppi_sel","Selected; Reco/True -1 (p_{#pi})", 40,-1,1);
+  h_res_Ppi_sel->Sumw2();
+
+  h_res_Ppi_michelscore = new TH2D("h_res_Ppi_michelscore",";Michel score;Reco/True -1 (p_{#pi})", 100,0,1,40,-1,1);
+
   h_true_Ppi_michel = new TH1D("h_true_Ppi_michel","With Michel score cut;True p_{#pi} (MeV/c);Events",120,0,1200);
   h_true_Ppi_michel->Sumw2();
-  h_reco_true_Ppi_sel = new TH2D("h_reco_true_Ppi_sel","Selected;True p_{#pi} (MeV/c); Reco/True -1", 120,0,1200,40,-1,1);
   h_reco_true_Ppi_michel = new TH2D("h_reco_true_Ppi_michel","With Michel score cut;True p_{#pi} (MeV/c); Reco/True -1", 120,0,1200,40,-1,1);
-  h_res_Ppi_sel = new TH1D("h_res_Ppi_sel","Selected; Reco/True -1 (p_{#pi})", 40,-1,1);
-  h_res_Ppi_michelscore = new TH2D("h_res_Ppi_michelscore",";Michel score;Reco/True -1 (p_{#pi})", 100,0,1,40,-1,1);
   h_res_Ppi_michel = new TH1D("h_res_Ppi_michel","With Michel score cut; Reco/True -1 (p_{#pi})", 40,-1,1);
+  h_res_Ppi_michel->Sumw2();
 }
 
 void EffEval::ProcessEvent(const anavar & evt){
@@ -37,7 +42,8 @@ void EffEval::ProcessEvent(const anavar & evt){
 void EffEval::FillHistograms(const anavar & evt){
   for (size_t i = 0; i<evt.true_beam_daughter_ID->size(); ++i){
     if (std::abs((*evt.true_beam_daughter_PDG)[i]) == 211){
-      h_true_Ppi_all->Fill((*evt.true_beam_daughter_startP)[i]*1000);
+      double true_mom = (*evt.true_beam_daughter_startP)[i]*1000;
+      h_true_Ppi_all->Fill(true_mom);
       bool foundreco = false;
       double besttrack = -1;
       double tracklength = 0;
@@ -55,20 +61,19 @@ void EffEval::FillHistograms(const anavar & evt){
         }
       }
       if (foundreco){
-        h_true_Ppi_sel->Fill((*evt.true_beam_daughter_startP)[i]*1000);
-        double piKE = (8/(1-0.37))*pow(tracklength,1-0.37);
-        double pimom = sqrt(pow(piKE+139.57,2)-pow(139.57,2));
-        h_reco_true_Ppi_sel->Fill((*evt.true_beam_daughter_startP)[i]*1000,
-                                  (pimom - (*evt.true_beam_daughter_startP)[i]*1000)/((*evt.true_beam_daughter_startP)[i]*1000));
-        h_res_Ppi_sel->Fill((pimom - (*evt.true_beam_daughter_startP)[i]*1000)/((*evt.true_beam_daughter_startP)[i]*1000));
+        double reco_KE = (8/(1-0.37))*pow(tracklength,1-0.37);
+        double reco_mom = sqrt(pow(reco_KE+139.57,2)-pow(139.57,2));
+        double res_mom = (reco_mom - true_mom)/true_mom;
+        h_true_Ppi_sel->Fill(true_mom);
+        h_reco_true_Ppi_sel->Fill(true_mom, res_mom);
+        h_res_Ppi_sel->Fill(res_mom);
         if (michelscore<0) michelscore = 0;
         if (michelscore>=1) michelscore = 0.999999;
-        h_res_Ppi_michelscore->Fill(michelscore, (pimom - (*evt.true_beam_daughter_startP)[i]*1000)/((*evt.true_beam_daughter_startP)[i]*1000));
+        h_res_Ppi_michelscore->Fill(michelscore, res_mom);
         if (michelscore>0.5){
-          h_true_Ppi_michel->Fill((*evt.true_beam_daughter_startP)[i]*1000);
-          h_reco_true_Ppi_michel->Fill((*evt.true_beam_daughter_startP)[i]*1000,
-                                       (pimom - (*evt.true_beam_daughter_startP)[i]*1000)/((*evt.true_beam_daughter_startP)[i]*1000));
-          h_res_Ppi_michel->Fill((pimom - (*evt.true_beam_daughter_startP)[i]*1000)/((*evt.true_beam_daughter_startP)[i]*1000));
+          h_true_Ppi_michel->Fill(true_mom);
+          h_reco_true_Ppi_michel->Fill(true_mom, res_mom);
+          h_res_Ppi_michel->Fill(res_mom);
         }
       }
     }
