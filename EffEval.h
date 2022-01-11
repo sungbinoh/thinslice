@@ -34,6 +34,10 @@ class EffEval {
   TFile *outputFile;
   TEfficiency *h_Eff_Ppi;
   TEfficiency *h_Eff_Ppi_michel;
+  TEfficiency *h_Eff_thetapi;
+  TEfficiency *h_Eff_thetapi_michel;
+  TEfficiency *h_Eff_phipi;
+  TEfficiency *h_Eff_phipi_michel;
   TH1D *h_true_Ppi_all;
   TH1D *h_true_Ppi_sel;
   TH2D *h_reco_true_Ppi_sel;
@@ -42,6 +46,22 @@ class EffEval {
   TH1D *h_true_Ppi_michel;
   TH2D *h_reco_true_Ppi_michel;
   TH1D *h_res_Ppi_michel;
+
+  TH1D *h_true_thetapi_all;
+  TH1D *h_true_thetapi_sel;
+  TH2D *h_reco_true_thetapi_sel;
+  TH1D *h_res_thetapi_sel;
+  TH1D *h_true_thetapi_michel;
+  TH2D *h_reco_true_thetapi_michel;
+  TH1D *h_res_thetapi_michel;
+
+  TH1D *h_true_phipi_all;
+  TH1D *h_true_phipi_sel;
+  TH2D *h_reco_true_phipi_sel;
+  TH1D *h_res_phipi_sel;
+  TH1D *h_true_phipi_michel;
+  TH2D *h_reco_true_phipi_michel;
+  TH1D *h_res_phipi_michel;
 
 };
 
