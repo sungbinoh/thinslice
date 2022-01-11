@@ -9,6 +9,7 @@ class anavar;
 class HadAna;
 class TEfficiency;
 class TH1D;
+class TH2D;
 
 class EffEval {
 
@@ -34,6 +35,13 @@ class EffEval {
   TEfficiency *h_Eff_Ppi;
   TH1D *h_true_Ppi_all;
   TH1D *h_true_Ppi_sel;
+  TH2D *h_reco_true_Ppi_sel;
+  TH1D *h_res_Ppi_sel;
+  TH2D *h_res_Ppi_michelscore;
+  TH1D *h_res_Ppi_michel;
+  TH1D *h_true_Ppi_michel;
+  TH2D *h_reco_true_Ppi_michel;
+  TEfficiency *h_Eff_Ppi_michel;
 
 };
 

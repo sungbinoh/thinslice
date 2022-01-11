@@ -4,6 +4,7 @@
 #include "TGraphErrors.h"
 #include "TVector3.h"
 #include "TH1D.h"
+#include "TH2D.h"
 #include "TEfficiency.h"
 #include "util.h"
 
@@ -16,11 +17,17 @@ EffEval::EffEval(){
 void EffEval::BookHistograms(){
 
   outputFile = TFile::Open(fOutputFileName.c_str(), "recreate"); // why c_str?
-  h_true_Ppi_all = new TH1D("h_true_Ppi_all","All;p_{#pi} (MeV/c);Events",120,0,1200);
+  h_true_Ppi_all = new TH1D("h_true_Ppi_all","All;True p_{#pi} (MeV/c);Events",120,0,1200);
   h_true_Ppi_all->Sumw2();
-  h_true_Ppi_sel = new TH1D("h_true_Ppi_sel","Selected;p_{#pi} (MeV/c);Events",120,0,1200);
+  h_true_Ppi_sel = new TH1D("h_true_Ppi_sel","Selected;True p_{#pi} (MeV/c);Events",120,0,1200);
   h_true_Ppi_sel->Sumw2();
-
+  h_true_Ppi_michel = new TH1D("h_true_Ppi_michel","With Michel score cut;True p_{#pi} (MeV/c);Events",120,0,1200);
+  h_true_Ppi_michel->Sumw2();
+  h_reco_true_Ppi_sel = new TH2D("h_reco_true_Ppi_sel","Selected;True p_{#pi} (MeV/c); Reco/True -1", 120,0,1200,40,-1,1);
+  h_reco_true_Ppi_michel = new TH2D("h_reco_true_Ppi_michel","With Michel score cut;True p_{#pi} (MeV/c); Reco/True -1", 120,0,1200,40,-1,1);
+  h_res_Ppi_sel = new TH1D("h_res_Ppi_sel","Selected; Reco/True -1 (p_{#pi})", 40,-1,1);
+  h_res_Ppi_michelscore = new TH2D("h_res_Ppi_michelscore",";Michel score;Reco/True -1 (p_{#pi})", 100,0,1,40,-1,1);
+  h_res_Ppi_michel = new TH1D("h_res_Ppi_michel","With Michel score cut; Reco/True -1 (p_{#pi})", 40,-1,1);
 }
 
 void EffEval::ProcessEvent(const anavar & evt){
@@ -32,13 +39,38 @@ void EffEval::FillHistograms(const anavar & evt){
     if (std::abs((*evt.true_beam_daughter_PDG)[i]) == 211){
       h_true_Ppi_all->Fill((*evt.true_beam_daughter_startP)[i]*1000);
       bool foundreco = false;
+      double besttrack = -1;
+      double tracklength = 0;
+      double michelscore = 0;
       for (size_t j = 0; j<evt.reco_daughter_PFP_ID->size(); ++j){
         if ((*evt.reco_daughter_PFP_true_byHits_ID)[j] == (*evt.true_beam_daughter_ID)[i]){
           foundreco = true;
+          if ((*evt.reco_daughter_PFP_true_byHits_purity)[j]*(*evt.reco_daughter_PFP_true_byHits_completeness)[j]>besttrack){
+            besttrack = (*evt.reco_daughter_PFP_true_byHits_purity)[j]*(*evt.reco_daughter_PFP_true_byHits_completeness)[j];
+            tracklength = (*evt.reco_daughter_allTrack_alt_len)[j];
+            if ((*evt.reco_daughter_allTrack_vertex_nHits)[j]){
+              michelscore = (*evt.reco_daughter_allTrack_vertex_michel_score)[j]/(*evt.reco_daughter_allTrack_vertex_nHits)[j];
+            }
+          }
         }
       }
-      if (foundreco) h_true_Ppi_sel->Fill((*evt.true_beam_daughter_startP)[i]*1000);
-
+      if (foundreco){
+        h_true_Ppi_sel->Fill((*evt.true_beam_daughter_startP)[i]*1000);
+        double piKE = (8/(1-0.37))*pow(tracklength,1-0.37);
+        double pimom = sqrt(pow(piKE+139.57,2)-pow(139.57,2));
+        h_reco_true_Ppi_sel->Fill((*evt.true_beam_daughter_startP)[i]*1000,
+                                  (pimom - (*evt.true_beam_daughter_startP)[i]*1000)/((*evt.true_beam_daughter_startP)[i]*1000));
+        h_res_Ppi_sel->Fill((pimom - (*evt.true_beam_daughter_startP)[i]*1000)/((*evt.true_beam_daughter_startP)[i]*1000));
+        if (michelscore<0) michelscore = 0;
+        if (michelscore>=1) michelscore = 0.999999;
+        h_res_Ppi_michelscore->Fill(michelscore, (pimom - (*evt.true_beam_daughter_startP)[i]*1000)/((*evt.true_beam_daughter_startP)[i]*1000));
+        if (michelscore>0.5){
+          h_true_Ppi_michel->Fill((*evt.true_beam_daughter_startP)[i]*1000);
+          h_reco_true_Ppi_michel->Fill((*evt.true_beam_daughter_startP)[i]*1000,
+                                       (pimom - (*evt.true_beam_daughter_startP)[i]*1000)/((*evt.true_beam_daughter_startP)[i]*1000));
+          h_res_Ppi_michel->Fill((pimom - (*evt.true_beam_daughter_startP)[i]*1000)/((*evt.true_beam_daughter_startP)[i]*1000));
+        }
+      }
     }
   }
 }
@@ -54,6 +86,12 @@ void EffEval::SaveHistograms(){
     h_Eff_Ppi = new TEfficiency(*h_true_Ppi_sel, *h_true_Ppi_all);
     h_Eff_Ppi->Write("h_Eff_Ppi");
   }
+
+  if (TEfficiency::CheckConsistency(*h_true_Ppi_michel, *h_true_Ppi_all)){
+    h_Eff_Ppi_michel = new TEfficiency(*h_true_Ppi_michel, *h_true_Ppi_all);
+    h_Eff_Ppi_michel->Write("h_Eff_Ppi_michel");
+  }
+
 }
 
 void EffEval::Run(anavar & evt, Long64_t nentries=-1){
