@@ -115,7 +115,8 @@ void EffEval::FillHistograms(const anavar & evt){
           tracklength = (*evt.reco_daughter_allTrack_alt_len)[j];
           if (std::abs((*evt.true_beam_daughter_PDG)[i]) == 211){
             double reco_KE = GetPionKE(tracklength);
-            reco_mom = sqrt(pow(reco_KE+139.57,2)-pow(139.57,2));
+            //reco_mom = sqrt(pow(reco_KE+139.57,2)-pow(139.57,2));
+            reco_mom = (*evt.reco_daughter_allTrack_momByRange_alt_muon)[j]*1000;
             res_mom = (reco_mom - true_mom)/true_mom;
           }
           reco_theta = (*evt.reco_daughter_allTrack_Theta)[j]*180/TMath::Pi();
