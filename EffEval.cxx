@@ -45,17 +45,17 @@ void EffEval::BookHistograms(){
   h_true_thetapi_sel = new TH1D("h_true_thetapi_sel","Selected;True #theta_{#pi};Events",180,0,180);
   h_true_thetapi_sel->Sumw2();
 
-  h_reco_true_thetapi_sel = new TH2D("h_reco_true_thetapi_sel","Selected;True #theta_{#pi}; Reco-True (#theta_{#pi})", 180,0,180,40,-20,20);
+  h_reco_true_thetapi_sel = new TH2D("h_reco_true_thetapi_sel","Selected;True #theta_{#pi}; Reco-True (#theta_{#pi})", 180,0,180,60,-30,30);
 
-  h_res_thetapi_sel = new TH1D("h_res_thetapi_sel","Selected; Reco - True (#theta_{#pi})", 40,-20,20);
+  h_res_thetapi_sel = new TH1D("h_res_thetapi_sel","Selected; Reco - True (#theta_{#pi})", 60,-30,30);
   h_res_thetapi_sel->Sumw2();
 
   h_true_thetapi_michel = new TH1D("h_true_thetapi_michel","With Michel score cut;True #theta_{#pi};Events",180,0,180);
   h_true_thetapi_michel->Sumw2();
 
-  h_reco_true_thetapi_michel = new TH2D("h_reco_true_thetapi_michel","With Michel score cut;True #theta_{#pi}; Reco - True (#theta_{#pi})", 180,0,180,40,-20,20);
+  h_reco_true_thetapi_michel = new TH2D("h_reco_true_thetapi_michel","With Michel score cut;True #theta_{#pi}; Reco - True (#theta_{#pi})", 180,0,180,60,-30,30);
 
-  h_res_thetapi_michel = new TH1D("h_res_thetapi_michel","With Michel score cut; Reco-True (#theta_{#pi})", 40,-20,20);
+  h_res_thetapi_michel = new TH1D("h_res_thetapi_michel","With Michel score cut; Reco-True (#theta_{#pi})", 60,-30,30);
   h_res_thetapi_michel->Sumw2();
 
   ////////////////////////////////
@@ -66,17 +66,17 @@ void EffEval::BookHistograms(){
   h_true_phipi_sel = new TH1D("h_true_phipi_sel","Selected;True #phi_{#pi};Events",180,-180,180);
   h_true_phipi_sel->Sumw2();
 
-  h_reco_true_phipi_sel = new TH2D("h_reco_true_phipi_sel","Selected;True #phi_{#pi}; Reco-True (#phi_{#pi})", 180,-180,180,40,-20,20);
+  h_reco_true_phipi_sel = new TH2D("h_reco_true_phipi_sel","Selected;True #phi_{#pi}; Reco-True (#phi_{#pi})", 180,-180,180,60,-30,30);
 
-  h_res_phipi_sel = new TH1D("h_res_phipi_sel","Selected; Reco - True (#phi_{#pi})", 40,-20,20);
+  h_res_phipi_sel = new TH1D("h_res_phipi_sel","Selected; Reco - True (#phi_{#pi})", 60,-30,30);
   h_res_phipi_sel->Sumw2();
 
   h_true_phipi_michel = new TH1D("h_true_phipi_michel","With Michel score cut;True #phi_{#pi};Events",180,-180,180);
   h_true_phipi_michel->Sumw2();
 
-  h_reco_true_phipi_michel = new TH2D("h_reco_true_phipi_michel","With Michel score cut;True #phi_{#pi}; Reco - True (#phi_{#pi})", 180,-180,180,40,-20,20);
+  h_reco_true_phipi_michel = new TH2D("h_reco_true_phipi_michel","With Michel score cut;True #phi_{#pi}; Reco - True (#phi_{#pi})", 180,-180,180,60,-30,30);
 
-  h_res_phipi_michel = new TH1D("h_res_phipi_michel","With Michel score cut; Reco-True (#phi_{#pi})", 40,-20,20);
+  h_res_phipi_michel = new TH1D("h_res_phipi_michel","With Michel score cut; Reco-True (#phi_{#pi})", 60,-30,30);
   h_res_phipi_michel->Sumw2();
 
   ////////////////////////////////
@@ -99,9 +99,9 @@ void EffEval::BookHistograms(){
   h_true_thetap_sel = new TH1D("h_true_thetap_sel","Selected;True #theta_{p};Events",180,0,180);
   h_true_thetap_sel->Sumw2();
 
-  h_reco_true_thetap_sel = new TH2D("h_reco_true_thetap_sel","Selected;True #theta_{p}; Reco-True (#theta_{p})", 180,0,180,40,-20,20);
+  h_reco_true_thetap_sel = new TH2D("h_reco_true_thetap_sel","Selected;True #theta_{p}; Reco-True (#theta_{p})", 180,0,180,60,-30,30);
 
-  h_res_thetap_sel = new TH1D("h_res_thetap_sel","Selected; Reco - True (#theta_{p})", 40,-20,20);
+  h_res_thetap_sel = new TH1D("h_res_thetap_sel","Selected; Reco - True (#theta_{p})", 60,-30,30);
   h_res_thetap_sel->Sumw2();
 
   ////////////////////////////////
@@ -112,9 +112,9 @@ void EffEval::BookHistograms(){
   h_true_phip_sel = new TH1D("h_true_phip_sel","Selected;True #phi_{p};Events",180,-180,180);
   h_true_phip_sel->Sumw2();
 
-  h_reco_true_phip_sel = new TH2D("h_reco_true_phip_sel","Selected;True #phi_{p}; Reco-True (#phi_{p})", 180,-180,180,40,-20,20);
+  h_reco_true_phip_sel = new TH2D("h_reco_true_phip_sel","Selected;True #phi_{p}; Reco-True (#phi_{p})", 180,-180,180,60,-30,30);
 
-  h_res_phip_sel = new TH1D("h_res_phip_sel","Selected; Reco - True (#phi_{p})", 40,-20,20);
+  h_res_phip_sel = new TH1D("h_res_phip_sel","Selected; Reco - True (#phi_{p})", 60,-30,30);
   h_res_phip_sel->Sumw2();
 
 }
