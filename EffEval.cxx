@@ -16,7 +16,7 @@ EffEval::EffEval(){
 
 void EffEval::BookHistograms(){
 
-  outputFile = TFile::Open(fOutputFileName.c_str(), "recreate"); // why c_str?
+  outputFile = TFile::Open(fOutputFileName.c_str(), "recreate");
   h_true_Ppi_all = new TH1D("h_true_Ppi_all","All;True p_{#pi} (MeV/c);Events",120,0,1200);
   h_true_Ppi_all->Sumw2();
 
@@ -79,6 +79,44 @@ void EffEval::BookHistograms(){
   h_res_phipi_michel = new TH1D("h_res_phipi_michel","With Michel score cut; Reco-True (#phi_{#pi})", 40,-20,20);
   h_res_phipi_michel->Sumw2();
 
+  ////////////////////////////////
+
+  h_true_Pp_all = new TH1D("h_true_Pp_all","All;True p_{p} (MeV/c);Events",120,0,1200);
+  h_true_Pp_all->Sumw2();
+
+  h_true_Pp_sel = new TH1D("h_true_Pp_sel","Selected;True p_{p} (MeV/c);Events",120,0,1200);
+  h_true_Pp_sel->Sumw2();
+
+  h_reco_true_Pp_sel = new TH2D("h_reco_true_Pp_sel","Selected;True p_{p} (MeV/c); Reco/True -1", 120,0,1200,40,-1,1);
+  h_res_Pp_sel = new TH1D("h_res_Pp_sel","Selected; Reco/True -1 (p_{p})", 40,-1,1);
+  h_res_Pp_sel->Sumw2();
+
+  ////////////////////////////////
+
+  h_true_thetap_all = new TH1D("h_true_thetap_all","All;True #theta_{p};Events",180,0,180);
+  h_true_thetap_all->Sumw2();
+
+  h_true_thetap_sel = new TH1D("h_true_thetap_sel","Selected;True #theta_{p};Events",180,0,180);
+  h_true_thetap_sel->Sumw2();
+
+  h_reco_true_thetap_sel = new TH2D("h_reco_true_thetap_sel","Selected;True #theta_{p}; Reco-True (#theta_{p})", 180,0,180,40,-20,20);
+
+  h_res_thetap_sel = new TH1D("h_res_thetap_sel","Selected; Reco - True (#theta_{p})", 40,-20,20);
+  h_res_thetap_sel->Sumw2();
+
+  ////////////////////////////////
+
+  h_true_phip_all = new TH1D("h_true_phip_all","All;True #phi_{p};Events",180,-180,180);
+  h_true_phip_all->Sumw2();
+
+  h_true_phip_sel = new TH1D("h_true_phip_sel","Selected;True #phi_{p};Events",180,-180,180);
+  h_true_phip_sel->Sumw2();
+
+  h_reco_true_phip_sel = new TH2D("h_reco_true_phip_sel","Selected;True #phi_{p}; Reco-True (#phi_{p})", 180,-180,180,40,-20,20);
+
+  h_res_phip_sel = new TH1D("h_res_phip_sel","Selected; Reco - True (#phi_{p})", 40,-20,20);
+  h_res_phip_sel->Sumw2();
+
 }
 
 void EffEval::ProcessEvent(const anavar & evt){
@@ -88,7 +126,8 @@ void EffEval::ProcessEvent(const anavar & evt){
 void EffEval::FillHistograms(const anavar & evt){
   for (size_t i = 0; i<evt.true_beam_daughter_ID->size(); ++i){
     //Only look at pion
-    if (std::abs((*evt.true_beam_daughter_PDG)[i]) != 211) continue;
+    if (std::abs((*evt.true_beam_daughter_PDG)[i]) != 211 &&
+        (*evt.true_beam_daughter_PDG)[i] != 2212) continue;
     double true_mom = (*evt.true_beam_daughter_startP)[i]*1000;
     double true_theta = GetTheta((*evt.true_beam_daughter_startPx)[i],
                                  (*evt.true_beam_daughter_startPy)[i],
@@ -117,6 +156,10 @@ void EffEval::FillHistograms(const anavar & evt){
             double reco_KE = GetPionKE(tracklength);
             //reco_mom = sqrt(pow(reco_KE+139.57,2)-pow(139.57,2));
             reco_mom = (*evt.reco_daughter_allTrack_momByRange_alt_muon)[j]*1000;
+            res_mom = (reco_mom - true_mom)/true_mom;
+          }
+          if ((*evt.true_beam_daughter_PDG)[i] == 2212){
+            reco_mom = (*evt.reco_daughter_allTrack_momByRange_alt_proton)[j]*1000;
             res_mom = (reco_mom - true_mom)/true_mom;
           }
           reco_theta = (*evt.reco_daughter_allTrack_Theta)[j]*180/TMath::Pi();
@@ -165,6 +208,26 @@ void EffEval::FillHistograms(const anavar & evt){
         }
       }
     }
+
+    if ((*evt.true_beam_daughter_PDG)[i] == 2212){
+      h_true_Pp_all->Fill(true_mom);
+      h_true_thetap_all->Fill(true_theta);
+      h_true_phip_all->Fill(true_phi);
+      if (foundreco){
+        h_true_Pp_sel->Fill(true_mom);
+        h_reco_true_Pp_sel->Fill(true_mom, res_mom);
+        h_res_Pp_sel->Fill(res_mom);
+
+        h_true_thetap_sel->Fill(true_theta);
+        h_reco_true_thetap_sel->Fill(true_theta, res_theta);
+        h_res_thetap_sel->Fill(res_theta);
+
+        h_true_phip_sel->Fill(true_phi);
+        h_reco_true_phip_sel->Fill(true_phi, res_phi);
+        h_res_phip_sel->Fill(res_phi);
+      }
+    }
+
   }
 }
 
@@ -205,6 +268,21 @@ void EffEval::SaveHistograms(){
     h_Eff_phipi_michel->Write("h_Eff_phipi_michel");
   }
 
+  ///////////////////////////////////////
+  if (TEfficiency::CheckConsistency(*h_true_Pp_sel, *h_true_Pp_all)){
+    h_Eff_Pp = new TEfficiency(*h_true_Pp_sel, *h_true_Pp_all);
+    h_Eff_Pp->Write("h_Eff_Pp");
+  }
+
+  if (TEfficiency::CheckConsistency(*h_true_thetap_sel, *h_true_thetap_all)){
+    h_Eff_thetap = new TEfficiency(*h_true_thetap_sel, *h_true_thetap_all);
+    h_Eff_thetap->Write("h_Eff_thetap");
+  }
+
+  if (TEfficiency::CheckConsistency(*h_true_phip_sel, *h_true_phip_all)){
+    h_Eff_phip = new TEfficiency(*h_true_phip_sel, *h_true_phip_all);
+    h_Eff_phip->Write("h_Eff_phip");
+  }
 
 }
 

@@ -63,6 +63,26 @@ class EffEval {
   TH2D *h_reco_true_phipi_michel;
   TH1D *h_res_phipi_michel;
 
+  ///////////////////////////////
+
+  TEfficiency *h_Eff_Pp;
+  TEfficiency *h_Eff_thetap;
+  TEfficiency *h_Eff_phip;
+  TH1D *h_true_Pp_all;
+  TH1D *h_true_Pp_sel;
+  TH2D *h_reco_true_Pp_sel;
+  TH1D *h_res_Pp_sel;
+
+  TH1D *h_true_thetap_all;
+  TH1D *h_true_thetap_sel;
+  TH2D *h_reco_true_thetap_sel;
+  TH1D *h_res_thetap_sel;
+
+  TH1D *h_true_phip_all;
+  TH1D *h_true_phip_sel;
+  TH2D *h_reco_true_phip_sel;
+  TH1D *h_res_phip_sel;
+
 };
 
 #endif
