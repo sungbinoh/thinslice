@@ -88,6 +88,8 @@ void ThinSlice::BookHistograms(){
       
       henergy_calorimetry_SCE[i][j] = new TH1D(Form("henergy_calorimetry_SCE_%d_%d",i,j), Form("Energy_calorimetry_SCE_corrected, %s, %s;Energy (MeV)", pi::cutName[i], pi::intTypeName[j]), 100, 0, 500);
       henergy_calorimetry_SCE[i][j]->Sumw2();
+      hdEdx_SCE[i][j] = new TH1D(Form("hdEdx_SCE_%d_%d",i,j), Form("dEdx_SCE_corrected, %s, %s; dE/dx (MeV/cm)", pi::cutName[i], pi::intTypeName[j]), 100, 1.7, 4.2);
+      hdEdx_SCE[i][j]->Sumw2();
 
       hdaughter_michel_scoreMu[i][j] = new TH1D(Form("hdaughter_michel_scoreMu_%d_%d",i,j), Form("daughter_michel_scoreMu, %s, %s;Michel score", pi::cutName[i], pi::intTypeName[j]), 10, 0, 1);
       hdaughter_michel_scoreMu[i][j]->Sumw2();
@@ -101,6 +103,9 @@ void ThinSlice::BookHistograms(){
       for (int k = 0; k<pi::nthinslices; ++k){
         hmediandEdxSlice[k][i][j] = new TH1D(Form("hmediandEdxSlice_%d_%d_%d",k,i,j), Form("mediandEdx, %s, %s, sliceID = %d;Median dE/dx (MeV/cm)", pi::cutName[i], pi::intTypeName[j], k), 8, 1, 5);
         hmediandEdxSlice[k][i][j]->Sumw2();
+        
+        hChi2_protonSlice[k][i][j] = new TH1D(Form("hChi2_protonSlice_%d_%d_%d",k,i,j), Form("Chi2_proton, %s, %s, sliceID = %d;Chi2_proton/Ndf", pi::cutName[i], pi::intTypeName[j], k), 10, 0, 100);
+        hChi2_protonSlice[k][i][j]->Sumw2();
 
         hdaughter_michel_scoreSlice[k][i][j] = new TH1D(Form("hdaughter_michel_scoreSlice_%d_%d_%d",k,i,j), Form("daughter_michel_score, %s, %s, sliceID = %d;Michel score", pi::cutName[i], pi::intTypeName[j], k), 10, 0, 1);
         hdaughter_michel_scoreSlice[k][i][j]->Sumw2();
@@ -494,6 +499,7 @@ void ThinSlice::FillHistograms(int cut, const anavar & evt){
       }
       if (reco_sliceID>=0 && reco_sliceID<pi::nthinslices){
         FillHistVec1D(hmediandEdxSlice[reco_sliceID][cut], hadana.median_dEdx, hadana.pitype);
+        FillHistVec1D(hChi2_protonSlice[reco_sliceID][cut], hadana.chi2_proton, hadana.pitype);
         FillHistVec1D(hdaughter_michel_scoreSlice[reco_sliceID][cut], hadana.daughter_michel_score, hadana.pitype);
         FillHistVec1D(hcosthetaSlice[reco_sliceID][cut], hadana.beam_costh, hadana.pitype);
       }
@@ -572,6 +578,7 @@ void ThinSlice::FillHistograms(int cut, const anavar & evt){
       FillHistVec1D(hmediandEdx[cut], hadana.median_dEdx, hadana.pitype);
       FillHistVec1D(hdaughter_michel_score[cut], hadana.daughter_michel_score, hadana.pitype);
       FillHistVec1D(henergy_calorimetry_SCE[cut], hadana.energy_calorimetry_SCE, hadana.pitype);
+      FillHistVec1D(hdEdx_SCE[cut], hadana.energy_calorimetry_SCE/hadana.reco_trklen, hadana.pitype);
       if (evt.reco_beam_calo_endZ>300 && hadana.median_dEdx<2.4){ // likely to be a cosmic muon?
         if (hadana.daughter_michel_score>=0){
           FillHistVec1D(hdaughter_michel_scoreMu[cut], hadana.daughter_michel_score, hadana.pitype);
@@ -599,6 +606,7 @@ void ThinSlice::FillHistograms(int cut, const anavar & evt){
       }
       if (reco_sliceID>=0 && reco_sliceID<pi::nthinslices){
         FillHistVec1D(hmediandEdxSlice[reco_sliceID][cut], hadana.median_dEdx, hadana.pitype);
+        FillHistVec1D(hChi2_protonSlice[reco_sliceID][cut], hadana.chi2_proton, hadana.pitype);
         FillHistVec1D(hdaughter_michel_scoreSlice[reco_sliceID][cut], hadana.daughter_michel_score, hadana.pitype);
         FillHistVec1D(hcosthetaSlice[reco_sliceID][cut], hadana.beam_costh, hadana.pitype);
       }
@@ -711,7 +719,7 @@ void ThinSlice::CalcXS(const Unfold & uf){
 
   double NA=6.02214076e23;
   double MAr=39.95; //gmol
-  double Density = 1.4; // g/cm^3
+  double Density = 1.4; // 1.396 g/cm^3
 
   for (int i = 0; i<pi::nthinslices; ++i){
     

@@ -67,6 +67,7 @@ class ThinSlice {
   TH1D *hmediandEdx[pi::nCuts][pi::nIntTypes+1];
   TH1D *hdaughter_michel_score[pi::nCuts][pi::nIntTypes+1];
   TH1D *henergy_calorimetry_SCE[pi::nCuts][pi::nIntTypes+1];
+  TH1D *hdEdx_SCE[pi::nCuts][pi::nIntTypes+1];
   TH1D *hdaughter_michel_scoreMu[pi::nCuts][pi::nIntTypes+1];
   TH1D *hdaughter_michel_scorePi[pi::nCuts][pi::nIntTypes+1];
   TH1D *hdaughter_michel_score2Mu[pi::nCuts][pi::nIntTypes+1];
@@ -75,6 +76,7 @@ class ThinSlice {
   TH1D *hdEdx_5cm[pi::nCuts][pi::nIntTypes+1];
 
   TH1D *hmediandEdxSlice[pi::nthinslices][pi::nCuts][pi::nIntTypes+1];
+  TH1D *hChi2_protonSlice[pi::nthinslices][pi::nCuts][pi::nIntTypes+1];
   TH1D *hdaughter_michel_scoreSlice[pi::nthinslices][pi::nCuts][pi::nIntTypes+1];
   TH1D *hcosthetaSlice[pi::nthinslices][pi::nCuts][pi::nIntTypes+1];
 
