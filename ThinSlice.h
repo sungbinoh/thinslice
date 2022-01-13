@@ -75,6 +75,10 @@ class ThinSlice {
   TH1D *hemscore[pi::nCuts][pi::nIntTypes+1];
   TH1D *hdEdx_5cm[pi::nCuts][pi::nIntTypes+1];
 
+  TH1D *hmediandEdx_bkg[pi::nCuts][pi::nIntTypes+1];
+  TH1D *hChi2_proton_bkg[pi::nCuts][pi::nIntTypes+1];
+  TH1D *hdaughter_michel_score_bkg[pi::nCuts][pi::nIntTypes+1];
+  TH1D *hcostheta_bkg[pi::nCuts][pi::nIntTypes+1];
   TH1D *hmediandEdxSlice[pi::nthinslices][pi::nCuts][pi::nIntTypes+1];
   TH1D *hChi2_protonSlice[pi::nthinslices][pi::nCuts][pi::nIntTypes+1];
   TH1D *hdaughter_michel_scoreSlice[pi::nthinslices][pi::nCuts][pi::nIntTypes+1];
@@ -113,6 +117,7 @@ class ThinSlice {
   void SetOutputFileName(std::string name){fOutputFileName = name;};
   void BookHistograms();
   void FillHistograms(int cut, const anavar & evt);
+  void FillSliceHist(const anavar & evt, int constraint_type);
   void SaveHistograms();
 
   void ProcessEvent(const anavar & evt, Unfold & uf);

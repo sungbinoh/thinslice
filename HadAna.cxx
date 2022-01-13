@@ -170,7 +170,7 @@ bool HadAna::PassPandoraSliceCut(const anavar& evt) const{ // whether recognized
   else return (evt.reco_beam_type == pandora_slice_pdg);
 }
 
-bool HadAna::PassBeamQualityCut() const{ // cut on beam entrance location and beam angle
+bool HadAna::PassBeamQualityCut(bool has_angle_cut) const{ // cut on beam entrance location and beam angle
 
   if (beamcut_dx_min<beamcut_dx_max){
     if (beam_dx<beamcut_dx_min)
@@ -200,7 +200,7 @@ bool HadAna::PassBeamQualityCut() const{ // cut on beam entrance location and be
       return false;
   }
 
-  if (beamcut_costh_min<beamcut_costh_max){
+  if (has_angle_cut && beamcut_costh_min<beamcut_costh_max){
     if (beam_costh<beamcut_costh_min)
       return false;
     if (beam_costh>beamcut_costh_max)
