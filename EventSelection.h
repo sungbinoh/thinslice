@@ -10,7 +10,7 @@ namespace pi{
     "PandoraSlice",
     "CaloSize",
     "BeamQuality",
-    "MediandEdx",
+    "ProtonCut",
     "MichelScore",
     "APA3",
   };
@@ -20,7 +20,7 @@ namespace pi{
     kPandoraSlice,
     kCaloSize,
     kBeamQuality,
-    kMediandEdx,
+    kProtonCut,
     kMichelScore,
     kAPA3,
   };

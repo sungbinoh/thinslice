@@ -803,8 +803,8 @@ void ThinSlice::Run(anavar & evt, Unfold & uf, Long64_t nentries=-1){
         FillHistograms(pi::kCaloSize, evt);
         if (hadana.PassBeamQualityCut()){
           FillHistograms(pi::kBeamQuality, evt);
-          if (hadana.PassMediandEdxCut()){
-            FillHistograms(pi::kMediandEdx, evt);
+          if (hadana.PassProtonCut()){
+            FillHistograms(pi::kProtonCut, evt);
             if (hadana.PassMichelScoreCut()){
               FillHistograms(pi::kMichelScore, evt);
               if (hadana.PassAPA3Cut(evt)){

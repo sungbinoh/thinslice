@@ -229,7 +229,7 @@ bool HadAna::PassMichelScoreCut() const{ // further veto muon tracks according t
   return daughter_michel_score < 0.55;
 }
 
-bool HadAna::PassMediandEdxCut() const{ // to remove proton background
+bool HadAna::PassProtonCut() const{ // to remove proton background
 
   return chi2_proton > 80; //median_dEdx < 2.4;
 }
@@ -240,7 +240,7 @@ bool HadAna::PassPiCuts(const anavar& evt) const{
     PassBeamQualityCut()&&
     PassAPA3Cut(evt)&&
     PassMichelScoreCut()&&
-    PassMediandEdxCut();
+    PassProtonCut();
 }
 
 bool HadAna::PassPCuts(const anavar& evt) const{

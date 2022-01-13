@@ -44,7 +44,7 @@ class HadAna{
   bool PassAPA3Cut(const anavar& evt) const;
   bool PassCaloSizeCut(const anavar& evt) const;
   bool PassMichelScoreCut() const;
-  bool PassMediandEdxCut() const;
+  bool PassProtonCut() const;
 
   bool PassPiCuts(const anavar& evt) const;
   bool PassPCuts(const anavar& evt) const;
