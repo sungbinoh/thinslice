@@ -378,6 +378,14 @@ void plot(){
     plot1d("hreco_beam_angleZ_SCE", i, "angleZ", "Events");
   }
 
+  plot1d("hmediandEdx_bkg", 0, "Median dE/dx (MeV/cm)", "Events");
+  plot1d("hmediandEdx_bkg", 6, "Median dE/dx (MeV/cm)", "Events");
+  plot1d("hChi2_proton_bkg", 0, "Chi2_p/Ndf", "Events");
+  plot1d("hChi2_proton_bkg", 6, "Chi2_p/Ndf", "Events");
+  plot1d("hdaughter_michel_score_bkg", 0, "Michel score", "Events");
+  plot1d("hdaughter_michel_score_bkg", 6, "Michel score", "Events");
+  plot1d("hcostheta_bkg", 0, "Cos(theta)", "Events");
+  plot1d("hcostheta_bkg", 6, "Cos(theta)", "Events");
   plot1dslice("hmediandEdxSlice", 6, "Median dE/dx (MeV/cm)", "Events");
   plot1dslice("hChi2_protonSlice", 6, "Chi2_p/Ndf", "Events");
   plot1dslice("hdaughter_michel_scoreSlice", 6, "Michel score", "Events");

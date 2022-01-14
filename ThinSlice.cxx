@@ -106,7 +106,7 @@ void ThinSlice::BookHistograms(){
       hChi2_proton_bkg[i][j]->Sumw2();
       hdaughter_michel_score_bkg[i][j] = new TH1D(Form("hdaughter_michel_score_bkg_%d_%d",i,j), Form("daughter_michel_score_bkg, %s, %s;Michel score", pi::cutName[i], pi::intTypeName[j]), 100, 0, 1);
       hdaughter_michel_score_bkg[i][j]->Sumw2();
-      hcostheta_bkg[i][j] = new TH1D(Form("hcostheta_bkg_%d_%d",i,j), Form("costheta_bkg, %s, %s;cos#theta", pi::cutName[i], pi::intTypeName[j]), 100, 0.8, 1);
+      hcostheta_bkg[i][j] = new TH1D(Form("hcostheta_bkg_%d_%d",i,j), Form("costheta_bkg, %s, %s;cos#theta", pi::cutName[i], pi::intTypeName[j]), 75, 0.85, 1);
       hcostheta_bkg[i][j]->Sumw2();
       for (int k = 0; k<pi::nthinslices; ++k){
         hmediandEdxSlice[k][i][j] = new TH1D(Form("hmediandEdxSlice_%d_%d_%d",k,i,j), Form("mediandEdx, %s, %s, sliceID = %d;Median dE/dx (MeV/cm)", pi::cutName[i], pi::intTypeName[j], k), 14, 1, 8);
@@ -118,7 +118,7 @@ void ThinSlice::BookHistograms(){
         hdaughter_michel_scoreSlice[k][i][j] = new TH1D(Form("hdaughter_michel_scoreSlice_%d_%d_%d",k,i,j), Form("daughter_michel_score, %s, %s, sliceID = %d;Michel score", pi::cutName[i], pi::intTypeName[j], k), 10, 0, 1);
         hdaughter_michel_scoreSlice[k][i][j]->Sumw2();
         
-        hcosthetaSlice[k][i][j] = new TH1D(Form("hcosthetaSlice_%d_%d_%d",k,i,j), Form("costheta, %s, %s, sliceID = %d;Cos(theta)", pi::cutName[i], pi::intTypeName[j], k), 20, 0.8, 1);
+        hcosthetaSlice[k][i][j] = new TH1D(Form("hcosthetaSlice_%d_%d_%d",k,i,j), Form("costheta, %s, %s, sliceID = %d;Cos(theta)", pi::cutName[i], pi::intTypeName[j], k), 15, 0.85, 1);
         hcosthetaSlice[k][i][j]->Sumw2();
       }        
 
@@ -703,32 +703,32 @@ void ThinSlice::FillHistograms(int cut, const anavar & evt){
   }
 }
 
-void ThinSlice::FillSliceHist(const anavar & evt, int constraint_type){
+void ThinSlice::FillSliceHist(const anavar & evt, int constraint_type, int cut){
   if (hadana.fAllTrackCheck) {
     cout<<"Warning: AllTrackCheck hasn't been fully implemented!!!"<<endl; // Do we need AllTrackCheck in main branch?
   }
   else {
     if (constraint_type == 1) { // muon
-      FillHistVec1D(hdaughter_michel_score_bkg[6], hadana.daughter_michel_score, hadana.pitype, false, false);
+      FillHistVec1D(hdaughter_michel_score_bkg[cut], hadana.daughter_michel_score, hadana.pitype, false, false);
     }
     else if (constraint_type == 2) { // proton
-      FillHistVec1D(hmediandEdx_bkg[6], hadana.median_dEdx, hadana.pitype, false, true);
-      FillHistVec1D(hChi2_proton_bkg[6], hadana.chi2_proton, hadana.pitype, false, true);
+      FillHistVec1D(hmediandEdx_bkg[cut], hadana.median_dEdx, hadana.pitype, false, true);
+      FillHistVec1D(hChi2_proton_bkg[cut], hadana.chi2_proton, hadana.pitype, false, true);
     }
     else if (constraint_type == 3) { // secondary pion
-      FillHistVec1D(hcostheta_bkg[6], hadana.beam_costh, hadana.pitype, true, false);
+      FillHistVec1D(hcostheta_bkg[cut], hadana.beam_costh, hadana.pitype, true, false);
     }
     // in each slice
     if (reco_sliceID>=0 && reco_sliceID<pi::nthinslices){
       if (constraint_type == 1) { // muon
-        FillHistVec1D(hdaughter_michel_scoreSlice[reco_sliceID][6], hadana.daughter_michel_score, hadana.pitype, false, false);
+        FillHistVec1D(hdaughter_michel_scoreSlice[reco_sliceID][cut], hadana.daughter_michel_score, hadana.pitype, false, false);
       }
       else if (constraint_type == 2) { // proton
-        FillHistVec1D(hmediandEdxSlice[reco_sliceID][6], hadana.median_dEdx, hadana.pitype, false, true);
-        FillHistVec1D(hChi2_protonSlice[reco_sliceID][6], hadana.chi2_proton, hadana.pitype, false, true);
+        FillHistVec1D(hmediandEdxSlice[reco_sliceID][cut], hadana.median_dEdx, hadana.pitype, false, true);
+        FillHistVec1D(hChi2_protonSlice[reco_sliceID][cut], hadana.chi2_proton, hadana.pitype, false, true);
       }
       else if (constraint_type == 3) { // secondary pion
-        FillHistVec1D(hcosthetaSlice[reco_sliceID][6], hadana.beam_costh, hadana.pitype, true, false);
+        FillHistVec1D(hcosthetaSlice[reco_sliceID][cut], hadana.beam_costh, hadana.pitype, true, false);
       }
     }
   }
@@ -866,6 +866,9 @@ void ThinSlice::Run(anavar & evt, Unfold & uf, Long64_t nentries=-1){
         }
       }
     }
+    FillSliceHist(evt, 1, 0);
+    FillSliceHist(evt, 2, 0);
+    FillSliceHist(evt, 3, 0);
   }
   
   uf.SaveHistograms();

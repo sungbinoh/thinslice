@@ -76,7 +76,7 @@ void bkgFit_mu(TFile *fmc, TFile *fdata, bool fitfakedata){
     h1->Scale(totaldata/totalmc);
     h2->Scale(totaldata/totalmc);
     fitter.SetHistograms(h0, h1, h2);
-    fitter.SetFitRange(6, 10);
+    fitter.SetFitRange(7, 9);
     fitter.Fit();
     vcorr.push_back(fitter.GetPar());
     vcorrerr.push_back(fitter.GetParError());
@@ -97,7 +97,7 @@ void bkgFit_mu(TFile *fmc, TFile *fdata, bool fitfakedata){
   h1->Scale(totaldata/totalmc);
   h2->Scale(totaldata/totalmc);
   fitter.SetHistograms(h0, h1, h2);
-  fitter.SetFitRange(h0->FindBin(0.55), -1);
+  fitter.SetFitRange(h0->FindBin(0.6), h0->FindBin(0.9));
   fitter.Fit();
   std::cout<<fitter.GetPar()<<" "<<fitter.GetParError()<<std::endl;
   // muon constraint ends
@@ -179,7 +179,7 @@ void bkgFit_p(TFile *fmc, TFile *fdata, bool fitfakedata){
     h1->Scale(totaldata/totalmc);
     h2->Scale(totaldata/totalmc);
     fitter.SetHistograms(h0, h1, h2);
-    fitter.SetFitRange(2, 8);
+    fitter.SetFitRange(3, 7);
     fitter.Fit();
     vcorr.push_back(fitter.GetPar());
     vcorrerr.push_back(fitter.GetParError());
@@ -199,7 +199,7 @@ void bkgFit_p(TFile *fmc, TFile *fdata, bool fitfakedata){
   h1->Scale(totaldata/totalmc);
   h2->Scale(totaldata/totalmc);
   fitter.SetHistograms(h0, h1, h2);
-  fitter.SetFitRange(2, 8);
+  fitter.SetFitRange(h0->FindBin(20), h0->FindBin(70));
   fitter.Fit();
   std::cout<<fitter.GetPar()<<" "<<fitter.GetParError()<<std::endl;
   // proton constraint ends
@@ -281,7 +281,7 @@ void bkgFit_spi(TFile *fmc, TFile *fdata, bool fitfakedata){
     h1->Scale(totaldata/totalmc);
     h2->Scale(totaldata/totalmc);
     fitter.SetHistograms(h0, h1, h2);
-    fitter.SetFitRange(2, 6); // don't use underflow bin
+    fitter.SetFitRange(6, 10); // don't use underflow bin
     fitter.Fit();
     vcorr.push_back(fitter.GetPar());
     vcorrerr.push_back(fitter.GetParError());
@@ -301,7 +301,7 @@ void bkgFit_spi(TFile *fmc, TFile *fdata, bool fitfakedata){
   h1->Scale(totaldata/totalmc);
   h2->Scale(totaldata/totalmc);
   fitter.SetHistograms(h0, h1, h2);
-  fitter.SetFitRange(2, h0->FindBin(0.955));
+  fitter.SetFitRange(h0->FindBin(0.9), h0->FindBin(0.95));
   fitter.Fit();
   std::cout<<fitter.GetPar()<<" "<<fitter.GetParError()<<std::endl;
   // secondary pion constraint ends
