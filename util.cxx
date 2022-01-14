@@ -5,20 +5,20 @@
 
 using namespace std;
 
-void FillHistVec1D(TH1D *hist[pi::nIntTypes+1], const double &value, const int &partype){
+void FillHistVec1D(TH1D *hist[pi::nIntTypes+1], const double &value, const int &partype, bool fill_underflow, bool fill_overflow){
   //hist[0]->Fill(value);
   double weight = 1.;
   if (partype == 3) // kMuon
     weight = 1.;//59;
   if (partype>=0 && partype < pi::nIntTypes+1){
-    if (value<hist[partype]->GetXaxis()->GetXmin()){
-      hist[partype]->Fill(hist[partype]->GetXaxis()->GetXmin(), weight);
+    if (value < hist[partype]->GetXaxis()->GetXmin()){ // underflow values
+      if (fill_underflow) hist[partype]->Fill(hist[partype]->GetXaxis()->GetXmin(), weight);
     }
-    else if (value<hist[partype]->GetXaxis()->GetXmax()){
+    else if (value < hist[partype]->GetXaxis()->GetXmax()){
       hist[partype]->Fill(value, weight);
     }
-    else{
-      hist[partype]->Fill(hist[partype]->GetXaxis()->GetXmax()-0.000001, weight);
+    else{ // overflow values
+      if (fill_overflow) hist[partype]->Fill(hist[partype]->GetXaxis()->GetXmax()-0.000001, weight);
     }
   }
 }
