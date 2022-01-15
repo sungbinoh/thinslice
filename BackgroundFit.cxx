@@ -5,6 +5,7 @@
 #include "TFile.h"
 #include "TH1D.h"
 #include "TCanvas.h"
+#include "TLine.h"
 #include "TGraphErrors.h"
 #include "TVectorD.h"
 #include <iostream>
@@ -19,9 +20,33 @@ static void show_usage(std::string name)
             << std::endl;
 }
 
-void bkgFit_mu(TFile *fmc, TFile *fdata, bool fitfakedata){
+void save_results(vector<double> vslice, vector<double> vcorr, vector<double> vcorrerr, const char* particle, bool fitfakedata, TFile *fout){
+  TCanvas *c1 = new TCanvas("c1","c1");
+  c1->SetGrid();
+  TGraphErrors *gr_corr = new TGraphErrors(vslice.size(), &vslice[0], &vcorr[0], 0, &vcorrerr[0]);
+  gr_corr->SetMarkerStyle(106);
+  gr_corr->SetTitle(Form("%s bkg constraint", particle));
+  gr_corr->GetXaxis()->SetTitle("Slice");
+  gr_corr->GetXaxis()->SetLimits(-1, 23); // 22 slices
+  gr_corr->GetYaxis()->SetTitle("Scale factor");
+  gr_corr->Draw("AP");
+  TLine *line = new TLine(-1, 1, 23, 1);
+  line->SetLineColor(kRed);
+  line->SetLineStyle(2);
+  line->Draw("same");
+  if (fitfakedata){
+    c1->Print(Form("bkgfitsMC_%s.png", particle));
+  }
+  else{
+    c1->Print(Form("bkgfits_%s.png", particle));
+  }
+  gr_corr->Write(Form("gr_corr_%s", particle));
+}
+
+void bkgFit_mu(TFile *fmc, TFile *fdata, bool fitfakedata, TFile *fout){
   const char varname[50] = "daughter_michel_score";
   const char particle[10] = "mu";
+  cout<<"##### Constrain muon bkg using "<<varname<<endl;
   
   double totaldata = 0;
   double totalmc = 0;
@@ -60,7 +85,6 @@ void bkgFit_mu(TFile *fmc, TFile *fdata, bool fitfakedata){
   // muon constraint begins
   for (int i = 0; i<pi::nthinslices; ++i){
     std::cout<<"##### Slice "<<i<<std::endl;
-    vslice.push_back(i);
     TH1D *h0 = hvarSlice[i][6][pi::kData];
     TH1D *h1 = hvarSlice[i][6][pi::kPiInel];
     h1->Add(hvarSlice[i][6][pi::kPiElas]);
@@ -78,8 +102,11 @@ void bkgFit_mu(TFile *fmc, TFile *fdata, bool fitfakedata){
     fitter.SetHistograms(h0, h1, h2);
     fitter.SetFitRange(7, 9);
     fitter.Fit();
-    vcorr.push_back(fitter.GetPar());
-    vcorrerr.push_back(fitter.GetParError());
+    if (fitter.GetFitStatus()){
+      vslice.push_back(i);
+      vcorr.push_back(fitter.GetPar());
+      vcorrerr.push_back(fitter.GetParError());
+    }
   }
   cout<<"##### Global fit #####"<<endl;
   TH1D *h0 = hvar[6][pi::kData];
@@ -100,31 +127,14 @@ void bkgFit_mu(TFile *fmc, TFile *fdata, bool fitfakedata){
   fitter.SetFitRange(h0->FindBin(0.6), h0->FindBin(0.9));
   fitter.Fit();
   std::cout<<fitter.GetPar()<<" "<<fitter.GetParError()<<std::endl;
-  // muon constraint ends
-  
-  TCanvas *c1 = new TCanvas("c1","c1");
-  TGraphErrors *gr_corr = new TGraphErrors(vslice.size(), &vslice[0], &vcorr[0], 0, &vcorrerr[0]);
-  gr_corr->Draw("ALP");
-  gr_corr->SetTitle(Form("%s bkg constraint", particle));
-  gr_corr->GetXaxis()->SetTitle("Slice");
-  gr_corr->GetYaxis()->SetTitle("Scale factor");
-  if (fitfakedata){
-    //TFile f(Form("bkgfitsMC_%s.root", particle), "recreate");
-    //gr_corr->Write(Form("gr_corr_%s", particle));
-    //f.Close();
-    c1->Print(Form("bkgfitsMC_%s.png", particle));
-  }
-  else{
-    //TFile f(Form("bkgfits_%s.root", particle), "recreate");
-    //gr_corr->Write(Form("gr_corr_%s", particle));
-    //f.Close();
-    c1->Print(Form("bkgfits_%s.png", particle));
-  }
+
+  save_results(vslice, vcorr, vcorrerr, particle, fitfakedata, fout);
 }
 
-void bkgFit_p(TFile *fmc, TFile *fdata, bool fitfakedata){
+void bkgFit_p(TFile *fmc, TFile *fdata, bool fitfakedata, TFile *fout){
   const char varname[50] = "Chi2_proton"; // "Chi2_proton"/"mediandEdx"
   const char particle[10] = "p";
+  cout<<"##### Constrain proton bkg using "<<varname<<endl;
   
   double totaldata = 0;
   double totalmc = 0;
@@ -163,7 +173,6 @@ void bkgFit_p(TFile *fmc, TFile *fdata, bool fitfakedata){
   // proton constraint begins
   for (int i = 0; i<pi::nthinslices; ++i){
     std::cout<<"##### Slice "<<i<<std::endl;
-    vslice.push_back(i);
     TH1D *h0 = hvarSlice[i][6][pi::kData];
     TH1D *h1 = hvarSlice[i][6][pi::kPiInel];
     h1->Add(hvarSlice[i][6][pi::kPiElas]);
@@ -181,8 +190,11 @@ void bkgFit_p(TFile *fmc, TFile *fdata, bool fitfakedata){
     fitter.SetHistograms(h0, h1, h2);
     fitter.SetFitRange(3, 7);
     fitter.Fit();
-    vcorr.push_back(fitter.GetPar());
-    vcorrerr.push_back(fitter.GetParError());
+    if (fitter.GetFitStatus()){
+      vslice.push_back(i);
+      vcorr.push_back(fitter.GetPar());
+      vcorrerr.push_back(fitter.GetParError());
+    }
   }
   cout<<"##### Global fit #####"<<endl;
   TH1D *h0 = hvar[6][pi::kData];
@@ -202,31 +214,14 @@ void bkgFit_p(TFile *fmc, TFile *fdata, bool fitfakedata){
   fitter.SetFitRange(h0->FindBin(20), h0->FindBin(70));
   fitter.Fit();
   std::cout<<fitter.GetPar()<<" "<<fitter.GetParError()<<std::endl;
-  // proton constraint ends
   
-  TCanvas *c1 = new TCanvas("c1","c1");
-  TGraphErrors *gr_corr = new TGraphErrors(vslice.size(), &vslice[0], &vcorr[0], 0, &vcorrerr[0]);
-  gr_corr->Draw("ALP");
-  gr_corr->SetTitle(Form("%s bkg constraint", particle));
-  gr_corr->GetXaxis()->SetTitle("Slice");
-  gr_corr->GetYaxis()->SetTitle("Scale factor");
-  if (fitfakedata){
-    //TFile f(Form("bkgfitsMC_%s.root", particle), "recreate");
-    //gr_corr->Write(Form("gr_corr_%s", particle));
-    //f.Close();
-    c1->Print(Form("bkgfitsMC_%s.png", particle));
-  }
-  else{
-    //TFile f(Form("bkgfits_%s.root", particle), "recreate");
-    //gr_corr->Write(Form("gr_corr_%s", particle));
-    //f.Close();
-    c1->Print(Form("bkgfits_%s.png", particle));
-  }
+  save_results(vslice, vcorr, vcorrerr, particle, fitfakedata, fout);
 }
 
-void bkgFit_spi(TFile *fmc, TFile *fdata, bool fitfakedata){
+void bkgFit_spi(TFile *fmc, TFile *fdata, bool fitfakedata, TFile *fout){
   const char varname[50] = "costheta";
   const char particle[10] = "spi";
+  cout<<"##### Constrain secondary pion bkg using "<<varname<<endl;
   
   double totaldata = 0;
   double totalmc = 0;
@@ -265,7 +260,6 @@ void bkgFit_spi(TFile *fmc, TFile *fdata, bool fitfakedata){
   // secondary pion constraint begins
   for (int i = 0; i<pi::nthinslices; ++i){
     std::cout<<"##### Slice "<<i<<std::endl;
-    vslice.push_back(i);
     TH1D *h0 = hvarSlice[i][6][pi::kData];
     TH1D *h1 = hvarSlice[i][6][pi::kPiInel];
     h1->Add(hvarSlice[i][6][pi::kPiElas]);
@@ -283,8 +277,11 @@ void bkgFit_spi(TFile *fmc, TFile *fdata, bool fitfakedata){
     fitter.SetHistograms(h0, h1, h2);
     fitter.SetFitRange(6, 10); // don't use underflow bin
     fitter.Fit();
-    vcorr.push_back(fitter.GetPar());
-    vcorrerr.push_back(fitter.GetParError());
+    if (fitter.GetFitStatus()){
+      vslice.push_back(i);
+      vcorr.push_back(fitter.GetPar());
+      vcorrerr.push_back(fitter.GetParError());
+    }
   }
   cout<<"##### Global fit #####"<<endl;
   TH1D *h0 = hvar[6][pi::kData];
@@ -304,26 +301,8 @@ void bkgFit_spi(TFile *fmc, TFile *fdata, bool fitfakedata){
   fitter.SetFitRange(h0->FindBin(0.9), h0->FindBin(0.95));
   fitter.Fit();
   std::cout<<fitter.GetPar()<<" "<<fitter.GetParError()<<std::endl;
-  // secondary pion constraint ends
   
-  TCanvas *c1 = new TCanvas("c1","c1");
-  TGraphErrors *gr_corr = new TGraphErrors(vslice.size(), &vslice[0], &vcorr[0], 0, &vcorrerr[0]);
-  gr_corr->Draw("ALP");
-  gr_corr->SetTitle(Form("%s bkg constraint", particle));
-  gr_corr->GetXaxis()->SetTitle("Slice");
-  gr_corr->GetYaxis()->SetTitle("Scale factor");
-  if (fitfakedata){
-    //TFile f(Form("bkgfitsMC_%s.root", particle), "recreate");
-    //gr_corr->Write(Form("gr_corr_%s", particle));
-    //f.Close();
-    c1->Print(Form("bkgfitsMC_%s.png", particle));
-  }
-  else{
-    //TFile f(Form("bkgfits_%s.root", particle), "recreate");
-    //gr_corr->Write(Form("gr_corr_%s", particle));
-    //f.Close();
-    c1->Print(Form("bkgfits_%s.png", particle));
-  }
+  save_results(vslice, vcorr, vcorrerr, particle, fitfakedata, fout);
 }
 
 
@@ -343,16 +322,20 @@ int main(int argc, char* argv[]){
   
   TFile *fmc = TFile::Open("/dune/app/users/yinrui/thinslice/build/mcprod4a.root");
   TFile *fdata;
+  TFile *fout;
   if (fitfakedata){
     fdata = TFile::Open("/dune/app/users/yinrui/thinslice/build/mcprod4a.root");
+    fout = TFile::Open("bkgfitsMC.root", "recreate");
   }
   else{
     fdata = TFile::Open("/dune/app/users/yinrui/thinslice/build/data.root");
+    fout = TFile::Open("bkgfits.root", "recreate");
   }
 
-  bkgFit_mu(fmc, fdata, fitfakedata);
-  bkgFit_p(fmc, fdata, fitfakedata);
-  bkgFit_spi(fmc, fdata, fitfakedata);
+  bkgFit_mu(fmc, fdata, fitfakedata, fout);
+  bkgFit_p(fmc, fdata, fitfakedata, fout);
+  bkgFit_spi(fmc, fdata, fitfakedata, fout);
 
+  fout->Close();
   return 0;
 }

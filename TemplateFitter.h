@@ -19,6 +19,7 @@ class TemplateFitter {
   
   double GetPar();
   double GetParError();
+  bool GetFitStatus();
 
   static TH1D *h0, *h1, *h2;
   static int i0, i1;

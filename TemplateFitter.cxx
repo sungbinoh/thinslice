@@ -99,3 +99,7 @@ double TemplateFitter::GetParError(){
     return 2;
   }
 }
+
+bool TemplateFitter::GetFitStatus(){
+  return fitsuccess;
+}
