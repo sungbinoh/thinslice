@@ -8,6 +8,9 @@
 #include "TLine.h"
 #include "TGraphErrors.h"
 #include "TVectorD.h"
+#include "TSystem.h"
+#include "json/json.h"
+#include <fstream>
 #include <iostream>
 #include <string>
 
@@ -15,12 +18,12 @@ static void show_usage(std::string name)
 {
   std::cerr << "Usage: " << name <<" <option(s)>\n"
             << "Options:\n"
-            << "\t-h,--help\t\tShow this help message\n"
-            << "\t-f,--fakedata\t\tDo fit on fake data instead of data"
+            << "\t-h,--help\t\tShow this help message.\n"
+            << "\t-c config.json\t\tSpecify configuration file."
             << std::endl;
 }
 
-void save_results(vector<double> vslice, vector<double> vcorr, vector<double> vcorrerr, const char* particle, bool fitfakedata, TFile *fout){
+void save_results(vector<double> vslice, vector<double> vcorr, vector<double> vcorrerr, const char* particle, string outfile){
   TCanvas *c1 = new TCanvas("c1","c1");
   c1->SetGrid();
   TGraphErrors *gr_corr = new TGraphErrors(vslice.size(), &vslice[0], &vcorr[0], 0, &vcorrerr[0]);
@@ -34,16 +37,12 @@ void save_results(vector<double> vslice, vector<double> vcorr, vector<double> vc
   line->SetLineColor(kRed);
   line->SetLineStyle(2);
   line->Draw("same");
-  if (fitfakedata){
-    c1->Print(Form("bkgfitsMC_%s.png", particle));
-  }
-  else{
-    c1->Print(Form("bkgfits_%s.png", particle));
-  }
+  c1->Print(Form("%s_%s.png", outfile.substr(0,outfile.find(".root")).c_str(), particle));
+  c1->Print(Form("%s_%s.pdf", outfile.substr(0,outfile.find(".root")).c_str(), particle));
   gr_corr->Write(Form("gr_corr_%s", particle));
 }
 
-void bkgFit_mu(TFile *fmc, TFile *fdata, bool fitfakedata, TFile *fout){
+void bkgFit_mu(TFile *fmc, TFile *fdata, string outfile){
   const char varname[50] = "daughter_michel_score";
   const char particle[10] = "mu";
   cout<<"##### Constrain muon bkg using "<<varname<<endl;
@@ -128,10 +127,10 @@ void bkgFit_mu(TFile *fmc, TFile *fdata, bool fitfakedata, TFile *fout){
   fitter.Fit();
   std::cout<<fitter.GetPar()<<" "<<fitter.GetParError()<<std::endl;
 
-  save_results(vslice, vcorr, vcorrerr, particle, fitfakedata, fout);
+  save_results(vslice, vcorr, vcorrerr, particle, outfile);
 }
 
-void bkgFit_p(TFile *fmc, TFile *fdata, bool fitfakedata, TFile *fout){
+void bkgFit_p(TFile *fmc, TFile *fdata, string outfile){
   const char varname[50] = "Chi2_proton"; // "Chi2_proton"/"mediandEdx"
   const char particle[10] = "p";
   cout<<"##### Constrain proton bkg using "<<varname<<endl;
@@ -215,10 +214,10 @@ void bkgFit_p(TFile *fmc, TFile *fdata, bool fitfakedata, TFile *fout){
   fitter.Fit();
   std::cout<<fitter.GetPar()<<" "<<fitter.GetParError()<<std::endl;
   
-  save_results(vslice, vcorr, vcorrerr, particle, fitfakedata, fout);
+  save_results(vslice, vcorr, vcorrerr, particle, outfile);
 }
 
-void bkgFit_spi(TFile *fmc, TFile *fdata, bool fitfakedata, TFile *fout){
+void bkgFit_spi(TFile *fmc, TFile *fdata, string outfile){
   const char varname[50] = "costheta";
   const char particle[10] = "spi";
   cout<<"##### Constrain secondary pion bkg using "<<varname<<endl;
@@ -302,39 +301,47 @@ void bkgFit_spi(TFile *fmc, TFile *fdata, bool fitfakedata, TFile *fout){
   fitter.Fit();
   std::cout<<fitter.GetPar()<<" "<<fitter.GetParError()<<std::endl;
   
-  save_results(vslice, vcorr, vcorrerr, particle, fitfakedata, fout);
+  save_results(vslice, vcorr, vcorrerr, particle, outfile);
 }
 
 
-int main(int argc, char* argv[]){
+int main(int argc, char** argv){
 
-  bool fitfakedata = false;
+  //bool fitfakedata = false;
 
-  for (int i = 1; i < argc; ++i) {
-    std::string arg = argv[i];
-    if ((arg == "-h") || (arg == "--help")) {
+  bool found_config = false;
+
+  string config_file;
+
+  //for (int i = 1; i < argc; ++i) {
+  for (int iArg = 1; iArg < argc; iArg++) {
+    if (!strcasecmp(argv[iArg],"-c")) {
+     config_file = argv[++iArg];
+     found_config = true;
+    }
+    if (!strcasecmp(argv[iArg],"-h")) {
       show_usage(argv[0]);
-      return 0;
-    } else if ((arg == "-f") || (arg == "--fakedata")) {
-      fitfakedata = true;
+      return 1;
     }
   }
-  
-  TFile *fmc = TFile::Open("/dune/app/users/yinrui/thinslice/build/mcprod4a.root");
-  TFile *fdata;
-  TFile *fout;
-  if (fitfakedata){
-    fdata = TFile::Open("/dune/app/users/yinrui/thinslice/build/mcprod4a.root");
-    fout = TFile::Open("bkgfitsMC.root", "recreate");
-  }
-  else{
-    fdata = TFile::Open("/dune/app/users/yinrui/thinslice/build/data.root");
-    fout = TFile::Open("bkgfits.root", "recreate");
+
+  if (!found_config){
+    show_usage(argv[0]);
+    return 1;
   }
 
-  bkgFit_mu(fmc, fdata, fitfakedata, fout);
-  bkgFit_p(fmc, fdata, fitfakedata, fout);
-  bkgFit_spi(fmc, fdata, fitfakedata, fout);
+  Json::Value root;
+  ifstream file(config_file);
+  file >> root;
+  cout<<root<<endl;
+  
+  TFile *fdata = TFile::Open(root["datafile"].asString().c_str());
+  TFile *fmc = TFile::Open(root["mcfile"].asString().c_str());
+  TFile *fout = TFile::Open(root["outfile"].asString().c_str(), "recreate");
+
+  bkgFit_mu(fmc, fdata, root["outfile"].asString());
+  bkgFit_p(fmc, fdata, root["outfile"].asString());
+  bkgFit_spi(fmc, fdata, root["outfile"].asString());
 
   fout->Close();
   return 0;
