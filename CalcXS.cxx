@@ -13,6 +13,9 @@
 #include <fstream>
 #include <iostream>
 #include <string>
+#include "RooUnfoldResponse.h"
+#include "RooUnfoldBayes.h"
+#include "TH2D.h"
 
 static void show_usage(std::string name)
 {
@@ -164,7 +167,43 @@ int main(int argc, char** argv){
   hsignal->Add(hproton,-1);
   hsignal->Add(hpi,-1);
   hsignal->Add(hother,-1);
+  
+  // unfolding
+  RooUnfoldResponse *response_SliceID_Int = (RooUnfoldResponse*)fmc->Get("response_SliceID_Int");
+  RooUnfoldBayes unfold_Int (response_SliceID_Int, hsignal, 12);
+  
+  TH1D *hsignal_uf;
+  //hsignal_uf->Sumw2();
+  hsignal_uf = (TH1D*)unfold_Int.Hreco();
+  hsignal_uf->SetNameTitle("hsignal_uf", "Unfolded signal;Slice ID;Events");
+  
+  // get Ninc and Nint
+  double Ninc[pi::nthinslices] = {0};
+  double Nint[pi::nthinslices] = {0};
+  double err_inc[pi::nthinslices] = {0};
+  double err_int[pi::nthinslices] = {0};
+  double SliceID[pi::nthinslices] = {0};
 
+  for (int i = 0; i<pi::nthinslices; ++i){
+    SliceID[i] = i;
+    Nint[i] = hsignal_uf->GetBinContent(i+2);
+    err_int[i] = hsignal_uf->GetBinError(i+2);
+    for (int j = i; j<=pi::nthinslices; ++j){
+      Ninc[i] += hsignal_uf->GetBinContent(j+2); // should we use hsignal+hpiel?
+      err_inc[i] += pow(hsignal_uf->GetBinError(j+2),2);
+    }
+    err_inc[i] = sqrt(err_inc[i]);
+  }
+  TGraphErrors *gr_inc = new TGraphErrors(pi::nthinslices, SliceID, Ninc, 0, err_inc);
+  gr_inc->SetNameTitle("hinc", "Incident number;Slice ID;Events");
+  gr_inc->Write();
+  TGraphErrors *gr_int = new TGraphErrors(pi::nthinslices, SliceID, Nint, 0, err_int);
+  gr_int->SetNameTitle("hint", "Interaction number;Slice ID;Events");
+  gr_int->Write();
+  TGraphErrors *gr_trueincE = (TGraphErrors*)fmc->Get("gr_trueincE"); // fdata->Get("gr_recoincE")
+  gr_trueincE->SetNameTitle("htrueincE", "True incident energy;Slice ID;Energy (MeV)");
+  gr_trueincE->Write();
+  
   fout->Write();
   fout->Close();
 
