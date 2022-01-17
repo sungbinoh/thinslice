@@ -23,7 +23,7 @@ static void show_usage(std::string name)
             << std::endl;
 }
 
-void save_results(vector<double> vslice, vector<double> vcorr, vector<double> vcorrerr, const char* particle, string outfile){
+void save_results(vector<double> vslice, vector<double> vcorr, vector<double> vcorrerr, double par, double parerr, const char* particle, string outfile){
   TCanvas *c1 = new TCanvas("c1","c1");
   c1->SetGrid();
   TGraphErrors *gr_corr = new TGraphErrors(vslice.size(), &vslice[0], &vcorr[0], 0, &vcorrerr[0]);
@@ -40,6 +40,10 @@ void save_results(vector<double> vslice, vector<double> vcorr, vector<double> vc
   c1->Print(Form("%s_%s.png", outfile.substr(0,outfile.find(".root")).c_str(), particle));
   c1->Print(Form("%s_%s.pdf", outfile.substr(0,outfile.find(".root")).c_str(), particle));
   gr_corr->Write(Form("gr_corr_%s", particle));
+  TVectorD sf(2);
+  sf[0] = par;
+  sf[1] = parerr;
+  sf.Write(Form("sf_%s", particle));
 }
 
 void bkgFit_mu(TFile *fmc, TFile *fdata, string outfile){
@@ -127,7 +131,7 @@ void bkgFit_mu(TFile *fmc, TFile *fdata, string outfile){
   fitter.Fit();
   std::cout<<fitter.GetPar()<<" "<<fitter.GetParError()<<std::endl;
 
-  save_results(vslice, vcorr, vcorrerr, particle, outfile);
+  save_results(vslice, vcorr, vcorrerr, fitter.GetPar(), fitter.GetParError(), particle, outfile);
 }
 
 void bkgFit_p(TFile *fmc, TFile *fdata, string outfile){
@@ -214,7 +218,7 @@ void bkgFit_p(TFile *fmc, TFile *fdata, string outfile){
   fitter.Fit();
   std::cout<<fitter.GetPar()<<" "<<fitter.GetParError()<<std::endl;
   
-  save_results(vslice, vcorr, vcorrerr, particle, outfile);
+  save_results(vslice, vcorr, vcorrerr, fitter.GetPar(), fitter.GetParError(), particle, outfile);
 }
 
 void bkgFit_spi(TFile *fmc, TFile *fdata, string outfile){
@@ -301,7 +305,7 @@ void bkgFit_spi(TFile *fmc, TFile *fdata, string outfile){
   fitter.Fit();
   std::cout<<fitter.GetPar()<<" "<<fitter.GetParError()<<std::endl;
   
-  save_results(vslice, vcorr, vcorrerr, particle, outfile);
+  save_results(vslice, vcorr, vcorrerr, fitter.GetPar(), fitter.GetParError(), particle, outfile);
 }
 
 
