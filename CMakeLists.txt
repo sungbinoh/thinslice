@@ -64,5 +64,8 @@
   add_executable(RunEffEval RunEffEval.cxx)
   target_link_libraries(RunEffEval Event)
 
-  install(TARGETS RunCrossSection BackgroundFit RunProtonInel RunEffEval DESTINATION bin)
+  add_executable(RunCalcXS CalcXS.cxx)
+  target_link_libraries(RunCalcXS Event)
+
+  install(TARGETS RunCrossSection BackgroundFit RunProtonInel RunEffEval RunCalcXS DESTINATION bin)
   install(TARGETS Event DESTINATION lib)
