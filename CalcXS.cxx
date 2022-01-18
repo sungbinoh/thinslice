@@ -77,12 +77,14 @@ int main(int argc, char** argv){
   TH1D *hdata = new TH1D("hdata","Data;Slice ID;Events",pi::nthinslices+2,-1,pi::nthinslices+1); // h_recosliceid_allevts_cuts (hreco_sliceID_6_0)
   TH1D *hproton = new TH1D("hproton","Proton background;Slice ID;Events",pi::nthinslices+2,-1,pi::nthinslices+1);
   TH1D *hmu = new TH1D("hmu","Muon background;Slice ID;Events",pi::nthinslices+2,-1,pi::nthinslices+1);
-  TH1D *hpi = new TH1D("hpi","Pion background;Slice ID;Events",pi::nthinslices+2,-1,pi::nthinslices+1);
+  TH1D *hspi = new TH1D("hspi","Secondary pion background;Slice ID;Events",pi::nthinslices+2,-1,pi::nthinslices+1);
+  TH1D *hpiel = new TH1D("hpiel","Pion elastic;Slice ID;Events",pi::nthinslices+2,-1,pi::nthinslices+1);
   TH1D *hother = new TH1D("hother","Other backgrounds;Slice ID;Events",pi::nthinslices+2,-1,pi::nthinslices+1);
   hdata->Sumw2();
   hproton->Sumw2();
   hmu->Sumw2();
-  hpi->Sumw2();
+  hspi->Sumw2();
+  hpiel->Sumw2();
   hother->Sumw2();
 
   // first loop to get total number of events
@@ -140,14 +142,23 @@ int main(int argc, char** argv){
           hproton->SetBinError(j+1, bine);
         }
         else if (i == pi::kMIDpi){
-          double binc = hpi->GetBinContent(bin);
-          double bine = hpi->GetBinError(bin);
+          double binc = hspi->GetBinContent(bin);
+          double bine = hspi->GetBinError(bin);
           binc += hsliceID[i]->GetBinContent(bin)*(*sf_spi)[0];
           bine = sqrt(pow(bine,2)
                       + pow(hsliceID[i]->GetBinError(bin)*(*sf_spi)[0],2)
                       + pow(hsliceID[i]->GetBinContent(bin)*(*sf_spi)[1],2));
-          hpi->SetBinContent(j+1, binc);
-          hpi->SetBinError(j+1, bine);
+          hspi->SetBinContent(j+1, binc);
+          hspi->SetBinError(j+1, bine);
+        }
+        else if (i == pi::kPiElas){
+          double binc = hpiel->GetBinContent(bin);
+          double bine = hpiel->GetBinError(bin);
+          binc += hsliceID[i]->GetBinContent(bin);
+          bine = sqrt(pow(bine,2)
+                      + pow(hsliceID[i]->GetBinError(bin),2));
+          hpiel->SetBinContent(j+1, binc);
+          hpiel->SetBinError(j+1, bine);
         }
         else if (i != pi::kPiInel){
           double binc = hother->GetBinContent(bin);
@@ -162,21 +173,29 @@ int main(int argc, char** argv){
     }
   }
 
-  TH1D *hsignal = (TH1D*)hdata->Clone("hsignal");
-  hsignal->SetTitle("Signal;Slice ID;Events");
-  hsignal->Add(hmu,-1);
-  hsignal->Add(hproton,-1);
-  hsignal->Add(hpi,-1);
-  hsignal->Add(hother,-1);
+  TH1D *hsiginc = (TH1D*)hdata->Clone("hsiginc");
+  hsiginc->SetTitle("Pion incident signal;Slice ID;Events");
+  hsiginc->Add(hmu,-1);
+  hsiginc->Add(hproton,-1);
+  hsiginc->Add(hspi,-1);
+  hsiginc->Add(hother,-1);
+  TH1D *hsignal = (TH1D*)hsiginc->Clone("hsignal");
+  hsignal->SetTitle("Pion interaction signal;Slice ID;Events");
+  hsignal->Add(hpiel,-1);
   
   // unfolding
+  RooUnfoldResponse *response_SliceID_Inc = (RooUnfoldResponse*)fmc->Get("response_SliceID_Inc");
+  RooUnfoldBayes unfold_Inc (response_SliceID_Inc, hsiginc, 4);
   RooUnfoldResponse *response_SliceID_Int = (RooUnfoldResponse*)fmc->Get("response_SliceID_Int");
   RooUnfoldBayes unfold_Int (response_SliceID_Int, hsignal, 4);
   
+  TH1D *hsiginc_uf;
   TH1D *hsignal_uf;
   //hsignal_uf->Sumw2();
+  hsiginc_uf = (TH1D*)unfold_Inc.Hreco();
+  hsiginc_uf->SetNameTitle("hsiginc_uf", "Unfolded incident signal;Slice ID;Events");
   hsignal_uf = (TH1D*)unfold_Int.Hreco();
-  hsignal_uf->SetNameTitle("hsignal_uf", "Unfolded signal;Slice ID;Events");
+  hsignal_uf->SetNameTitle("hsignal_uf", "Unfolded interaction signal;Slice ID;Events");
   
   // get Ninc and Nint
   double Ninc[pi::nthinslices] = {0};
@@ -190,8 +209,8 @@ int main(int argc, char** argv){
     Nint[i] = hsignal_uf->GetBinContent(i+2);
     err_int[i] = hsignal_uf->GetBinError(i+2);
     for (int j = i; j<=pi::nthinslices; ++j){
-      Ninc[i] += hsignal_uf->GetBinContent(j+2); // should we use hsignal+hpiel?
-      err_inc[i] += pow(hsignal_uf->GetBinError(j+2),2);
+      Ninc[i] += hsiginc_uf->GetBinContent(j+2);
+      err_inc[i] += pow(hsiginc_uf->GetBinError(j+2),2);
     }
     err_inc[i] = sqrt(err_inc[i]);
   }
@@ -232,16 +251,14 @@ int main(int argc, char** argv){
   gr_recoxs->GetXaxis()->SetTitle("Pion Kinetic Energy (MeV)");
   gr_recoxs->GetXaxis()->SetRangeUser(360, 900);
   gr_recoxs->GetYaxis()->SetTitle("#sigma_{inelastic} (mb)");
-  //gr_recoxs->GetYaxis()->SetRangeUser(400, 900);
+  gr_recoxs->GetYaxis()->SetRangeUser(400, 900);
   gr_recoxs->SetLineWidth(2);
   gr_recoxs->Draw("ape");
   total_inel_KE->SetLineColor(2);
   total_inel_KE->Draw("c");
   c1->Print("recoxs.png");
   
-  
   fout->Write();
   fout->Close();
-
   return 0;
 }
