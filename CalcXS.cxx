@@ -195,14 +195,46 @@ int main(int argc, char** argv){
     err_inc[i] = sqrt(err_inc[i]);
   }
   TGraphErrors *gr_inc = new TGraphErrors(pi::nthinslices, SliceID, Ninc, 0, err_inc);
-  gr_inc->SetNameTitle("hinc", "Incident number;Slice ID;Events");
+  gr_inc->SetNameTitle("gr_inc", "Incident number;Slice ID;Events");
   gr_inc->Write();
   TGraphErrors *gr_int = new TGraphErrors(pi::nthinslices, SliceID, Nint, 0, err_int);
-  gr_int->SetNameTitle("hint", "Interaction number;Slice ID;Events");
+  gr_int->SetNameTitle("gr_int", "Interaction number;Slice ID;Events");
   gr_int->Write();
   TGraphErrors *gr_trueincE = (TGraphErrors*)fmc->Get("gr_trueincE"); // fdata->Get("gr_recoincE")
-  gr_trueincE->SetNameTitle("htrueincE", "True incident energy;Slice ID;Energy (MeV)");
+  gr_trueincE->SetNameTitle("gr_trueincE", "True incident energy;Slice ID;Energy (MeV)");
   gr_trueincE->Write();
+  
+  // Calculate cross-section
+  double NA=6.02214076e23;
+  double MAr=39.95; //gmol
+  double Density = 1.4; // g/cm^3
+  double xs[pi::nthinslices] = {0};
+  double err_xs[pi::nthinslices] = {0};
+  double incE[pi::nthinslices] = {0};
+  double err_incE[pi::nthinslices] = {0};
+  for (int i = 0; i<pi::nthinslices; ++i){
+    xs[i] = MAr/(Density*NA*pi::thinslicewidth)*log(Ninc[i]/(Ninc[i]-Nint[i]))*1e27;
+    err_xs[i] = MAr/(Density*NA*pi::thinslicewidth)*1e27*sqrt(pow(Nint[i]*err_inc[i]/Ninc[i]/(Ninc[i]-Nint[i]),2)+pow(err_int[i]/(Ninc[i]-Nint[i]),2));
+    incE[i] = gr_trueincE->GetPointY(i);
+    err_incE[i] = gr_trueincE->GetErrorY(i);
+  }
+  TGraphErrors *gr_recoxs = new TGraphErrors(pi::nthinslices, incE, xs, err_incE, err_xs);
+  gr_recoxs->SetNameTitle("gr_recoxs", "Reco cross-section;Energy (MeV); Cross-section (mb)");
+  gr_recoxs->Write();
+  TFile f2("../files/exclusive_xsec.root");
+  TGraph *total_inel_KE = (TGraph*)f2.Get("total_inel_KE");
+  TCanvas *c1 = new TCanvas("c1", "c1");
+  gr_recoxs->SetTitle("Pion Inelastic Cross Section");
+  gr_recoxs->GetXaxis()->SetTitle("Pion Kinetic Energy (MeV)");
+  gr_recoxs->GetXaxis()->SetRangeUser(360, 900);
+  gr_recoxs->GetYaxis()->SetTitle("#sigma_{inelastic} (mb)");
+  gr_recoxs->GetYaxis()->SetRangeUser(400, 900);
+  gr_recoxs->SetLineWidth(2);
+  gr_recoxs->Draw("ape");
+  total_inel_KE->SetLineColor(2);
+  total_inel_KE->Draw("c");
+  c1->Print("recoxs.png");
+  
   
   fout->Write();
   fout->Close();
