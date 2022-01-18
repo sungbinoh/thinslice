@@ -74,7 +74,7 @@ int main(int argc, char** argv){
   double totalmc = 0;
   TH1D *hsliceID[pi::nIntTypes+1];
 
-  TH1D *hdata = new TH1D("hdata","Data;Slice ID;Events",pi::nthinslices+2,-1,pi::nthinslices+1);
+  TH1D *hdata = new TH1D("hdata","Data;Slice ID;Events",pi::nthinslices+2,-1,pi::nthinslices+1); // h_recosliceid_allevts_cuts (hreco_sliceID_6_0)
   TH1D *hproton = new TH1D("hproton","Proton background;Slice ID;Events",pi::nthinslices+2,-1,pi::nthinslices+1);
   TH1D *hmu = new TH1D("hmu","Muon background;Slice ID;Events",pi::nthinslices+2,-1,pi::nthinslices+1);
   TH1D *hpi = new TH1D("hpi","Pion background;Slice ID;Events",pi::nthinslices+2,-1,pi::nthinslices+1);
@@ -93,12 +93,12 @@ int main(int argc, char** argv){
     else {
       hsliceID[i] = (TH1D*)fmc->Get(Form("hreco_sliceID_%d_%d",pi::nCuts-1,i));
     }
-    for (int j = 0; j < pi::nthinslices; ++j){
+    for (int j = 0; j < pi::nthinslices+2; ++j){
       if (i==0){
-        totaldata += hsliceID[i]->GetBinContent(hsliceID[i]->FindBin(j+0.5));
+        totaldata += hsliceID[i]->GetBinContent(hsliceID[i]->FindBin(j-0.5));
       }
       else{
-        totalmc += hsliceID[i]->GetBinContent(hsliceID[i]->FindBin(j+0.5));
+        totalmc += hsliceID[i]->GetBinContent(hsliceID[i]->FindBin(j-0.5));
       }
     }
   }
