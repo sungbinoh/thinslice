@@ -61,6 +61,7 @@ int main(int argc, char** argv){
   TFile *fbkg  = TFile::Open(root["bkgfile"].asString().c_str());
   TFile *fout  = TFile::Open(root["outfile"].asString().c_str(), "recreate");
 
+  //TVectorD sf(2); sf[0] = 1.; sf[1] = 0.;
   TVectorD *sf_mu = (TVectorD*)fbkg->Get("sf_mu");
   TVectorD *sf_p = (TVectorD*)fbkg->Get("sf_p");
   TVectorD *sf_spi = (TVectorD*)fbkg->Get("sf_spi");
@@ -73,11 +74,11 @@ int main(int argc, char** argv){
   double totalmc = 0;
   TH1D *hsliceID[pi::nIntTypes+1];
 
-  TH1D *hdata = new TH1D("hdata","Data;Slice ID;Events",pi::nthinslices,0,pi::nthinslices);
-  TH1D *hproton = new TH1D("hproton","Proton background;Slice ID;Events",pi::nthinslices,0,pi::nthinslices);
-  TH1D *hmu = new TH1D("hmu","Muon background;Slice ID;Events",pi::nthinslices,0,pi::nthinslices);
-  TH1D *hpi = new TH1D("hpi","Pion background;Slice ID;Events",pi::nthinslices,0,pi::nthinslices);
-  TH1D *hother = new TH1D("hother","Other backgrounds;Slice ID;Events",pi::nthinslices,0,pi::nthinslices);
+  TH1D *hdata = new TH1D("hdata","Data;Slice ID;Events",pi::nthinslices+2,-1,pi::nthinslices+1);
+  TH1D *hproton = new TH1D("hproton","Proton background;Slice ID;Events",pi::nthinslices+2,-1,pi::nthinslices+1);
+  TH1D *hmu = new TH1D("hmu","Muon background;Slice ID;Events",pi::nthinslices+2,-1,pi::nthinslices+1);
+  TH1D *hpi = new TH1D("hpi","Pion background;Slice ID;Events",pi::nthinslices+2,-1,pi::nthinslices+1);
+  TH1D *hother = new TH1D("hother","Other backgrounds;Slice ID;Events",pi::nthinslices+2,-1,pi::nthinslices+1);
   hdata->Sumw2();
   hproton->Sumw2();
   hmu->Sumw2();
@@ -111,8 +112,8 @@ int main(int argc, char** argv){
       hsliceID[i] = (TH1D*)fmc->Get(Form("hreco_sliceID_%d_%d",pi::nCuts-1,i));
       hsliceID[i]->Scale(totaldata/totalmc);
     }
-    for (int j = 0; j < pi::nthinslices; ++j){
-      int bin = hsliceID[i]->FindBin(j+0.5);
+    for (int j = 0; j < pi::nthinslices+2; ++j){
+      int bin = hsliceID[i]->FindBin(j-0.5);
       if (i==0){
         hdata->SetBinContent(j+1, hsliceID[i]->GetBinContent(bin));
         hdata->SetBinError(j+1, hsliceID[i]->GetBinError(bin));
@@ -170,7 +171,7 @@ int main(int argc, char** argv){
   
   // unfolding
   RooUnfoldResponse *response_SliceID_Int = (RooUnfoldResponse*)fmc->Get("response_SliceID_Int");
-  RooUnfoldBayes unfold_Int (response_SliceID_Int, hsignal, 12);
+  RooUnfoldBayes unfold_Int (response_SliceID_Int, hsignal, 4);
   
   TH1D *hsignal_uf;
   //hsignal_uf->Sumw2();
@@ -185,7 +186,7 @@ int main(int argc, char** argv){
   double SliceID[pi::nthinslices] = {0};
 
   for (int i = 0; i<pi::nthinslices; ++i){
-    SliceID[i] = i;
+    SliceID[i] = i+1;
     Nint[i] = hsignal_uf->GetBinContent(i+2);
     err_int[i] = hsignal_uf->GetBinError(i+2);
     for (int j = i; j<=pi::nthinslices; ++j){
@@ -200,9 +201,12 @@ int main(int argc, char** argv){
   TGraphErrors *gr_int = new TGraphErrors(pi::nthinslices, SliceID, Nint, 0, err_int);
   gr_int->SetNameTitle("gr_int", "Interaction number;Slice ID;Events");
   gr_int->Write();
-  TGraphErrors *gr_trueincE = (TGraphErrors*)fmc->Get("gr_trueincE"); // fdata->Get("gr_recoincE")
+  TGraphErrors *gr_trueincE = (TGraphErrors*)fmc->Get("gr_trueincE");
   gr_trueincE->SetNameTitle("gr_trueincE", "True incident energy;Slice ID;Energy (MeV)");
   gr_trueincE->Write();
+  TGraphErrors *gr_recoincE = (TGraphErrors*)fdata->Get("gr_recoincE");
+  gr_recoincE->SetNameTitle("gr_recoincE", "Reco incident energy;Slice ID;Energy (MeV)");
+  gr_recoincE->Write();
   
   // Calculate cross-section
   double NA=6.02214076e23;
@@ -228,7 +232,7 @@ int main(int argc, char** argv){
   gr_recoxs->GetXaxis()->SetTitle("Pion Kinetic Energy (MeV)");
   gr_recoxs->GetXaxis()->SetRangeUser(360, 900);
   gr_recoxs->GetYaxis()->SetTitle("#sigma_{inelastic} (mb)");
-  gr_recoxs->GetYaxis()->SetRangeUser(400, 900);
+  //gr_recoxs->GetYaxis()->SetRangeUser(400, 900);
   gr_recoxs->SetLineWidth(2);
   gr_recoxs->Draw("ape");
   total_inel_KE->SetLineColor(2);
