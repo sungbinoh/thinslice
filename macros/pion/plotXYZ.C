@@ -2,8 +2,8 @@
   gStyle->SetOptStat(0);
   gStyle->SetOptFit(0);
 
-  TFile *fmc = TFile::Open("../../install/bin/mcprod4a.root");
-  TFile *fdata = TFile::Open("../../install/bin/data.root");
+  TFile *fmc = TFile::Open("../../build/mcprod4a.root");
+  TFile *fdata = TFile::Open("../../build/data.root");
 
   TH1D *hreco_beam_startX_SCE_data = (TH1D*)fdata->Get("hreco_beam_startX_SCE_2_0");
   TH1D *hreco_beam_startX_SCE_mc = (TH1D*)fmc->Get("hreco_beam_startX_SCE_2_0");

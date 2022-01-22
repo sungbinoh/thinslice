@@ -1,6 +1,6 @@
 {
 
-  TFile *file = TFile::Open("../../install/bin/mcprod4a.root");
+  TFile *file = TFile::Open("../../build/mcprod4a.root");
 
   TGraphErrors *gr_trueincE = (TGraphErrors*)file->Get("gr_trueincE");
   TGraphErrors *gr_recoincE = (TGraphErrors*)file->Get("gr_recoincE");
@@ -29,6 +29,7 @@
   gr_reco_trueincE->GetYaxis()->SetTitle("Reco KE - True KE (MeV)");
 
   c1->Print("plots/incE.pdf");
+  c1->Print("plots/incE.png");
   c2->Print("plots/incEdiff.pdf");
-
+  c2->Print("plots/incEdiff.png");
 }
