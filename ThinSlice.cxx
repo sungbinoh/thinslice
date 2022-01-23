@@ -16,7 +16,7 @@ ThinSlice::ThinSlice(){
 
 void ThinSlice::BookHistograms(){
 
-  outputFile = TFile::Open(fOutputFileName.c_str(), "recreate"); // why c_str?
+  outputFile = TFile::Open(fOutputFileName.c_str(), "recreate");
   
   for (int i = 0; i<pi::nthinslices; ++i){ // energy distribution in each thin slice
     reco_incE[i] = new TH1D(Form("reco_incE_%d",i),Form("Reco incident energy, %.1f < z < %.1f (cm)",i*pi::thinslicewidth, (i+1)*pi::thinslicewidth), pi::nbinse, 0, 1200.);
@@ -145,8 +145,9 @@ void ThinSlice::BookHistograms(){
 
       hreco_beam_true_byE_matched[i][j] = new TH1D(Form("hreco_beam_true_byE_matched_%d_%d",i,j), Form("reco_beam_true_byE_matched, %s, %s;Truth matched", pi::cutName[i], pi::intTypeName[j]), 2, 0, 2);
       hreco_beam_true_byE_matched[i][j]->Sumw2();
-      const double xbins[25] = {-10.,0.,10.,20.,30.,40.,50.,60.,70.,80.,90.,100.,110.,120.,130.,140.,150.,160.,170.,180.,190.,200.,210.,220.,600}; // a user-defined binning
-      hreco_trklen[i][j] = new TH1D(Form("hreco_trklen_%d_%d",i,j), Form("reco_trklen, %s, %s;Track length (cm)", pi::cutName[i], pi::intTypeName[j]), 24, xbins);
+      //const double xbins[25] = {-10.,0.,10.,20.,30.,40.,50.,60.,70.,80.,90.,100.,110.,120.,130.,140.,150.,160.,170.,180.,190.,200.,210.,220.,600}; // a user-defined binning
+      //hreco_trklen[i][j] = new TH1D(Form("hreco_trklen_%d_%d",i,j), Form("reco_trklen, %s, %s;Track length (cm)", pi::cutName[i], pi::intTypeName[j]), 24, xbins);
+      hreco_trklen[i][j] = new TH1D(Form("hreco_trklen_%d_%d",i,j), Form("reco_trklen, %s, %s;Track length (cm)", pi::cutName[i], pi::intTypeName[j]), 61, -10, 600);
       hreco_trklen[i][j]->Sumw2();
       htrue_trklen[i][j] = new TH1D(Form("htrue_trklen_%d_%d",i,j), Form("true_trklen, %s, %s;Track length (cm)", pi::cutName[i], pi::intTypeName[j]), 61, -10, 600);
       htrue_trklen[i][j]->Sumw2();
@@ -389,15 +390,14 @@ void ThinSlice::ProcessEvent(const anavar & evt, Unfold & uf){
   }
 
   if (evt.MC){
-    if (evt.true_beam_PDG == 211){
-      if (isTestSample){
+    if (evt.true_beam_PDG == 211){ // true pion beam incident event
+      if (isTestSample){ // fake data
         h_truesliceid_pion_all->Fill(true_sliceID);
       }
       else{
         uf.eff_den_Inc->Fill(true_sliceID);
       }
-      if (hadana.PassPiCuts(evt) && evt.reco_beam_true_byE_matched){
-        //if (hadana.PassPiCuts(evt)){
+      if (hadana.PassPiCuts(evt) && evt.reco_beam_true_byE_matched){ // the beam pion passed full selections (reco_beam_true_byE_matched is used to veto secondary particles)
         if (isTestSample){
           h_recosliceid_pion_cuts->Fill(reco_sliceID);
           h_truesliceid_pion_cuts->Fill(true_sliceID);
@@ -408,14 +408,11 @@ void ThinSlice::ProcessEvent(const anavar & evt, Unfold & uf){
           uf.response_SliceID_Inc.Fill(reco_sliceID, true_sliceID);
         }
       }
-      else {
-        if (!isTestSample){
-          uf.response_SliceID_Inc.Miss(true_sliceID);
-          //std::cout<<true_sliceID<<std::endl;
-        }
+      else { // this beam pion event is not selected
+        if (!isTestSample) uf.response_SliceID_Inc.Miss(true_sliceID);
       }
       
-      if ((*evt.true_beam_endProcess) == "pi+Inelastic"){
+      if ((*evt.true_beam_endProcess) == "pi+Inelastic"){ // true pion beam interaction event (exclude elastics)
         if (isTestSample){
           h_truesliceid_pioninelastic_all->Fill(true_sliceID);
         }
@@ -423,7 +420,6 @@ void ThinSlice::ProcessEvent(const anavar & evt, Unfold & uf){
           uf.eff_den_Int->Fill(true_sliceID);
         }
         if (hadana.PassPiCuts(evt) && evt.reco_beam_true_byE_matched){
-          //if (hadana.PassPiCuts(evt)){
           if (isTestSample){
             h_recosliceid_pioninelastic_cuts->Fill(reco_sliceID);
             h_truesliceid_pioninelastic_cuts->Fill(true_sliceID);
@@ -439,7 +435,7 @@ void ThinSlice::ProcessEvent(const anavar & evt, Unfold & uf){
         }
       }
     }
-    if (hadana.PassPiCuts(evt)){
+    if (hadana.PassPiCuts(evt)){ // the event passed full selections
       if (isTestSample){
         h_recosliceid_allevts_cuts->Fill(reco_sliceID);
       }
