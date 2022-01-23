@@ -70,10 +70,7 @@ int main(int argc, char** argv){
   cout<<"Proton scaling factor: "<<(*sf_p)[0]<<"+-"<<(*sf_p)[1]<<endl;
   cout<<"Pion scaling factor: "<<(*sf_spi)[0]<<"+-"<<(*sf_spi)[1]<<endl;
 
-  double totaldata = 0;
-  double totalmc = 0;
   TH1D *hsliceID[pi::nIntTypes+1];
-
   TH1D *hdata = new TH1D("hdata","Data;Slice ID;Events",pi::nthinslices+2,-1,pi::nthinslices+1); // h_recosliceid_allevts_cuts (hreco_sliceID_6_0)
   TH1D *hproton = new TH1D("hproton","Proton background;Slice ID;Events",pi::nthinslices+2,-1,pi::nthinslices+1);
   TH1D *hmu = new TH1D("hmu","Muon background;Slice ID;Events",pi::nthinslices+2,-1,pi::nthinslices+1);
@@ -95,14 +92,19 @@ int main(int argc, char** argv){
     else {
       hsliceID[i] = (TH1D*)fmc->Get(Form("hreco_sliceID_%d_%d",pi::nCuts-1,i));
     }
-    for (int j = 0; j < pi::nthinslices+2; ++j){
-      if (i==0){
-        totaldata += hsliceID[i]->GetBinContent(hsliceID[i]->FindBin(j-0.5));
-      }
-      else{
-        totalmc += hsliceID[i]->GetBinContent(hsliceID[i]->FindBin(j-0.5));
-      }
+  }
+  TH1D *hmc = new TH1D("hmc","MC;Slice ID;Events",hsliceID[0]->GetNbinsX(),-1,hsliceID[0]->GetNbinsX()-1);
+  hmc->Sumw2();
+  for (int j = 0; j < pi::nthinslices+2; ++j){
+    int bin = hsliceID[0]->FindBin(j-0.5);
+    hdata->SetBinContent(j+1, hsliceID[0]->GetBinContent(bin));
+    hdata->SetBinError(j+1, hsliceID[0]->GetBinError(bin));
+    double nmc = 0;
+    for (int i = 1; i < pi::nIntTypes+1; ++i){
+      nmc += hsliceID[i]->GetBinContent(bin);
     }
+    hmc->SetBinContent(j+1, nmc);
+    hmc->SetBinError(j+1, sqrt(nmc));
   }
 
   // second loop to fill histograms
@@ -112,15 +114,13 @@ int main(int argc, char** argv){
     }
     else {
       hsliceID[i] = (TH1D*)fmc->Get(Form("hreco_sliceID_%d_%d",pi::nCuts-1,i));
-      hsliceID[i]->Scale(totaldata/totalmc);
+      //hsliceID[i]->Scale(totaldata/totalmc);
+      hsliceID[i]->Multiply(hsliceID[0]);
+      hsliceID[i]->Divide(hmc);
     }
     for (int j = 0; j < pi::nthinslices+2; ++j){
       int bin = hsliceID[i]->FindBin(j-0.5);
-      if (i==0){
-        hdata->SetBinContent(j+1, hsliceID[i]->GetBinContent(bin));
-        hdata->SetBinError(j+1, hsliceID[i]->GetBinError(bin));
-      }
-      else{
+      if (i!=0){
         if (i == pi::kMuon || i == pi::kMIDmu){
           double binc = hmu->GetBinContent(bin);
           double bine = hmu->GetBinError(bin);
