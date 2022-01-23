@@ -244,7 +244,7 @@ int main(int argc, char** argv){
   TGraphErrors *gr_recoxs = new TGraphErrors(pi::nthinslices, incE, xs, err_incE, err_xs);
   gr_recoxs->SetNameTitle("gr_recoxs", "Reco cross-section;Energy (MeV); Cross-section (mb)");
   gr_recoxs->Write();
-  TFile f2("../files/exclusive_xsec.root");
+  /*TFile f2("../files/exclusive_xsec.root");
   TGraph *total_inel_KE = (TGraph*)f2.Get("total_inel_KE");
   TCanvas *c1 = new TCanvas("c1", "c1");
   gr_recoxs->SetTitle("Pion Inelastic Cross Section");
@@ -256,7 +256,41 @@ int main(int argc, char** argv){
   gr_recoxs->Draw("ape");
   total_inel_KE->SetLineColor(2);
   total_inel_KE->Draw("c");
-  c1->Print("recoxs.png");
+  c1->Print("recoxs.png");*/
+  
+  // test sample validation
+  TH1D *hval_siginc_reco = (TH1D*)fmc->Get("h_recosliceid_pion_cuts");
+  hval_siginc_reco->Write("hval_siginc_reco");
+  TH1D *hval_trueinc = (TH1D*)fmc->Get("h_truesliceid_pion_all");
+  hval_trueinc->Write("hval_trueinc");
+  TH1D *hval_signal_reco = (TH1D*)fmc->Get("h_recosliceid_pioninelastic_cuts");
+  hval_signal_reco->Write("hval_signal_reco");
+  TH1D *hval_trueint = (TH1D*)fmc->Get("h_truesliceid_pioninelastic_all");
+  hval_trueint->Write("hval_trueint");
+  double Ninc_t[pi::nthinslices] = {0};
+  double Nint_t[pi::nthinslices] = {0};
+  double err_inc_t[pi::nthinslices] = {0};
+  double err_int_t[pi::nthinslices] = {0};
+  for (int i = 0; i<pi::nthinslices; ++i){
+    Nint_t[i] = hval_trueint->GetBinContent(i+2);
+    err_int_t[i] = hval_trueint->GetBinError(i+2);
+    for (int j = i; j<=pi::nthinslices; ++j){
+      Ninc_t[i] += hval_trueinc->GetBinContent(j+2);
+      err_inc_t[i] += pow(hval_trueinc->GetBinError(j+2),2);
+    }
+    err_inc_t[i] = sqrt(err_inc_t[i]);
+  }
+  double xs_t[pi::nthinslices] = {0};
+  double err_xs_t[pi::nthinslices] = {0};
+  for (int i = 0; i<pi::nthinslices; ++i){
+    xs_t[i] = MAr/(Density*NA*pi::thinslicewidth)*log(Ninc_t[i]/(Ninc_t[i]-Nint_t[i]))*1e27;
+    err_xs_t[i] = MAr/(Density*NA*pi::thinslicewidth)*1e27*sqrt(pow(Nint_t[i]*err_inc_t[i]/Ninc_t[i]/(Ninc_t[i]-Nint_t[i]),2)+pow(err_int_t[i]/(Ninc_t[i]-Nint_t[i]),2));
+  }
+  TGraphErrors *gr_truexs = new TGraphErrors(pi::nthinslices, incE, xs_t, 0, err_xs_t);
+  gr_truexs->SetNameTitle("gr_truexs", "Reco cross-section;Energy (MeV); Cross-section (mb)");
+  gr_truexs->Write();
+  TGraphErrors *gr_truexs_allMC = (TGraphErrors*)fmc->Get("gr_truexs");
+  gr_truexs_allMC->Write("gr_truexs_allMC");
   
   fout->Write();
   fout->Close();
