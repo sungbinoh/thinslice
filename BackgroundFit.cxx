@@ -46,47 +46,32 @@ void save_results(vector<double> vslice, vector<double> vcorr, vector<double> vc
   sf.Write(Form("sf_%s", particle));
 }
 
-void bkgFit_mu(TFile *fmc, TFile *fdata, string outfile){
+void bkgFit_mu(TFile *fmc, TFile *fdata, string outfile, int smin=0, int smax=pi::nthinslices-1){
   const char varname[50] = "daughter_michel_score";
   const char particle[10] = "mu";
   cout<<"##### Constrain muon bkg using "<<varname<<endl;
   
   double totaldata = 0;
   double totalmc = 0;
-  double ndata[pi::nthinslices] = {0};
-  double nmc[pi::nthinslices] = {0};
   TH1D *hvarSlice[pi::nthinslices][pi::nCuts][pi::nIntTypes+1];
   TH1D *hvar[pi::nCuts][pi::nIntTypes+1];
-  TH1D *hsliceID[pi::nCuts][pi::nIntTypes+1];
  
   for (int i = 0; i < pi::nCuts; ++i){
     for (int j = 0; j < pi::nIntTypes+1; ++j){
-      for (int k = 0; k < pi::nthinslices; ++k){
+      for (int k = smin; k <= smax; ++k){
         if (j==0){ // data
           hvarSlice[k][i][j] = (TH1D*)fdata->Get(Form("h%sSlice_%d_%d_%d",varname,k,i,j));
-          if (i==6) totaldata += hvarSlice[k][i][j]->Integral(); // normalization should be done before any cut or after all cuts?
+          if (i==6) totaldata += hvarSlice[k][i][j]->Integral(); // normalization is done after all cuts
         }
         else{ // MC
           hvarSlice[k][i][j] = (TH1D*)fmc->Get(Form("h%sSlice_%d_%d_%d",varname,k,i,j));
           if (i==6) totalmc += hvarSlice[k][i][j]->Integral();
         }
-        if (k==0){
-          if (j==0){ // data
-            hvar[i][j] = (TH1D*)fdata->Get(Form("h%s_bkg_%d_%d",varname,i,j));
-            hsliceID[i][j] = (TH1D*)fdata->Get(Form("hreco_sliceID_%d_%d",i,j));
-          }
-          else{ // MC
-            hvar[i][j] = (TH1D*)fmc->Get(Form("h%s_bkg_%d_%d",varname,i,j));
-            hsliceID[i][j] = (TH1D*)fmc->Get(Form("hreco_sliceID_%d_%d",i,j));
-          }
+        if (k==smin){
+          hvar[i][j] = (TH1D*)hvarSlice[k][i][j]->Clone(Form("h%s_%d_%d",varname,i,j));
         }
-        if (i==6){
-          if (j==0){// data
-            ndata[k] += hsliceID[i][j]->GetBinContent(hsliceID[i][j]->FindBin(k+0.5));
-          }
-          else {//MC
-            nmc[k] += hsliceID[i][j]->GetBinContent(hsliceID[i][j]->FindBin(k+0.5));
-          }
+        else{
+          hvar[i][j]->Add(hvarSlice[k][i][j]);
         }
       }
     }
@@ -99,7 +84,7 @@ void bkgFit_mu(TFile *fmc, TFile *fdata, string outfile){
   std::vector<double> vcorrerr;
 
   // muon constraint begins
-  for (int i = 0; i<pi::nthinslices; ++i){
+  for (int i = smin; i <= smax; ++i){
     std::cout<<"##### Slice "<<i<<std::endl;
     TH1D *h0 = hvarSlice[i][6][pi::kData];
     TH1D *h1 = hvarSlice[i][6][pi::kPiInel];
@@ -150,7 +135,7 @@ void bkgFit_mu(TFile *fmc, TFile *fdata, string outfile){
   save_results(vslice, vcorr, vcorrerr, fitter.GetPar(), fitter.GetParError(), particle, outfile);
 }
 
-void bkgFit_p(TFile *fmc, TFile *fdata, string outfile){
+void bkgFit_p(TFile *fmc, TFile *fdata, string outfile, int smin=0, int smax=pi::nthinslices-1){
   const char varname[50] = "Chi2_proton"; // "Chi2_proton"/"mediandEdx"
   const char particle[10] = "p";
   cout<<"##### Constrain proton bkg using "<<varname<<endl;
@@ -162,7 +147,7 @@ void bkgFit_p(TFile *fmc, TFile *fdata, string outfile){
 
   for (int i = 0; i < pi::nCuts; ++i){
     for (int j = 0; j < pi::nIntTypes+1; ++j){
-      for (int k = 0; k < pi::nthinslices; ++k){
+      for (int k = smin; k <= smax; ++k){
         if (j==0){ // data
           hvarSlice[k][i][j] = (TH1D*)fdata->Get(Form("h%sSlice_%d_%d_%d",varname,k,i,j));
           if (i==6) totaldata += hvarSlice[k][i][j]->Integral(); // normalization should be done before any cut or after all cuts?
@@ -171,13 +156,11 @@ void bkgFit_p(TFile *fmc, TFile *fdata, string outfile){
           hvarSlice[k][i][j] = (TH1D*)fmc->Get(Form("h%sSlice_%d_%d_%d",varname,k,i,j));
           if (i==6) totalmc += hvarSlice[k][i][j]->Integral();
         }
-        if (k==0){
-          if (j==0){ // data
-            hvar[i][j] = (TH1D*)fdata->Get(Form("h%s_bkg_%d_%d",varname,i,j));
-          }
-          else{ // MC
-            hvar[i][j] = (TH1D*)fmc->Get(Form("h%s_bkg_%d_%d",varname,i,j));
-          }
+        if (k==smin){
+          hvar[i][j] = (TH1D*)hvarSlice[k][i][j]->Clone(Form("h%s_%d_%d",varname,i,j));
+        }
+        else{
+          hvar[i][j]->Add(hvarSlice[k][i][j]);
         }
       }
     }
@@ -190,7 +173,7 @@ void bkgFit_p(TFile *fmc, TFile *fdata, string outfile){
   std::vector<double> vcorrerr;
 
   // proton constraint begins
-  for (int i = 0; i<pi::nthinslices; ++i){
+  for (int i = smin; i <= smax; ++i){
     std::cout<<"##### Slice "<<i<<std::endl;
     TH1D *h0 = hvarSlice[i][6][pi::kData];
     TH1D *h1 = hvarSlice[i][6][pi::kPiInel];
@@ -237,7 +220,7 @@ void bkgFit_p(TFile *fmc, TFile *fdata, string outfile){
   save_results(vslice, vcorr, vcorrerr, fitter.GetPar(), fitter.GetParError(), particle, outfile);
 }
 
-void bkgFit_spi(TFile *fmc, TFile *fdata, string outfile){
+void bkgFit_spi(TFile *fmc, TFile *fdata, string outfile, int smin=0, int smax=pi::nthinslices-1){
   const char varname[50] = "costheta";
   const char particle[10] = "spi";
   cout<<"##### Constrain secondary pion bkg using "<<varname<<endl;
@@ -249,7 +232,7 @@ void bkgFit_spi(TFile *fmc, TFile *fdata, string outfile){
 
   for (int i = 0; i < pi::nCuts; ++i){
     for (int j = 0; j < pi::nIntTypes+1; ++j){
-      for (int k = 0; k < pi::nthinslices; ++k){
+      for (int k = smin; k <= smax; ++k){
         if (j==0){ // data
           hvarSlice[k][i][j] = (TH1D*)fdata->Get(Form("h%sSlice_%d_%d_%d",varname,k,i,j));
           if (i==6) totaldata += hvarSlice[k][i][j]->Integral(); // normalization should be done before any cut or after all cuts?
@@ -258,13 +241,11 @@ void bkgFit_spi(TFile *fmc, TFile *fdata, string outfile){
           hvarSlice[k][i][j] = (TH1D*)fmc->Get(Form("h%sSlice_%d_%d_%d",varname,k,i,j));
           if (i==6) totalmc += hvarSlice[k][i][j]->Integral();
         }
-        if (k==0){
-          if (j==0){ // data
-            hvar[i][j] = (TH1D*)fdata->Get(Form("h%s_bkg_%d_%d",varname,i,j));
-          }
-          else{ // MC
-            hvar[i][j] = (TH1D*)fmc->Get(Form("h%s_bkg_%d_%d",varname,i,j));
-          }
+        if (k==smin){
+          hvar[i][j] = (TH1D*)hvarSlice[k][i][j]->Clone(Form("h%s_%d_%d",varname,i,j));
+        }
+        else{
+          hvar[i][j]->Add(hvarSlice[k][i][j]);
         }
       }
     }
@@ -277,7 +258,7 @@ void bkgFit_spi(TFile *fmc, TFile *fdata, string outfile){
   std::vector<double> vcorrerr;
 
   // secondary pion constraint begins
-  for (int i = 0; i<pi::nthinslices; ++i){
+  for (int i = smin; i <= smax; ++i){
     std::cout<<"##### Slice "<<i<<std::endl;
     TH1D *h0 = hvarSlice[i][6][pi::kData];
     TH1D *h1 = hvarSlice[i][6][pi::kPiInel];
@@ -332,12 +313,20 @@ int main(int argc, char** argv){
   bool found_config = false;
 
   string config_file;
+  int smin = 0;
+  int smax = pi::nthinslices-1;
 
   //for (int i = 1; i < argc; ++i) {
   for (int iArg = 1; iArg < argc; iArg++) {
     if (!strcasecmp(argv[iArg],"-c")) {
-     config_file = argv[++iArg];
-     found_config = true;
+      config_file = argv[++iArg];
+      found_config = true;
+    }
+    if (!strcasecmp(argv[iArg],"-smin")) {
+      smin = std::stoi(argv[++iArg]);
+    }
+    if (!strcasecmp(argv[iArg],"-smax")) {
+      smax = std::stoi(argv[++iArg]);
     }
     if (!strcasecmp(argv[iArg],"-h")) {
       show_usage(argv[0]);
@@ -359,9 +348,9 @@ int main(int argc, char** argv){
   TFile *fmc = TFile::Open(root["mcfile"].asString().c_str());
   TFile *fout = TFile::Open(root["outfile"].asString().c_str(), "recreate");
 
-  bkgFit_mu(fmc, fdata, root["outfile"].asString());
-  bkgFit_p(fmc, fdata, root["outfile"].asString());
-  bkgFit_spi(fmc, fdata, root["outfile"].asString());
+  bkgFit_mu(fmc, fdata, root["outfile"].asString(), smin, smax);
+  bkgFit_p(fmc, fdata, root["outfile"].asString(), smin, smax);
+  bkgFit_spi(fmc, fdata, root["outfile"].asString(), smin, smax);
 
   fout->Close();
   return 0;
