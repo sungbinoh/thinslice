@@ -52,10 +52,10 @@ void muon_reweight(){
     //cout<<i<<endl;
     //cout<<mcbin<<endl;
     //cout<<data_dist->GetBinError(i)<<endl;
-    hdata->SetBinContent(i, data_dist->GetBinContent(i+1));
-    hdata->SetBinError(i, data_dist->GetBinError(i+1));
-    hmc->SetBinContent(i, mcbin);
-    hmc0->SetBinContent(i, mcbin0);
+    hdata->SetBinContent(i, data_dist->GetBinContent(i+1)/10);
+    hdata->SetBinError(i, data_dist->GetBinError(i+1)/10);
+    hmc->SetBinContent(i, mcbin/10);
+    hmc0->SetBinContent(i, mcbin0/10);
   }
   double over_data = data_dist->Integral(23, uppbound);
   //mcbin = mc_dist->Integral(23, uppbound) * mcnorm;
@@ -74,17 +74,18 @@ void muon_reweight(){
   fom += chi*chi;
   cout<<"FOM = "<<fom/(boundbin+1)<<endl;
   
-  hdata->SetBinContent(boundbin+1, over_data);
-  hdata->SetBinError(boundbin+1, over_data_err);
-  hmc->SetBinContent(boundbin+1, mcbin);
-  hmc0->SetBinContent(boundbin+1, mcbin0);
+  hdata->SetBinContent(boundbin+1, over_data/280);
+  hdata->SetBinError(boundbin+1, over_data_err/280);
+  hmc->SetBinContent(boundbin+1, mcbin/280);
+  hmc0->SetBinContent(boundbin+1, mcbin0/280);
   
   TCanvas* c1 = new TCanvas("c1","c1");
   hmc->SetLineColor(kRed);
   hmc0->SetLineColor(kBlue);
-  //hmc->GetYaxis()->SetRangeUser(0, 1.2*htemp2->GetBinContent(htemp2->GetMaximumBin()));
+  hdata->GetYaxis()->SetRangeUser(0, 1.1*hmc0->GetBinContent(hmc0->GetMaximumBin()));
   hdata->Draw();
   hdata->GetXaxis()->SetTitle("Reco_track_length [cm]");
+  hdata->GetYaxis()->SetTitle("Event/cm");
   hmc->Draw("same");
   hmc0->Draw("same");
   hdata->SetTitle("Muon reweighting");
