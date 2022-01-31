@@ -116,8 +116,8 @@ class ThinSlice {
   TFile *outputFile;
   void SetOutputFileName(std::string name){fOutputFileName = name;};
   void BookHistograms();
-  void FillHistograms(int cut, const anavar & evt);
-  void FillSliceHist(const anavar & evt, int constraint_type, int cut=6);
+  void FillHistograms(int cut, const anavar & evt, double weight=1.);
+  void FillSliceHist(const anavar & evt, int constraint_type, double weight=1., int cut=6);
   void SaveHistograms();
 
   void ProcessEvent(const anavar & evt, Unfold & uf);

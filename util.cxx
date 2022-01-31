@@ -5,11 +5,22 @@
 
 using namespace std;
 
-void FillHistVec1D(TH1D *hist[pi::nIntTypes+1], const double &value, const int &partype, bool fill_underflow, bool fill_overflow){
-  //hist[0]->Fill(value);
+double CalWeight(const anavar & evt, const int &partype){
   double weight = 1.;
+  
   if (partype == 3) // kMuon
-    weight = 1.;//59;
+    weight *= 1.;//58;
+  
+  /*if (partype == 0) { // fake data
+    if (evt.true_beam_PDG == -13)
+      weight = 1.6;
+  }*/
+  
+  return weight;
+}
+
+void FillHistVec1D(TH1D *hist[pi::nIntTypes+1], const double &value, const int &partype, double weight, bool fill_underflow, bool fill_overflow){
+  //hist[0]->Fill(value);
   if (partype>=0 && partype < pi::nIntTypes+1){
     if (value < hist[partype]->GetXaxis()->GetXmin()){ // underflow values
       if (fill_underflow) hist[partype]->Fill(hist[partype]->GetXaxis()->GetXmin(), weight);
@@ -23,10 +34,7 @@ void FillHistVec1D(TH1D *hist[pi::nIntTypes+1], const double &value, const int &
   }
 }
 
-void FillHistVec2D(TH2D *hist[pi::nIntTypes+1], const double &value1, const double &value2, const int &partype){
-  double weight = 1.;
-  if (partype == 3) // kMuon
-    weight = 1.;//59;
+void FillHistVec2D(TH2D *hist[pi::nIntTypes+1], const double &value1, const double &value2, const int &partype, double weight){
   //hist[0]->Fill(value1, value2);
   if (partype>=0 && partype < pi::nIntTypes+1){
     hist[partype]->Fill(value1, value2, weight);
