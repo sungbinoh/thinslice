@@ -4,7 +4,7 @@ void makeXS(){
 
   gStyle->SetOptStat(0);
 
-  TFile *file = TFile::Open("../../build/mcprod4a.root");
+  TFile *file = TFile::Open("../../build/mcprod4a_0208ss.root");
 
   TH1D *eff_num_Int = (TH1D*)file->Get("eff_num_Int");
   TH1D *eff_den_Int = (TH1D*)file->Get("eff_den_Int");
@@ -44,7 +44,7 @@ void makeXS(){
   TH1D *hint = (TH1D*)h_recosliceid_allevts_cuts->Clone("hint");
 
   hinc->Multiply(pur_Inc);
-  TCanvas *c1 = new TCanvas("c1","c1");
+  /*TCanvas *c1 = new TCanvas("c1","c1");
   h_recosliceid_allevts_cuts->SetLineColor(3);
   h_recosliceid_allevts_cuts->SetMarkerColor(3);
   h_recosliceid_allevts_cuts->SetTitle("All Pions;Reco SliceID;Events");
@@ -112,9 +112,9 @@ void makeXS(){
   leg4->AddEntry(hint, "Selected #times purity","ple");
   leg4->AddEntry(h_truesliceid_pioninelastic_uf,"Unfolded pions","ple");
   leg4->AddEntry(h_truesliceid_pioninelastic_all,"True pions","l");
-  leg4->Draw();
+  leg4->Draw();*/
 
-  double Ninc[pi::nthinslices] = {0};
+  /*double Ninc[pi::nthinslices] = {0};
   double Nint[pi::nthinslices] = {0};
   double err_inc[pi::nthinslices] = {0};
   double err_int[pi::nthinslices] = {0};
@@ -162,57 +162,57 @@ void makeXS(){
   double err_xs[pi::nthinslices] = {0};
   double incE[pi::nthinslices] = {0};
 
-  TGraphErrors *gr_trueincE = (TGraphErrors*)file->Get("gr_trueincE");
+  TGraphErrors *gr_trueincE = (TGraphErrors*)file->Get("gr_trueincE");*/
   TGraphErrors *gr_truexs = (TGraphErrors*)file->Get("gr_truexs");
-  for (int i = 0; i<pi::nthinslices; ++i){
+  /*for (int i = 0; i<pi::nthinslices; ++i){
     xs[i] = MAr/(Density*NA*pi::thinslicewidth)*log(Ninc[i]/(Ninc[i]-Nint[i]))*1e27;
     //err_xs[i] = MAr/(Density*NA*pi::thinslicewidth)*1e27*sqrt(N_int[i]+pow(N_int[i],2)/N_inc[i])/N_incidents[i];
     err_xs[i] = MAr/(Density*NA*pi::thinslicewidth)*1e27*sqrt(pow(Nint[i]*err_inc[i]/Ninc[i]/(Ninc[i]-Nint[i]),2)+pow(err_int[i]/(Ninc[i]-Nint[i]),2));
     incE[i] = gr_trueincE->GetPointY(i);
     //std::cout<<i<<" "<<Ninc[i]<<" "<<Nint[i]<<" "<<xs[i]<<" "<<incE[i]<<std::endl;
-  }
+  }*/
 
   TFile f2("../../files/exclusive_xsec.root");
   TGraph *total_inel_KE = (TGraph*)f2.Get("total_inel_KE");
 //  TGraph *abs_KE = (TGraph*)f2.Get("abs_KE");
 //  TGraph *cex_KE = (TGraph*)f2.Get("cex_KE");
 
-  TGraphErrors *gr_recoxs = new TGraphErrors(pi::nthinslices, incE, xs, 0, err_xs);
-  TCanvas *c5 = new TCanvas("c5", "c5");
-  gr_recoxs->SetTitle("Pion Inelastic Cross Section");
-  gr_recoxs->GetXaxis()->SetTitle("Pion Kinetic Energy (MeV)");
-  gr_recoxs->GetXaxis()->SetRangeUser(360, 900);
-  gr_recoxs->GetYaxis()->SetTitle("#sigma_{inelastic} (mb)");
-  gr_recoxs->GetYaxis()->SetRangeUser(400, 900);
-  gr_recoxs->SetLineWidth(2);
-  gr_recoxs->Draw("ape");
+  //TGraphErrors *gr_recoxs = new TGraphErrors(pi::nthinslices, incE, xs, 0, err_xs);
+  TCanvas *c5 = new TCanvas("c5", "c5", 1200, 500);
+  gr_truexs->SetTitle("Pion Inelastic Cross Section");
+  gr_truexs->GetXaxis()->SetTitle("Pion Kinetic Energy (MeV)");
+  gr_truexs->GetXaxis()->SetRangeUser(10, 1000);
+  gr_truexs->GetYaxis()->SetTitle("#sigma_{inelastic} (mb)");
+  gr_truexs->GetYaxis()->SetRangeUser(400, 1000);
+  gr_truexs->SetLineWidth(2);
+  gr_truexs->Draw("ape");
   gr_truexs->SetMarkerColor(3);
   gr_truexs->SetLineColor(3);
-  gr_truexs->Draw("pe");
+  //gr_truexs->Draw("pe");
   total_inel_KE->SetLineColor(2);
   total_inel_KE->Draw("c");
   TLegend *leg5 = new TLegend(0.3,0.65,0.8,0.9);
   leg5->SetFillStyle(0);
-  leg5->AddEntry(gr_recoxs, "MC with reconstruction", "pe");
+  //leg5->AddEntry(gr_recoxs, "MC with reconstruction", "pe");
   leg5->AddEntry(gr_truexs, "MC truth", "pe");
   leg5->AddEntry(total_inel_KE, "Geant4 (theory prediction)", "l");
   leg5->Draw();
 
-  c1->Print("plots/xs_sliceidinc_reco.pdf");
+  /*c1->Print("plots/xs_sliceidinc_reco.pdf");
   c2->Print("plots/xs_sliceidinc_true.pdf");
   c3->Print("plots/xs_sliceidint_reco.pdf");
-  c4->Print("plots/xs_sliceidint_true.pdf");
+  c4->Print("plots/xs_sliceidint_true.pdf");*/
   c5->Print("plots/xs_pi+inel.pdf");
-  c6->Print("plots/xs_Ninc.pdf");
-  c7->Print("plots/xs_Nint.pdf");
+  //c6->Print("plots/xs_Ninc.pdf");
+  //c7->Print("plots/xs_Nint.pdf");
 
-  c1->Print("plots/xs_sliceidinc_reco.png");
+  /*c1->Print("plots/xs_sliceidinc_reco.png");
   c2->Print("plots/xs_sliceidinc_true.png");
   c3->Print("plots/xs_sliceidint_reco.png");
-  c4->Print("plots/xs_sliceidint_true.png");
+  c4->Print("plots/xs_sliceidint_true.png");*/
   c5->Print("plots/xs_pi+inel.png");
-  c6->Print("plots/xs_Ninc.png");
-  c7->Print("plots/xs_Nint.png");
+  //c6->Print("plots/xs_Ninc.png");
+  //c7->Print("plots/xs_Nint.png");
 
 }
   
