@@ -213,7 +213,7 @@ void ThinSlice::ProcessEvent(const anavar & evt, Unfold & uf){
   //if (evt.MC && evt.event%2 == 0) isTestSample = false;
 
   if (hadana.fAllTrackCheck) {//using all-track reconstruction
-    if (evt.MC){
+    /*if (evt.MC){
       //true_sliceID = int(evt.true_beam_endZ/pi::thinslicewidth);
       true_sliceID = int(hadana.true_trklen/pi::thinslicewidth);
       if (true_sliceID < 0) true_sliceID = -1;
@@ -298,17 +298,47 @@ void ThinSlice::ProcessEvent(const anavar & evt, Unfold & uf){
       if (reco_sliceID < 0) reco_sliceID = -1;
       if (evt.reco_beam_calo_endZ_allTrack < 0) reco_sliceID = -1;
       if (reco_sliceID >= pi::nthinslices) reco_sliceID = pi::nthinslices;
-    }
+    }*/
   }
   else {//not using all track reconstruction
     if (evt.MC){
       //true_sliceID = int(evt.true_beam_endZ/pi::thinslicewidth);
-      true_sliceID = int(hadana.true_trklen/pi::thinslicewidth);
+      double inc_energy = 999999.;
+      for (size_t i = 0; i<evt.true_beam_traj_Z->size(); ++i){
+        if ((hadana.true_trklen_accum)[i] != 0) {
+          inc_energy = (*evt.true_beam_traj_KE)[i-1];
+          //cout<<i<<"\t"<<(hadana.true_trklen_accum)[i]<<"\t"<<inc_energy<<endl;
+          break;
+        }
+      }
+      //inc_energy = evt.beam_inst_P*1000;
+      if (inc_energy == 0) cout<<"$$@$$"<<hadana.true_trklen<<endl;
+      double plim = 1000.;
+      
+      true_sliceID = int(hadana.true_trklen/pi::thinslicewidth + (plim-inc_energy)/20);
       if (true_sliceID < 0) true_sliceID = -1;
-      if (evt.true_beam_endZ < 0) true_sliceID = -1;
+      if (true_sliceID >= 0) {
+        if (hadana.true_trklen <= 0) {
+          //cout<<hadana.true_trklen<<"$#000#"<<evt.true_beam_endZ<<endl;
+          true_sliceID = -1;
+        }
+        if (evt.true_beam_endZ < 0) {
+          cout<<hadana.true_trklen<<"$#@!@#"<<evt.true_beam_endZ<<endl;
+          true_sliceID = -1;
+        }
+        //if (inc_energy > plim) true_sliceID = -1;
+      }
       if (true_sliceID >= pi::nthinslices) true_sliceID = pi::nthinslices;
       if (evt.true_beam_PDG == 211){
-        for (int i = 0; i<=true_sliceID; ++i){
+        /*if (inc_energy > 2000) {
+          cout<<"$$$$$"<<hadana.true_trklen<<"\t"<<inc_energy<<endl;
+          for (size_t i = 0; i<evt.true_beam_traj_Z->size(); ++i){
+            cout<<(hadana.true_trklen_accum)[i]<<"\t"<<(*evt.true_beam_traj_KE)[i]<<endl;
+          }
+        }*/
+        int starti = int((plim-inc_energy)/20 + 0.5);
+        if (starti<0) starti = 0;
+        for (int i = starti; i<=true_sliceID; ++i){
           if (i<pi::nthinslices) ++true_incidents[i]; // count incident events
         }
       }
@@ -351,11 +381,12 @@ void ThinSlice::ProcessEvent(const anavar & evt, Unfold & uf){
         if (!(evt.true_beam_traj_Z->empty())){
           std::vector<std::vector<double>> vincE(pi::nthinslices);
           for (size_t i = 0; i<evt.true_beam_traj_Z->size()-1; ++i){//last point always has KE = 0
+            if ((hadana.true_trklen_accum)[i]<=0) continue;
             //int this_sliceID = int((*evt.true_beam_traj_Z)[i]/pi::thinslicewidth);
-            int this_sliceID = int((hadana.true_trklen_accum)[i]/pi::thinslicewidth);
-            double this_incE = (*evt.true_beam_traj_KE)[i];
+            int this_sliceID = int((hadana.true_trklen_accum)[i]/pi::thinslicewidth + (plim-inc_energy)/20);
             if (this_sliceID>=pi::nthinslices) continue;
             if (this_sliceID<0) continue;
+            double this_incE = (*evt.true_beam_traj_KE)[i];
             vincE[this_sliceID].push_back(this_incE);
           }
           for (size_t i = 0; i<vincE.size(); ++i){
