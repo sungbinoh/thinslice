@@ -59,7 +59,7 @@ int main(int argc, char ** argv){
   mcths.SetOutputFileName(root["mcoutfile"].asString());
   mcths.Run(mcevt, uf, -1);
 
-  anavar dataevt(datachain);
+  /*anavar dataevt(datachain);
 
   ThinSlice dataths;
   dataths.SetOutputFileName(root["dataoutfile"].asString());
@@ -68,7 +68,7 @@ int main(int argc, char ** argv){
   ThinSlice cosmicsths;
   cosmicsths.SetSelectCosmics(true);
   cosmicsths.SetOutputFileName(root["cosmicsoutfile"].asString());
-  cosmicsths.Run(dataevt, uf, -1);
+  cosmicsths.Run(dataevt, uf, -1);*/
 
   return 0;
 

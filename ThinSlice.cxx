@@ -208,14 +208,15 @@ void ThinSlice::ProcessEvent(const anavar & evt, Unfold & uf){
   hadana.ProcessEvent(evt);
   reco_sliceID = -1;
   true_sliceID = -1;
+  int inc_sliceID = -1;
 
   isTestSample = (hadana.pitype == pi::kData); // fake data
   //if (evt.MC && evt.event%2 == 0) isTestSample = false;
 
   if (hadana.fAllTrackCheck) {//using all-track reconstruction
-    if (evt.MC){
+    /*if (evt.MC){
       //true_sliceID = int(evt.true_beam_endZ/pi::thinslicewidth);
-      true_sliceID = int(hadana.true_trklen/pi::thinslicewidth);
+      /true_sliceID = int(hadana.true_trklen/pi::thinslicewidth);
       if (true_sliceID < 0) true_sliceID = -1;
       if (evt.true_beam_endZ < 0) true_sliceID = -1;
       if (true_sliceID >= pi::nthinslices) true_sliceID = pi::nthinslices;
@@ -298,17 +299,37 @@ void ThinSlice::ProcessEvent(const anavar & evt, Unfold & uf){
       if (reco_sliceID < 0) reco_sliceID = -1;
       if (evt.reco_beam_calo_endZ_allTrack < 0) reco_sliceID = -1;
       if (reco_sliceID >= pi::nthinslices) reco_sliceID = pi::nthinslices;
-    }
+    }*/
   }
   else {//not using all track reconstruction
     if (evt.MC){
-      //true_sliceID = int(evt.true_beam_endZ/pi::thinslicewidth);
-      true_sliceID = int(hadana.true_trklen/pi::thinslicewidth);
+      double inc_energy = 999999.;
+      for (size_t i = 0; i<evt.true_beam_traj_Z->size(); ++i){
+        if ((hadana.true_trklen_accum)[i] != 0) {
+          inc_energy = (*evt.true_beam_traj_KE)[i-1];
+          break;
+        }
+      }
+      double int_energy = 999999.;
+      if (inc_energy < 999999) { // entered TPC
+        int traj_max = evt.true_beam_traj_Z->size()-1;
+        if ((*evt.true_beam_traj_KE)[traj_max] != 0) {
+          int_energy = (*evt.true_beam_traj_KE)[traj_max];
+        }
+        else {
+          int temp = traj_max-1;
+          while ((*evt.true_beam_traj_KE)[temp] == 0) temp--;
+          int_energy = (*evt.true_beam_traj_KE)[temp] - 2*((hadana.true_trklen_accum)[traj_max]-(hadana.true_trklen_accum)[temp]); // 2 MeV/cm
+        }
+      }
+      inc_sliceID = int( (pi::plim-inc_energy)/pi::Eslicewidth + 0.5); // ignore the first imcomplete slice?
+      if (inc_sliceID < 0) inc_sliceID = 0;
+      true_sliceID = int( (pi::plim-int_energy)/pi::Eslicewidth );
       if (true_sliceID < 0) true_sliceID = -1;
       if (evt.true_beam_endZ < 0) true_sliceID = -1;
       if (true_sliceID >= pi::nthinslices) true_sliceID = pi::nthinslices;
       if (evt.true_beam_PDG == 211){
-        for (int i = 0; i<=true_sliceID; ++i){
+        for (int i = inc_sliceID; i<=true_sliceID; ++i){
           if (i<pi::nthinslices) ++true_incidents[i]; // count incident events
         }
       }
@@ -742,6 +763,9 @@ void ThinSlice::SaveHistograms(){
 void ThinSlice::CalcXS(const Unfold & uf){
 
   double slcid[pi::nthinslices] = {0};
+  double Eslice[pi::nthinslices] = {0};
+  double Einterval[pi::nthinslices] = {0};
+  double dEdx[pi::nthinslices] = {2.28752,2.2831,2.27861,2.27404,2.2694,2.26468,2.25988,2.255,2.25004,2.245,2.23987,2.23466,2.22937,2.22399,2.21852,2.21297,2.20734,2.20163,2.19584,2.18997,2.18404,2.17805,2.17201,2.16592,2.15982,2.15371,2.14763,2.1416,2.13566,2.12988,2.12431,2.11905,2.1142,2.10991,2.10638,2.10386,2.1027,2.10337,2.10652,2.11309,2.12444,2.1426,2.17077,2.21412,2.28169,2.39051,2.57809,2.93999,3.81236,7.94844};
   double avg_trueincE[pi::nthinslices] = {0};
   double avg_recoincE[pi::nthinslices] = {0};
   double err_trueincE[pi::nthinslices] = {0};
@@ -759,6 +783,9 @@ void ThinSlice::CalcXS(const Unfold & uf){
   for (int i = 0; i<pi::nthinslices; ++i){
     
     slcid[i] = i;
+    Eslice[i] = pi::plim - (i+0.5)*pi::Eslicewidth;
+    Einterval[i] = pi::Eslicewidth/2;
+    //dEdx[i] = 2.16; // MeV/cm
     avg_trueincE[i] = true_incE[i]->GetMean();
     err_trueincE[i] = true_incE[i]->GetMeanError();
     avg_recoincE[i] = reco_incE[i]->GetMean();
@@ -768,8 +795,8 @@ void ThinSlice::CalcXS(const Unfold & uf){
     //std::cout<<i<<" "<<avg_trueincE[i]<<std::endl;
     if (true_incidents[i] && true_interactions[i]){
       //true_cosangle = true_AngCorr->GetMean(); // no need to include angle correction
-      truexs[i] = MAr/(Density*NA*pi::thinslicewidth/true_cosangle)*log(true_incidents[i]/(true_incidents[i]-true_interactions[i]))*1e27;
-      err_truexs[i] = MAr/(Density*NA*pi::thinslicewidth/true_cosangle)*1e27*sqrt(true_interactions[i]+pow(true_interactions[i],2)/true_incidents[i])/true_incidents[i];
+      truexs[i] = dEdx[i]*MAr/(Density*NA*pi::Eslicewidth/true_cosangle)*log(true_incidents[i]/(true_incidents[i]-true_interactions[i]))*1e27;
+      err_truexs[i] = dEdx[i]*MAr/(Density*NA*pi::Eslicewidth/true_cosangle)*1e27*sqrt(true_interactions[i]+pow(true_interactions[i],2)/true_incidents[i])/true_incidents[i];
     }
   }
 
@@ -781,7 +808,7 @@ void ThinSlice::CalcXS(const Unfold & uf){
   gr_recoincE->Write("gr_recoincE");
   gr_reco_trueincE->Write("gr_reco_trueincE");
 
-  TGraphErrors *gr_truexs = new TGraphErrors(pi::nthinslices, &(avg_trueincE[0]), &(truexs[0]), 0, &(err_truexs[0]));
+  TGraphErrors *gr_truexs = new TGraphErrors(pi::nthinslices, &(Eslice[0]), &(truexs[0]), &(Einterval[0]), &(err_truexs[0]));
   
   gr_truexs->Write("gr_truexs");
 
