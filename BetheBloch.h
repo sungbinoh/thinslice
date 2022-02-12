@@ -12,7 +12,7 @@ class BetheBloch {
 
   double MPVdEdx(double KE, double pitch);
 
-
+  double RangeFromKE(double KE, int n= 10000);
 
  private:
 
@@ -25,6 +25,8 @@ class BetheBloch {
   double densityEffect(double beta, double gamma);
 
   double betaGamma(double KE);
+
+
 };
 
 #endif

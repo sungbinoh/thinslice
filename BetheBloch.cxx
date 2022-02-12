@@ -1,4 +1,5 @@
 #include "BetheBloch.h"
+#include "TF1.h"
 #include <iostream>
 #include <cmath>
 
@@ -108,4 +109,16 @@ double BetheBloch::MPVdEdx(double KE, double pitch){
 
   return eloss_mpv;
 }
-  
+
+double BetheBloch::RangeFromKE(double KE, int n){
+
+  double step = KE/n;
+
+  double area = 0.;
+
+  for (int i = 0; i<n; ++i){
+    area += 1/meandEdx((i+0.5)*step)*step;
+  }
+  return area;
+
+}
