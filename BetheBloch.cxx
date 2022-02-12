@@ -1,17 +1,25 @@
 #include "BetheBloch.h"
 #include "TF1.h"
+#include "TSpline.h"
 #include <iostream>
 #include <cmath>
 
 using namespace std;
 
-BetheBloch::BetheBloch(){
-  pdgcode = 0;
-  mass = 0;
-  charge = 0;
+BetheBloch::BetheBloch()
+  : pdgcode(0)
+  , mass(0)
+  , charge(0)
+  , sp_KE_range(0)
+  , sp_range_KE(0){
 }
 
-BetheBloch::BetheBloch(int pdg){
+BetheBloch::BetheBloch(int pdg)
+  : pdgcode(0)
+  , mass(0)
+  , charge(0)
+  , sp_KE_range(0)
+  , sp_range_KE(0){
   SetPdgCode(pdg);
 }
 
@@ -39,6 +47,9 @@ void BetheBloch::SetPdgCode(int pdg){
     cout<<"Unknown pdg code "<<pdgcode<<endl;
     exit(1);
   }
+
+  CreateSplines();
+
 }
 
 double BetheBloch::densityEffect(double beta, double gamma){
@@ -121,4 +132,31 @@ double BetheBloch::RangeFromKE(double KE, int n){
   }
   return area;
 
+}
+
+void BetheBloch::CreateSplines(int np, double minke, double maxke){
+
+  if (sp_KE_range) delete sp_KE_range;
+  if (sp_range_KE) delete sp_range_KE;
+
+  vector<double> KE(np);
+  vector<double> Range(np);
+
+  for (int i = 0; i<np; ++i){
+    double ke = pow(10, log10(minke)+i*log10(maxke/minke)/np);
+    KE.push_back(ke);
+    Range.push_back(RangeFromKE(ke));
+  }
+
+  sp_KE_range = new TSpline3("sp_KE_range", &KE[0], &Range[0], KE.size(), "b2e2");
+  sp_range_KE = new TSpline3("sp_range_KE", &Range[0], &KE[0], KE.size(), "b2e2");
+
+}
+
+double BetheBloch::RangeFromKESpline(double KE){
+  return sp_KE_range->Eval(KE);
+}
+
+double BetheBloch::KEFromRangeSpline(double range){
+  return sp_range_KE->Eval(range);
 }
