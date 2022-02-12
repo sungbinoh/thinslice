@@ -97,16 +97,14 @@ double BetheBloch::MPVdEdx(double KE, double pitch){
   double Z = 18;
   double A = 39.948;
   double I = pow(10,-6)*10.5*18; //MeV
-  double j = 0.2;
   double  me = 0.511; //MeV me*c^2
 
-  pitch *= rho; // g*cm^-2
   double gamma = (KE + mass) / mass;
   double beta = sqrt( 1 - 1/pow(gamma,2));
 
-  double xi = ( K/2 )*( Z/A )* ( pitch / pow(beta,2));
+  double xi = ( K/2 )*( Z/A )* ( pitch * rho / pow(beta,2));
 
-  double eloss_mpv = xi*(log( 2*me*pow(gamma,2)*pow(beta,2) / I ) + log( xi / I ) + j - pow(beta,2) - densityEffect( beta, gamma ) );
+  double eloss_mpv = xi*(log( 2*me*pow(gamma,2)*pow(beta,2) / I ) + log( xi / I ) + 0.2 - pow(beta,2) - densityEffect( beta, gamma ) )/pitch;
 
   return eloss_mpv;
 }
