@@ -83,7 +83,7 @@ double BetheBloch::meandEdx(double KE){
   //KE is kinetic energy in MeV
   
   double K = 0.307;
-  double rho = 1.4;
+  double rho = 1.396;
   double Z = 18;
   double A = 39.948;
   double I = pow(10,-6)*10.5*18; //MeV
@@ -105,7 +105,7 @@ double BetheBloch::MPVdEdx(double KE, double pitch){
   //pitch is in cm
 
   double K = 0.307;
-  double rho = 1.4;
+  double rho = 1.396;
   double Z = 18;
   double A = 39.948;
   double I = pow(10,-6)*10.5*18; //MeV
@@ -139,18 +139,26 @@ void BetheBloch::CreateSplines(int np, double minke, double maxke){
   if (sp_KE_range) delete sp_KE_range;
   if (sp_range_KE) delete sp_range_KE;
 
-  vector<double> KE(np);
-  vector<double> Range(np);
+  double *KE = new double[np];
+  double *Range = new double[np];
+//  vector<double> KE(np);
+//  vector<double> Range(np);
 
   for (int i = 0; i<np; ++i){
     double ke = pow(10, log10(minke)+i*log10(maxke/minke)/np);
-    KE.push_back(ke);
-    Range.push_back(RangeFromKE(ke));
+//    KE.push_back(ke);
+//    Range.push_back(RangeFromKE(ke));
+//    cout<<KE.back()<<" "<<Range.back()<<endl;
+    KE[i] = ke;
+    Range[i] = RangeFromKE(ke);
   }
 
-  sp_KE_range = new TSpline3("sp_KE_range", &KE[0], &Range[0], KE.size(), "b2e2");
-  sp_range_KE = new TSpline3("sp_range_KE", &Range[0], &KE[0], KE.size(), "b2e2");
-
+  sp_KE_range = new TSpline3("sp_KE_range", KE, Range, np, "b2e2", 0, 0);
+  sp_range_KE = new TSpline3("sp_range_KE", Range, KE, np, "b2e2", 0, 0);
+  //cout<<sp_KE_range->Eval(10)<<endl;
+  delete[] KE;
+  delete[] Range;
+  cout<<"Done creating splines for particle with pdgcode "<<pdgcode<<endl;
 }
 
 double BetheBloch::RangeFromKESpline(double KE){

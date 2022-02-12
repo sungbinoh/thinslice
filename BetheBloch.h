@@ -35,7 +35,7 @@ class BetheBloch {
 
   double betaGamma(double KE);
 
-  void CreateSplines(int np = 1000, double minke = 0.1, double maxke = 1e4);
+  void CreateSplines(int np = 1000, double minke = 0.1, double maxke = 2e5);
 
 };
 
