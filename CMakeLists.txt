@@ -48,7 +48,7 @@
 # include directories and C++ standard are propagated to our libraries or executables.
 # Note: To ensure compatibility with Cling, targets *must* be compiled using the
 # same C++ standard as ROOT was compiled with.
-  add_library(Event SHARED anavar.C HadAna.cxx ThinSlice.cxx EffEval.cxx ProtonInel.cxx util.cxx Unfold.cxx TemplateFitter.cxx)
+  add_library(Event SHARED anavar.C HadAna.cxx ThinSlice.cxx EffEval.cxx ProtonInel.cxx util.cxx Unfold.cxx TemplateFitter.cxx BetheBloch.cxx)
   target_link_libraries(Event PUBLIC ${ROOT_LIBRARIES} ${RooUnfold_LIBRARIES} ${JSONCPP_LIBRARIES})
 #   target_compile_options(Event INTERFACE ${CMAKE_REQUIRED_FLAGS})
 # Create the main program using the library.
