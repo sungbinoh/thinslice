@@ -23,4 +23,6 @@ double GetThetaxz(double x, double y, double z);
 
 double GetThetayz(double x, double y, double z);
 
+void SetProtoDUNEStyle();
+
 #endif
