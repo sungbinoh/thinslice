@@ -19,6 +19,7 @@ int main(){
   BetheBloch bb(13);
 
   //cout<<bb.meandEdx(1000)<<" "<<bb.MPVdEdx(1000, 0.5)<<endl;
+  //cout<<bb.KEAtLength(1000, 100)<<" "<<bb.KEAtLength(1000,500)<<endl;
   //https://pdg.lbl.gov/2012/AtomicNuclearProperties/MUON_ELOSS_TABLES/muonloss_289.pdf
   const int np = 29;
   double spline_KE[np] = {
