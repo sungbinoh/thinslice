@@ -14,6 +14,8 @@ int main(){
   gStyle->SetPadGridX(1);
   gStyle->SetPadGridY(1);
 
+
+  // Create a BetheBloch object for muon
   BetheBloch bb(13);
 
   //cout<<bb.meandEdx(1000)<<" "<<bb.MPVdEdx(1000, 0.5)<<endl;
@@ -72,6 +74,73 @@ int main(){
   leg1->Draw();
   c1->Print("muKERange.png");
   c1->Print("muKERange.pdf");
+
+  gPad->SetLogx(1);
+  gPad->SetLogy(0);
+  const int np2 = 1000;
+  double rr[np2];
+  double KE[4][np2];
+  double dEdx[4][np2];
+  double pdg[4] = {13, 211, 321, 2212};
+  char particle[4][100] = {"Muon", "Pion", "Kaon", "Proton"};
+  TGraph *grrrdEdx[4];
+  TGraph *grrrKE[4];
+  for (int i = 0; i<4; ++i){
+    if (bb.GetPdgCode() != pdg[i]){
+      bb.SetPdgCode(pdg[i]);
+    }
+    for (int j = 0; j<np2; ++j){
+      if (i==0){
+        rr[j] = pow(10, log10(0.1)+j*log10(1000/0.1)/np2);
+      }
+      KE[i][j] = bb.KEFromRangeSpline(rr[j]);
+      dEdx[i][j] = bb.meandEdx(KE[i][j]);
+//      if (j==0) cout<<i<<" "<<rr[j]<<" "<<KE[i][j]<<" "<<dEdx[i][j]<<endl;
+//      if (j==np2-1) cout<<i<<" "<<rr[j]<<" "<<KE[i][j]<<" "<<dEdx[i][j]<<endl;
+//      if (i==3){
+//        cout<<rr[j]<<" "<<KE[i][j]<<" "<<dEdx[i][j]<<endl;
+//      }
+    }
+    grrrdEdx[i] = new TGraph(np2, rr, dEdx[i]);
+    grrrKE[i] = new TGraph(np2, rr, KE[i]);
+  }
+
+  TLegend *leg2 = new TLegend(0.6,0.6,0.8,0.9);
+  leg2->SetFillStyle(0);
+  for (int i = 0; i<4; ++i){
+    grrrdEdx[i]->SetLineColor(i+1);
+    grrrdEdx[i]->SetLineWidth(2);
+    grrrdEdx[i]->Draw(i==0?"ac":"c");
+    if (i==0){
+      grrrdEdx[i]->SetTitle("");
+      grrrdEdx[i]->GetXaxis()->SetTitle("Residual range (cm)");
+      grrrdEdx[i]->GetYaxis()->SetTitle("dE/dx (MeV/cm)");
+      grrrdEdx[i]->GetYaxis()->SetRangeUser(0,55);
+    }
+    leg2->AddEntry(grrrdEdx[i], particle[i], "l");
+  }
+  leg2->Draw();
+  c1->Print("RRdEdx.png");
+  c1->Print("RRdEdx.pdf");
+
+  gPad->SetLogx(1);
+  gPad->SetLogy(1);
+  TLegend *leg3 = new TLegend(0.2,0.6,0.4,0.9);
+  leg3->SetFillStyle(0);
+  for (int i = 0; i<4; ++i){
+    grrrKE[i]->SetLineColor(i+1);
+    grrrKE[i]->SetLineWidth(2);
+    grrrKE[i]->Draw(i==0?"ac":"c");
+    if (i==0){
+      grrrKE[i]->SetTitle("");
+      grrrKE[i]->GetXaxis()->SetTitle("Range (cm)");
+      grrrKE[i]->GetYaxis()->SetTitle("KE (MeV)");
+    }
+    leg3->AddEntry(grrrKE[i], particle[i], "l");
+  }
+  leg3->Draw();
+  c1->Print("RRKE.png");
+  c1->Print("RRKE.pdf");
 
   return 0;
 

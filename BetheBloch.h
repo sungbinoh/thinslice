@@ -10,6 +10,10 @@ class BetheBloch {
   BetheBloch();
   BetheBloch(int pdg);
 
+  void SetPdgCode(int pdg);
+
+  int GetPdgCode(){ return pdgcode;};
+
   double meandEdx(double KE);
 
   double MPVdEdx(double KE, double pitch);
@@ -29,13 +33,11 @@ class BetheBloch {
   TSpline3 *sp_KE_range;
   TSpline3 *sp_range_KE;
 
-  void SetPdgCode(int pdg);
-
   double densityEffect(double beta, double gamma);
 
   double betaGamma(double KE);
 
-  void CreateSplines(int np = 1000, double minke = 0.1, double maxke = 2e5);
+  void CreateSplines(int np = 1000, double minke = .01, double maxke = 2e5);
 
 };
 

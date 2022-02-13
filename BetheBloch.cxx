@@ -93,9 +93,10 @@ double BetheBloch::meandEdx(double KE){
   double beta = sqrt( 1 - 1/pow(gamma,2));
   
   double wmax = 2*me*pow(beta,2)*pow(gamma,2)/(1+2*gamma*me/mass + pow(me,2)/pow(mass,2));
-  
+
+  //cout<<wmax<<" "<<rho*K*Z*pow(charge,2)<<" "<<A*pow(beta,2)<<" "<<0.5*log(2*me*pow(gamma,2)*pow(beta,2)*wmax/pow(I,2))<<" "<<pow(beta,2)<<" "<<densityEffect( beta, gamma )/2<<endl;
   double dEdX = (rho*K*Z*pow(charge,2))/(A*pow(beta,2))*(0.5*log(2*me*pow(gamma,2)*pow(beta,2)*wmax/pow(I,2)) - pow(beta,2) - densityEffect( beta, gamma )/2 );
-  
+
   return dEdX;
 }
 
@@ -115,7 +116,7 @@ double BetheBloch::MPVdEdx(double KE, double pitch){
   double beta = sqrt( 1 - 1/pow(gamma,2));
 
   double xi = ( K/2 )*( Z/A )* ( pitch * rho / pow(beta,2));
-
+  
   double eloss_mpv = xi*(log( 2*me*pow(gamma,2)*pow(beta,2) / I ) + log( xi / I ) + 0.2 - pow(beta,2) - densityEffect( beta, gamma ) )/pitch;
 
   return eloss_mpv;
@@ -128,7 +129,9 @@ double BetheBloch::RangeFromKE(double KE, int n){
   double area = 0.;
 
   for (int i = 0; i<n; ++i){
-    area += 1/meandEdx((i+0.5)*step)*step;
+    double dEdx = meandEdx((i+0.5)*step);
+    if (dEdx)
+      area += 1/dEdx*step;
   }
   return area;
 
@@ -148,9 +151,9 @@ void BetheBloch::CreateSplines(int np, double minke, double maxke){
     double ke = pow(10, log10(minke)+i*log10(maxke/minke)/np);
 //    KE.push_back(ke);
 //    Range.push_back(RangeFromKE(ke));
-//    cout<<KE.back()<<" "<<Range.back()<<endl;
     KE[i] = ke;
     Range[i] = RangeFromKE(ke);
+    //if (pdgcode ==2212) cout<<KE[i]<<" "<<Range[i]<<" "<<meandEdx(KE[i])<<endl;
   }
 
   sp_KE_range = new TSpline3("sp_KE_range", KE, Range, np, "b2e2", 0, 0);
@@ -162,9 +165,17 @@ void BetheBloch::CreateSplines(int np, double minke, double maxke){
 }
 
 double BetheBloch::RangeFromKESpline(double KE){
+  if (!sp_KE_range){
+    cout<<"Spline does not exist."<<endl;
+    exit(1);
+  }
   return sp_KE_range->Eval(KE);
 }
 
 double BetheBloch::KEFromRangeSpline(double range){
+  if (!sp_range_KE){
+    cout<<"Spline does not exit."<<endl;
+    exit(1);
+  }
   return sp_range_KE->Eval(range);
 }
