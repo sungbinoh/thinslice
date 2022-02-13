@@ -160,8 +160,8 @@ void SetProtoDUNEStyle(){
   protoDUNEStyle->SetLabelOffset(0.005,"xy");
   //protoDUNEStyle->SetLabelOffset(0.005,"z");
   protoDUNEStyle->SetTitleSize(0.05,"xyz");
-  protoDUNEStyle->SetTitleOffset(1,"x");
-  protoDUNEStyle->SetTitleOffset(1.2,"yz");
+  protoDUNEStyle->SetTitleOffset(1.15,"x");
+  protoDUNEStyle->SetTitleOffset(1.15,"yz");
   protoDUNEStyle->SetStatFontSize(0.05);
   protoDUNEStyle->SetTextSize(0.05);
   protoDUNEStyle->SetTitleBorderSize(0);
@@ -271,5 +271,5 @@ void SetProtoDUNEStyle(){
 
 
   // Avoid too many decimal places in the axis labels
-  TGaxis::SetMaxDigits(4);
+  //TGaxis::SetMaxDigits(4);
 }
