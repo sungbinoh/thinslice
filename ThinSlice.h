@@ -5,6 +5,7 @@
 #include "SliceParams.h"
 #include "HadAna.h"
 #include "Unfold.h"
+#include "BetheBloch.h"
 
 class anavar;
 class HadAna;
@@ -111,6 +112,10 @@ class ThinSlice {
   
   TH1D *htrklen_csda_proton[pi::nCuts][pi::nIntTypes+1];
   TH1D *hChi2_proton[pi::nCuts][pi::nIntTypes+1];
+  
+  TH1D *h_beam_inst_KE;
+  TH1D *h_true_ffKE;
+  TH1D *h_upstream_Eloss;
 
   std::string fOutputFileName;
   TFile *outputFile;

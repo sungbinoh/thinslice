@@ -565,6 +565,14 @@ void HadAna::ProcessEvent(const anavar& evt){
       reco_trklen_accum[i] = reco_trklen;
       //cout<<i<<"\t"<<reco_trklen_accum[i]<<endl;
     }
+    // front-face energy
+    true_ffKE = 999999.;
+    for (size_t i = 0; i<evt.true_beam_traj_Z->size(); ++i){
+      if ((true_trklen_accum)[i] != 0) {
+        true_ffKE = (*evt.true_beam_traj_KE)[i-1];
+        break;
+      }
+    }
   }
   energy_calorimetry_SCE = 0; //MeV
   for (int i=0; i<evt.reco_beam_calibrated_dEdX_SCE->size(); i++){

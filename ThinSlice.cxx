@@ -6,6 +6,7 @@
 #include "RooUnfoldBayes.h"
 #include "RooUnfoldSvd.h"
 #include "util.h"
+#include "BetheBloch.h"
 
 #include <iostream>
 
@@ -193,6 +194,12 @@ void ThinSlice::BookHistograms(){
       hChi2_proton[i][j]->Sumw2();
     }
   }
+  h_beam_inst_KE = new TH1D("h_beam_inst_KE","h_beam_inst_KE;MeV", 100, 0, 2000);
+  h_beam_inst_KE->Sumw2();
+  h_true_ffKE = new TH1D("h_true_ffKE","h_true_ffKE;MeV", 100, 0, 2000);
+  h_true_ffKE->Sumw2();
+  h_upstream_Eloss = new TH1D("h_upstream_Eloss","h_upstream_Eloss;MeV", 100, -100, 100);
+  h_upstream_Eloss->Sumw2();
 
    for (int i = 0; i<pi::nthinslices; ++i){
      true_interactions[i] = 0;
@@ -303,15 +310,13 @@ void ThinSlice::ProcessEvent(const anavar & evt, Unfold & uf){
   }
   else {//not using all track reconstruction
     if (evt.MC){
-      double inc_energy = 999999.;
-      for (size_t i = 0; i<evt.true_beam_traj_Z->size(); ++i){
-        if ((hadana.true_trklen_accum)[i] != 0) {
-          inc_energy = (*evt.true_beam_traj_KE)[i-1];
-          break;
-        }
-      }
+      double beam_inst_KE = sqrt(pow(evt.beam_inst_P*1000,2)+pow(139.57,2)) - 139.57;
+      h_beam_inst_KE->Fill(beam_inst_KE);
+      h_true_ffKE->Fill(hadana.true_ffKE);
+      h_upstream_Eloss->Fill(beam_inst_KE - hadana.true_ffKE);
+
       double int_energy = 999999.;
-      if (inc_energy < 999999) { // entered TPC
+      if (hadana.true_ffKE < 999999) { // entered TPC
         int traj_max = evt.true_beam_traj_Z->size()-1;
         if ((*evt.true_beam_traj_KE)[traj_max] != 0) {
           int_energy = (*evt.true_beam_traj_KE)[traj_max];
@@ -322,7 +327,7 @@ void ThinSlice::ProcessEvent(const anavar & evt, Unfold & uf){
           int_energy = (*evt.true_beam_traj_KE)[temp] - 2*((hadana.true_trklen_accum)[traj_max]-(hadana.true_trklen_accum)[temp]); // 2 MeV/cm
         }
       }
-      inc_sliceID = int( (pi::plim-inc_energy)/pi::Eslicewidth + 0.5); // ignore the first imcomplete slice?
+      inc_sliceID = int( (pi::plim - hadana.true_ffKE)/pi::Eslicewidth + 0.5); // ignore the first imcomplete slice?
       if (inc_sliceID < 0) inc_sliceID = 0;
       true_sliceID = int( (pi::plim-int_energy)/pi::Eslicewidth );
       if (true_sliceID < 0) true_sliceID = -1;
@@ -765,7 +770,7 @@ void ThinSlice::CalcXS(const Unfold & uf){
   double slcid[pi::nthinslices] = {0};
   double Eslice[pi::nthinslices] = {0};
   double Einterval[pi::nthinslices] = {0};
-  double dEdx[pi::nthinslices] = {2.28752,2.2831,2.27861,2.27404,2.2694,2.26468,2.25988,2.255,2.25004,2.245,2.23987,2.23466,2.22937,2.22399,2.21852,2.21297,2.20734,2.20163,2.19584,2.18997,2.18404,2.17805,2.17201,2.16592,2.15982,2.15371,2.14763,2.1416,2.13566,2.12988,2.12431,2.11905,2.1142,2.10991,2.10638,2.10386,2.1027,2.10337,2.10652,2.11309,2.12444,2.1426,2.17077,2.21412,2.28169,2.39051,2.57809,2.93999,3.81236,7.94844};
+  double dEdx[pi::nthinslices] = {0};
   double avg_trueincE[pi::nthinslices] = {0};
   double avg_recoincE[pi::nthinslices] = {0};
   double err_trueincE[pi::nthinslices] = {0};
@@ -779,13 +784,14 @@ void ThinSlice::CalcXS(const Unfold & uf){
   double NA=6.02214076e23;
   double MAr=39.95; //gmol
   double Density = 1.4; // 1.396 g/cm^3
-
+  BetheBloch bb(211);
   for (int i = 0; i<pi::nthinslices; ++i){
     
     slcid[i] = i;
     Eslice[i] = pi::plim - (i+0.5)*pi::Eslicewidth;
     Einterval[i] = pi::Eslicewidth/2;
-    //dEdx[i] = 2.16; // MeV/cm
+    dEdx[i] = bb.meandEdx(Eslice[i]); // MeV/cm
+    cout<<dEdx[i]<<"\t";
     avg_trueincE[i] = true_incE[i]->GetMean();
     err_trueincE[i] = true_incE[i]->GetMeanError();
     avg_recoincE[i] = reco_incE[i]->GetMean();

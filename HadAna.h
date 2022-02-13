@@ -63,6 +63,7 @@ class HadAna{
   double reco_trklen;
   std::vector<double> true_trklen_accum;
   std::vector<double> reco_trklen_accum;
+  double true_ffKE;
   
   double trklen_csda_proton;
   double beam_score;
