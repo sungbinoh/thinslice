@@ -1,6 +1,10 @@
 #ifndef BETHEBLOCH_H
 #define BETHEBLOCH_H
 
+#include <map>
+
+using namespace std;
+
 class TSpline3;
 
 class BetheBloch {
@@ -18,12 +22,19 @@ class BetheBloch {
 
   double MPVdEdx(double KE, double pitch);
 
-  double RangeFromKE(double KE, int n= 10000);
+  double IntegratedEdx(double KE0, double KE1, int n = 10000);
+
+  double RangeFromKE(double KE);
 
   double RangeFromKESpline(double KE);
 
   double KEFromRangeSpline(double range);
 
+  double KEAtLength(double KE0, double tracklength);
+
+  void CreateSplineAtKE(int iKE);
+
+  
  private:
 
   int pdgcode;
@@ -33,6 +44,8 @@ class BetheBloch {
   TSpline3 *sp_KE_range;
   TSpline3 *sp_range_KE;
 
+  map<int, TSpline3*> spmap;
+  
   double densityEffect(double beta, double gamma);
 
   double betaGamma(double KE);

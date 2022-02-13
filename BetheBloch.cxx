@@ -3,6 +3,7 @@
 #include "TSpline.h"
 #include <iostream>
 #include <cmath>
+#include <algorithm>
 
 using namespace std;
 
@@ -122,19 +123,25 @@ double BetheBloch::MPVdEdx(double KE, double pitch){
   return eloss_mpv;
 }
 
-double BetheBloch::RangeFromKE(double KE, int n){
+double BetheBloch::IntegratedEdx(double KE0, double KE1, int n){
 
-  double step = KE/n;
+  if (KE0>KE1) swap(KE0, KE1);
 
-  double area = 0.;
+  double step = (KE1-KE0)/n;
 
+  double area = 0;
+  
   for (int i = 0; i<n; ++i){
-    double dEdx = meandEdx((i+0.5)*step);
+    double dEdx = meandEdx(KE0 + (i+0.5)*step);
     if (dEdx)
       area += 1/dEdx*step;
   }
   return area;
+}
 
+double BetheBloch::RangeFromKE(double KE){
+
+  return IntegratedEdx(0, KE);
 }
 
 void BetheBloch::CreateSplines(int np, double minke, double maxke){
@@ -142,6 +149,11 @@ void BetheBloch::CreateSplines(int np, double minke, double maxke){
   if (sp_KE_range) delete sp_KE_range;
   if (sp_range_KE) delete sp_range_KE;
 
+  for (const auto & x : spmap){
+    if (x.second) delete x.second;
+  }
+  spmap.clear();
+  
   double *KE = new double[np];
   double *Range = new double[np];
 //  vector<double> KE(np);
@@ -178,4 +190,56 @@ double BetheBloch::KEFromRangeSpline(double range){
     exit(1);
   }
   return sp_range_KE->Eval(range);
+}
+
+double BetheBloch::KEAtLength(double KE0, double tracklength){
+
+  int iKE = int(KE0);
+
+  if (spmap.find(iKE)==spmap.end()){
+    CreateSplineAtKE(iKE);
+  }
+
+  double deltaE = spmap[iKE]->Eval(tracklength);
+
+  if (deltaE < 0) cout<<"Negative delta E: "<<deltaE<<endl;
+  if (KE0 - deltaE < 0) cout<<"Negative KE: "<<KE0 - deltaE<<endl;
+  
+  return KE0 - deltaE;
+
+}
+
+void BetheBloch::CreateSplineAtKE(int iKE){
+
+  double KE0 = iKE;
+
+  // Sample every 10 MeV
+  int np = int(KE0/10);
+  double *deltaE;
+  double *trklength;
+  if (np>1){
+    deltaE = new double[np];
+    trklength = new double[np];
+    for (int i = 0; i<np; ++i){
+      double KE = KE0 - i*10;
+      deltaE[i] = KE0 - KE;
+      trklength[i] = IntegratedEdx(KE, KE0);
+      //cout<<iKE<<" "<<KE<<" "<<i<<"/"<<np<<" "<<trklength[i]<<endl;
+    }
+  }
+  else{
+    cout<<"KE too low: "<<iKE<<endl;
+    np = 2;
+    deltaE = new double[np];
+    trklength = new double[np];
+    deltaE[0] = 0;
+    trklength[0] = 0;
+    deltaE[1] = KE0;
+    trklength[1] = RangeFromKE(KE0);
+  }
+
+  spmap[iKE] = new TSpline3(Form("KE %d",iKE), trklength, deltaE, np, "b2e2", 0, 0);
+  delete[] trklength;
+  delete[] deltaE;
+
 }
