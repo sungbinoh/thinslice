@@ -56,6 +56,12 @@ void FillHistVec2D(TH2D *hist[pi::nIntTypes+1], const double &value1, const doub
     hist[partype]->Fill(value1, value2, weight);
   }
 }
+void FillProfVec(TProfile *profile[pi::nIntTypes+1], const double &value1, const double &value2, const int &partype){
+  //hist[0]->Fill(value1, value2);
+  if (partype>=0 && partype < pi::nIntTypes+1){
+    profile[partype]->Fill(value1, value2);
+  }
+}
 
 void FillHist1D(TH1D *hist, const double &value, const double &wei){
   if (value<hist->GetXaxis()->GetXmin()){

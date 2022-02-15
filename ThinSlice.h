@@ -6,7 +6,6 @@
 #include "HadAna.h"
 #include "Unfold.h"
 #include "BetheBloch.h"
-#include "TProfile.h"
 
 class anavar;
 class HadAna;
@@ -22,6 +21,10 @@ class ThinSlice {
 
   int reco_sliceID;
   int true_sliceID;
+  int reco_ini_sliceID;
+  int true_ini_sliceID;
+  double int_energy_reco;
+  double int_energy_true;
 
   bool isTestSample;
 
@@ -114,14 +117,14 @@ class ThinSlice {
   
   TH1D *htrklen_csda_proton[pi::nCuts][pi::nIntTypes+1];
   TH1D *hChi2_proton[pi::nCuts][pi::nIntTypes+1];
+  TH1D *h_diff_reco_true_Eint[pi::nCuts][pi::nIntTypes+1];
+  TH2D *h_diff_reco_true_vs_true_Eint[pi::nCuts][pi::nIntTypes+1];
+  TProfile *pf_diff_reco_true_vs_true_Eint[pi::nCuts][pi::nIntTypes+1];
   
   TH1D *h_beam_inst_KE;
   TH1D *h_true_ffKE;
   TH1D *h_upstream_Eloss;
   TH1D *h_diff_Eint;
-  TH1D *h_diff_reco_true_Eint;
-  TH2D *h_diff_reco_true_vs_true_Eint;
-  TProfile *pf_diff_reco_true_vs_true_Eint;
 
   std::string fOutputFileName;
   TFile *outputFile;

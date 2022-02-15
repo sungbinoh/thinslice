@@ -193,6 +193,10 @@ void ThinSlice::BookHistograms(){
       htrklen_csda_proton[i][j]->Sumw2();
       hChi2_proton[i][j] = new TH1D(Form("hChi2_proton_%d_%d",i,j), Form("Chi2_proton, %s, %s;Chi2/Ndof", pi::cutName[i], pi::intTypeName[j]), 101, -1, 100);
       hChi2_proton[i][j]->Sumw2();
+      h_diff_reco_true_Eint[i][j] = new TH1D(Form("h_diff_reco_true_Eint_%d_%d",i,j), Form("h_diff_reco_true_Eint, %s, %s;MeV", pi::cutName[i], pi::intTypeName[j]), 100, -300, 300);
+      h_diff_reco_true_Eint[i][j]->Sumw2();
+      h_diff_reco_true_vs_true_Eint[i][j] = new TH2D(Form("h_diff_reco_true_vs_true_Eint_%d_%d",i,j), Form("h_diff_reco_true_vs_true_Eint, %s, %s;MeV", pi::cutName[i], pi::intTypeName[j]), 100, 0, 1000, 100, -300, 300);
+      pf_diff_reco_true_vs_true_Eint[i][j] = new TProfile(Form("pf_diff_reco_true_vs_true_Eint_%d_%d",i,j), Form("pf_diff_reco_true_vs_true_Eint, %s, %s;MeV", pi::cutName[i], pi::intTypeName[j]), 100, 0, 1000);
     }
   }
   h_beam_inst_KE = new TH1D("h_beam_inst_KE","h_beam_inst_KE;MeV", 100, 0, 2000);
@@ -203,10 +207,6 @@ void ThinSlice::BookHistograms(){
   h_upstream_Eloss->Sumw2();
   h_diff_Eint = new TH1D("h_diff_Eint","h_diff_Eint;MeV", 100, -100, 100);
   h_diff_Eint->Sumw2();
-  h_diff_reco_true_Eint = new TH1D("h_diff_reco_true_Eint","h_diff_reco_true_Eint;MeV", 100, -300, 300);
-  h_diff_reco_true_Eint->Sumw2();
-  h_diff_reco_true_vs_true_Eint = new TH2D("h_diff_reco_true_vs_true_Eint", "h_diff_reco_true_vs_true_Eint", 100, 0, 1000, 100, -300, 300);
-  pf_diff_reco_true_vs_true_Eint = new TProfile("pf_diff_reco_true_vs_true_Eint", "pf_diff_reco_true_vs_true_Eint", 100, 0, 1000);
 
    for (int i = 0; i<pi::nthinslices; ++i){
      true_interactions[i] = 0;
@@ -222,7 +222,10 @@ void ThinSlice::ProcessEvent(const anavar & evt, Unfold & uf){
   hadana.ProcessEvent(evt);
   reco_sliceID = -1;
   true_sliceID = -1;
-  int inc_sliceID = -1;
+  reco_ini_sliceID = -1;
+  true_ini_sliceID = -1;
+  int_energy_reco = 999999.;
+  int_energy_true = 999999.;
 
   isTestSample = (hadana.pitype == pi::kData); // fake data
   //if (evt.MC && evt.event%2 == 0) isTestSample = false;
@@ -316,45 +319,36 @@ void ThinSlice::ProcessEvent(const anavar & evt, Unfold & uf){
     }*/
   }
   else {//not using all track reconstruction
+    double beam_inst_KE = sqrt(pow(evt.beam_inst_P*1000,2)+pow(139.57,2)) - 139.57;
     if (evt.MC){
-      double beam_inst_KE = sqrt(pow(evt.beam_inst_P*1000,2)+pow(139.57,2)) - 139.57;
       h_beam_inst_KE->Fill(beam_inst_KE);
       h_true_ffKE->Fill(hadana.true_ffKE);
       h_upstream_Eloss->Fill(beam_inst_KE - hadana.true_ffKE);
 
-      double int_energy = 999999.;
-      double inc_energy_reco = 999999.;
-      double int_energy_reco = 999999.;
       if (hadana.true_ffKE < 999999) { // entered TPC
         int traj_max = evt.true_beam_traj_Z->size()-1;
-        double int_energy_true = 999999.;
+        double int_energy_traj = 999999.;
         if ((*evt.true_beam_traj_KE)[traj_max] != 0) {
-          int_energy_true = (*evt.true_beam_traj_KE)[traj_max];
+          int_energy_traj = (*evt.true_beam_traj_KE)[traj_max];
         }
         else {
           int temp = traj_max-1;
           while ((*evt.true_beam_traj_KE)[temp] == 0) temp--;
-          int_energy_true = (*evt.true_beam_traj_KE)[temp] - 2*((hadana.true_trklen_accum)[traj_max]-(hadana.true_trklen_accum)[temp]); // 2 MeV/cm
+          int_energy_traj = (*evt.true_beam_traj_KE)[temp] - 2*((hadana.true_trklen_accum)[traj_max]-(hadana.true_trklen_accum)[temp]); // 2 MeV/cm
         }
-        int_energy = bb.KEAtLength(hadana.true_ffKE, hadana.true_trklen);
-        //if (int_energy<0) int_energy = 0;
-        h_diff_Eint->Fill(int_energy - int_energy_true);
-        //cout<<int_energy<<"\t"<<int_energy_true<<endl;
-        // reco
-        inc_energy_reco = beam_inst_KE - 11.74;
-        int_energy_reco = bb.KEAtLength(inc_energy_reco, hadana.reco_trklen);
-        h_diff_reco_true_Eint->Fill(int_energy_reco - int_energy);
-        h_diff_reco_true_vs_true_Eint->Fill(int_energy, int_energy_reco - int_energy, 1);
-        pf_diff_reco_true_vs_true_Eint->Fill(int_energy, int_energy_reco - int_energy);
+        int_energy_true = bb.KEAtLength(hadana.true_ffKE, hadana.true_trklen);
+        //if (int_energy_true<0) int_energy_true = 0;
+        h_diff_Eint->Fill(int_energy_true - int_energy_traj);
+        //cout<<int_energy_true<<"\t"<<int_energy_traj<<endl;
       }
-      inc_sliceID = int( (pi::plim - hadana.true_ffKE)/pi::Eslicewidth + 0.5); // ignore the first imcomplete slice?
-      if (inc_sliceID < 0) inc_sliceID = 0;
-      true_sliceID = int( (pi::plim-int_energy)/pi::Eslicewidth );
+      true_ini_sliceID = int( (pi::plim - hadana.true_ffKE)/pi::Eslicewidth + 0.5); // ignore the first imcomplete slice?
+      if (true_ini_sliceID < 0) true_ini_sliceID = 0;
+      true_sliceID = int( (pi::plim-int_energy_true)/pi::Eslicewidth );
       if (true_sliceID < 0) true_sliceID = -1;
       if (evt.true_beam_endZ < 0) true_sliceID = -1;
       if (true_sliceID >= pi::nthinslices) true_sliceID = pi::nthinslices;
       if (evt.true_beam_PDG == 211){
-        for (int i = inc_sliceID; i<=true_sliceID; ++i){
+        for (int i = true_ini_sliceID; i<=true_sliceID; ++i){
           if (i<pi::nthinslices) ++true_incidents[i]; // count incident events
         }
       }
@@ -427,8 +421,10 @@ void ThinSlice::ProcessEvent(const anavar & evt, Unfold & uf){
     }
 
     if (!evt.reco_beam_calo_wire->empty()){
-      //reco_sliceID = int(evt.reco_beam_calo_endZ/pi::thinslicewidth);
-      reco_sliceID = int(hadana.reco_trklen/pi::thinslicewidth);
+      double inc_energy_reco = beam_inst_KE - 11.74;
+      int_energy_reco = bb.KEAtLength(inc_energy_reco, hadana.reco_trklen);
+      reco_ini_sliceID = int( (pi::plim - inc_energy_reco)/pi::Eslicewidth + 0.5);
+      reco_sliceID = int( (pi::plim-int_energy_reco)/pi::Eslicewidth );
       if (reco_sliceID < 0) reco_sliceID = -1;
       if (evt.reco_beam_calo_endZ < 0) reco_sliceID = -1;
       if (reco_sliceID >= pi::nthinslices) reco_sliceID = pi::nthinslices;
@@ -604,6 +600,9 @@ void ThinSlice::FillHistograms(int cut, const anavar & evt, double weight){
       FillHistVec1D(htrklen_csda_proton[cut], hadana.trklen_csda_proton, hadana.pitype, weight);
       FillHistVec1D(hChi2_proton[cut], hadana.chi2_proton, hadana.pitype, weight);
       FillHistVec1D(hreco_reconstructable_beam_event[cut], evt.reco_reconstructable_beam_event, hadana.pitype, weight);
+      FillHistVec1D(h_diff_reco_true_Eint[cut], int_energy_reco - int_energy_true, hadana.pitype);
+      FillHistVec2D(h_diff_reco_true_vs_true_Eint[cut], int_energy_true, int_energy_reco - int_energy_true, hadana.pitype);
+      FillProfVec(pf_diff_reco_true_vs_true_Eint[cut], int_energy_true, int_energy_reco - int_energy_true, hadana.pitype);
       
       FillHistVec1D(htrue_beam_endZ[cut], evt.true_beam_endZ_SCE, hadana.pitype, weight);
       FillHistVec1D(htrue_beam_endZ_SCE[cut], evt.true_beam_endZ, hadana.pitype, weight); // it seems SCE is reversed? and I didn't find true_beam_endZ_SCE on wiki?
