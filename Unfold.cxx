@@ -3,10 +3,12 @@
 Unfold::Unfold(int nb, double xlo, double xhi)
   : response_SliceID_Int(nb, xlo, xhi)
   , response_SliceID_Inc(nb, xlo, xhi)
+  , response_SliceID_Ini(nb, xlo, xhi)
 {
 
   response_SliceID_Int.UseOverflow(false);
   response_SliceID_Inc.UseOverflow(false);
+  response_SliceID_Ini.UseOverflow(false);
 
   eff_num_Int = new TH1D("eff_num_Int", "eff_num_Int", nb, xlo, xhi);
   eff_den_Int = new TH1D("eff_den_Int", "eff_den_Int", nb, xlo, xhi);
@@ -58,7 +60,11 @@ void Unfold::SaveHistograms(){
   TH2D *hinc = (TH2D*)response_SliceID_Inc.Hresponse();
   hinc->SetTitle("Incidents; Reco Slice ID; True Slice ID");
   hinc->Write("hresponse_SliceID_Inc");
+  TH2D *hini = (TH2D*)response_SliceID_Ini.Hresponse();
+  hini->SetTitle("Initial; Reco Slice ID; True Slice ID");
+  hini->Write("hresponse_SliceID_Ini");
 
   response_SliceID_Int.Write("response_SliceID_Int");
   response_SliceID_Inc.Write("response_SliceID_Inc");
+  response_SliceID_Ini.Write("response_SliceID_Ini");
 }

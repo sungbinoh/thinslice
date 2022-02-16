@@ -13,6 +13,7 @@ class Unfold {
 
   RooUnfoldResponse response_SliceID_Int;  //Interaction
   RooUnfoldResponse response_SliceID_Inc;  //Incident
+  RooUnfoldResponse response_SliceID_Ini;  //Initial
 
   TH1D *eff_num_Int; //Interaction efficiency numerator
   TH1D *eff_den_Int; //Interaction efficiency denominator

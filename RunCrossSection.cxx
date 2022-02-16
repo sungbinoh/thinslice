@@ -57,7 +57,7 @@ int main(int argc, char ** argv){
 
   ThinSlice mcths;
   mcths.SetOutputFileName(root["mcoutfile"].asString());
-  mcths.Run(mcevt, uf, -1);
+  mcths.Run(mcevt, uf, 30000);
 
   /*anavar dataevt(datachain);
 

@@ -33,19 +33,27 @@ void ThinSlice::BookHistograms(){
   true_AngCorr->Sumw2();
 
   h_truesliceid_pion_all = new TH1D("h_truesliceid_pion_all","h_truesliceid_pion_all;True SliceID", pi::nthinslices + 2, -1, pi::nthinslices + 1);
+  h_trueinisliceid_pion_all = new TH1D("h_trueinisliceid_pion_all","h_trueinisliceid_pion_all;True SliceID", pi::nthinslices + 2, -1, pi::nthinslices + 1);
   h_truesliceid_pion_cuts = new TH1D("h_truesliceid_pion_cuts","h_truesliceid_pion_cuts;True SliceID", pi::nthinslices + 2, -1, pi::nthinslices + 1);
+  h_trueinisliceid_pion_cuts = new TH1D("h_trueinisliceid_pion_cuts","h_trueinisliceid_pion_cuts;True SliceID", pi::nthinslices + 2, -1, pi::nthinslices + 1);
   h_truesliceid_pioninelastic_all = new TH1D("h_truesliceid_pioninelastic_all","h_truesliceid_pioninelastic_all;True SliceID", pi::nthinslices + 2, -1, pi::nthinslices + 1);
   h_truesliceid_pioninelastic_cuts = new TH1D("h_truesliceid_pioninelastic_cuts","h_truesliceid_pioninelastic_cuts;True SliceID", pi::nthinslices + 2, -1, pi::nthinslices + 1);
   h_recosliceid_allevts_cuts = new TH1D("h_recosliceid_allevts_cuts","h_recosliceid_allevts_cuts;Reco SliceID", pi::nthinslices + 2, -1, pi::nthinslices + 1);
+  h_recoinisliceid_allevts_cuts = new TH1D("h_recoinisliceid_allevts_cuts","h_recoinisliceid_allevts_cuts;Reco SliceID", pi::nthinslices + 2, -1, pi::nthinslices + 1);
   h_recosliceid_pion_cuts = new TH1D("h_recosliceid_pion_cuts","h_recosliceid_pion_cuts;Reco SliceID", pi::nthinslices + 2, -1, pi::nthinslices + 1);
+  h_recoinisliceid_pion_cuts = new TH1D("h_recoinisliceid_pion_cuts","h_recoinisliceid_pion_cuts;Reco SliceID", pi::nthinslices + 2, -1, pi::nthinslices + 1);
   h_recosliceid_pioninelastic_cuts = new TH1D("h_recosliceid_pioninelastic_cuts","h_recosliceid_pioninelastic_cuts;Reco SliceID", pi::nthinslices + 2, -1, pi::nthinslices + 1);
 
   h_truesliceid_pion_all->Sumw2();
+  h_trueinisliceid_pion_all->Sumw2();
   h_truesliceid_pion_cuts->Sumw2();
+  h_trueinisliceid_pion_cuts->Sumw2();
   h_truesliceid_pioninelastic_all->Sumw2();
   h_truesliceid_pioninelastic_cuts->Sumw2();
   h_recosliceid_allevts_cuts->Sumw2();
+  h_recoinisliceid_allevts_cuts->Sumw2();
   h_recosliceid_pion_cuts->Sumw2();
+  h_recoinisliceid_pion_cuts->Sumw2();
   h_recosliceid_pioninelastic_cuts->Sumw2();
 
   for (int i = 0; i < pi::nCuts; ++i){
@@ -73,14 +81,16 @@ void ThinSlice::BookHistograms(){
       hreco_vs_true_beam_endZ_SCE[i][j]= new TH2D(Form("hreco_vs_true_beam_endZ_SCE_%d_%d",i,j), Form("%s, %s;true_beam_endZ_SCE (cm);reco_beam_endZ_SCE (cm)", pi::cutName[i], pi::intTypeName[j]), 70, -100, 600, 70, -100, 600);
       hreco_true_vs_true_beam_endZ_SCE[i][j]= new TH2D(Form("hreco_true_vs_true_beam_endZ_SCE_%d_%d",i,j), Form("%s, %s;true_beam_endZ_SCE (cm);reco - true_beam_endZ_SCE (cm)", pi::cutName[i], pi::intTypeName[j]), 70, -100, 600, 100, -100, 100);
 
-      htrue_sliceID[i][j] = new TH1D(Form("htrue_sliceID_%d_%d",i,j),Form("true_sliceID, %s, %s;true_sliceID (cm)", pi::cutName[i], pi::intTypeName[j]), 26, -1, 25);
+      htrue_sliceID[i][j] = new TH1D(Form("htrue_sliceID_%d_%d",i,j),Form("true_sliceID, %s, %s;true_sliceID (cm)", pi::cutName[i], pi::intTypeName[j]), pi::nthinslices+2, -1, pi::nthinslices+1);
       htrue_sliceID[i][j]->Sumw2();
-      hreco_sliceID[i][j] = new TH1D(Form("hreco_sliceID_%d_%d",i,j),Form("reco_sliceID, %s, %s;reco_sliceID", pi::cutName[i], pi::intTypeName[j]), 26, -1, 25);
+      hreco_sliceID[i][j] = new TH1D(Form("hreco_sliceID_%d_%d",i,j),Form("reco_sliceID, %s, %s;reco_sliceID", pi::cutName[i], pi::intTypeName[j]), pi::nthinslices+2, -1, pi::nthinslices+1);
       hreco_sliceID[i][j]->Sumw2();
+      hreco_inisliceID[i][j] = new TH1D(Form("hreco_inisliceID_%d_%d",i,j),Form("reco_inisliceID, %s, %s;reco_inisliceID", pi::cutName[i], pi::intTypeName[j]), pi::nthinslices+2, -1, pi::nthinslices+1);
+      hreco_inisliceID[i][j]->Sumw2();
       hreco_true_sliceID[i][j] = new TH1D(Form("hreco_true_sliceID_%d_%d",i,j), Form("reco_true_sliceID, %s, %s;reco_sliceID - true_sliceID", pi::cutName[i], pi::intTypeName[j]), 20, -10, 10);
       hreco_true_sliceID[i][j]->Sumw2();
-      hreco_vs_true_sliceID[i][j]= new TH2D(Form("hreco_vs_true_sliceID_%d_%d",i,j), Form("%s, %s;true_sliceID;reco_sliceID", pi::cutName[i], pi::intTypeName[j]), 26, -1, 25, 26, -1, 25);
-      hreco_true_vs_true_sliceID[i][j]= new TH2D(Form("hreco_true_vs_true_sliceID_%d_%d",i,j), Form("%s, %s;true_sliceID;reco_sliceID - true_sliceID", pi::cutName[i], pi::intTypeName[j]), 26, -1, 25, 20, -10, 10);
+      hreco_vs_true_sliceID[i][j]= new TH2D(Form("hreco_vs_true_sliceID_%d_%d",i,j), Form("%s, %s;true_sliceID;reco_sliceID", pi::cutName[i], pi::intTypeName[j]), pi::nthinslices+2, -1, pi::nthinslices+1, pi::nthinslices+2, -1, pi::nthinslices+1);
+      hreco_true_vs_true_sliceID[i][j]= new TH2D(Form("hreco_true_vs_true_sliceID_%d_%d",i,j), Form("%s, %s;true_sliceID;reco_sliceID - true_sliceID", pi::cutName[i], pi::intTypeName[j]), pi::nthinslices+2, -1, pi::nthinslices+1, 20, -10, 10);
 
       hmediandEdx[i][j] = new TH1D(Form("hmediandEdx_%d_%d",i,j), Form("mediandEdx, %s, %s;Median dE/dx (MeV/cm)", pi::cutName[i], pi::intTypeName[j]), 100, 0, 5);
       hmediandEdx[i][j]->Sumw2();
@@ -348,6 +358,7 @@ void ThinSlice::ProcessEvent(const anavar & evt, Unfold & uf){
     if (evt.true_beam_PDG == 211){ // true pion beam incident event
       if (isTestSample){ // fake data
         h_truesliceid_pion_all->Fill(true_sliceID);
+        h_trueinisliceid_pion_all->Fill(true_ini_sliceID);
       }
       else{
         uf.eff_den_Inc->Fill(true_sliceID);
@@ -356,15 +367,21 @@ void ThinSlice::ProcessEvent(const anavar & evt, Unfold & uf){
         if (isTestSample){
           h_recosliceid_pion_cuts->Fill(reco_sliceID);
           h_truesliceid_pion_cuts->Fill(true_sliceID);
+          h_recoinisliceid_pion_cuts->Fill(reco_ini_sliceID);
+          h_trueinisliceid_pion_cuts->Fill(true_ini_sliceID);
         }
         else{
           uf.eff_num_Inc->Fill(true_sliceID);
           uf.pur_num_Inc->Fill(reco_sliceID);
           uf.response_SliceID_Inc.Fill(reco_sliceID, true_sliceID);
+          uf.response_SliceID_Ini.Fill(reco_ini_sliceID, true_ini_sliceID);
         }
       }
       else { // this beam pion event is not selected
-        if (!isTestSample) uf.response_SliceID_Inc.Miss(true_sliceID);
+        if (!isTestSample) {
+          uf.response_SliceID_Inc.Miss(true_sliceID);
+          uf.response_SliceID_Ini.Miss(true_ini_sliceID);
+        }
       }
       
       if ((*evt.true_beam_endProcess) == "pi+Inelastic"){ // true pion beam interaction event (exclude elastics)
@@ -393,6 +410,7 @@ void ThinSlice::ProcessEvent(const anavar & evt, Unfold & uf){
     if (hadana.PassPiCuts(evt)){ // the event passed full selections
       if (isTestSample){
         h_recosliceid_allevts_cuts->Fill(reco_sliceID);
+        h_recoinisliceid_allevts_cuts->Fill(reco_ini_sliceID);
       }
       else {
         uf.pur_den->Fill(reco_sliceID);
@@ -428,6 +446,7 @@ void ThinSlice::FillHistograms(int cut, const anavar & evt, double weight){
       FillHistVec2D(hreco_true_vs_true_beam_endZ_SCE[cut], evt.true_beam_endZ, evt.reco_beam_calo_endZ - evt.true_beam_endZ, hadana.pitype, weight);
       
       FillHistVec1D(hreco_sliceID[cut], reco_sliceID, hadana.pitype, weight);
+      FillHistVec1D(hreco_inisliceID[cut], reco_ini_sliceID, hadana.pitype, weight);
       FillHistVec1D(hreco_true_sliceID[cut], reco_sliceID - true_sliceID, hadana.pitype, weight);
       FillHistVec2D(hreco_vs_true_sliceID[cut], true_sliceID, reco_sliceID, hadana.pitype, weight);
       FillHistVec2D(hreco_true_vs_true_sliceID[cut], true_sliceID, reco_sliceID - true_sliceID, hadana.pitype, weight);
@@ -589,6 +608,7 @@ void ThinSlice::SaveHistograms(){
   outputFile->Write();
   h_truesliceid_pion_uf->Write("h_truesliceid_pion_uf");
   h_truesliceid_pioninelastic_uf->Write("h_truesliceid_pioninelastic_uf");
+  //h_trueinisliceid_pion_uf->Write("h_trueinisliceid_pion_uf");
   //response_SliceID_Pion->Write("response_SliceID_Pion");
   //response_SliceID_PionInEl->Write("response_SliceID_PionInEl");
 }
@@ -655,6 +675,7 @@ void ThinSlice::CalcXS(const Unfold & uf){
 
   RooUnfoldBayes   unfold_Inc (&uf.response_SliceID_Inc, hinc, 4);
   RooUnfoldBayes   unfold_Int (&uf.response_SliceID_Int, hint, 4);
+  //RooUnfoldBayes   unfold_Ini (&uf.response_SliceID_Ini, hini, 4);
 
 //  RooUnfoldSvd     unfold_Inc (&uf.response_SliceID_Inc, hinc, 20);   // OR
 //  RooUnfoldSvd     unfold_Int (&uf.response_SliceID_Int, hint, 20);   // OR
@@ -664,7 +685,7 @@ void ThinSlice::CalcXS(const Unfold & uf){
 
   h_truesliceid_pion_uf = (TH1D*) unfold_Inc.Hreco();
   h_truesliceid_pioninelastic_uf = (TH1D*) unfold_Int.Hreco();
-
+  //h_trueinisliceid_pion_uf = (TH1D*) unfold_Ini.Hreco();
 }
 
 void ThinSlice::Run(anavar & evt, Unfold & uf, Long64_t nentries=-1){

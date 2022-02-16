@@ -30,10 +30,10 @@ void save_results(vector<double> vslice, vector<double> vcorr, vector<double> vc
   gr_corr->SetMarkerStyle(106);
   gr_corr->SetTitle(Form("%s bkg constraint", particle));
   gr_corr->GetXaxis()->SetTitle("Slice");
-  gr_corr->GetXaxis()->SetLimits(-1, 23); // 22 slices
+  gr_corr->GetXaxis()->SetLimits(-1, pi::nthinslices+1);
   gr_corr->GetYaxis()->SetTitle("Scale factor");
   gr_corr->Draw("AP");
-  TLine *line = new TLine(-1, 1, 23, 1);
+  TLine *line = new TLine(-1, 1, pi::nthinslices+1, 1);
   line->SetLineColor(kRed);
   line->SetLineStyle(2);
   line->Draw("same");

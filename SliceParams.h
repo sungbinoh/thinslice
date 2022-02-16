@@ -6,9 +6,9 @@
 
 namespace pi{
   const double thinslicewidth = 10; //cm
-  const double Eslicewidth = 20; //MeV
+  const double Eslicewidth = 50; //MeV
   const double plim = 1000;
-  const int nthinslices = 50;
+  const int nthinslices = 20;
   
   const int nbinse=100;
   const int nbinsthickness = 100;

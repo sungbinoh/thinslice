@@ -36,13 +36,18 @@ class ThinSlice {
   TH1D *true_AngCorr;
 
   TH1D *h_truesliceid_pion_all;
+  TH1D *h_trueinisliceid_pion_all;
   TH1D *h_truesliceid_pion_uf;
+  //TH1D *h_trueinisliceid_pion_uf;
   TH1D *h_truesliceid_pion_cuts;
+  TH1D *h_trueinisliceid_pion_cuts;
   TH1D *h_truesliceid_pioninelastic_all;
   TH1D *h_truesliceid_pioninelastic_uf;
   TH1D *h_truesliceid_pioninelastic_cuts;
   TH1D *h_recosliceid_allevts_cuts;
+  TH1D *h_recoinisliceid_allevts_cuts;
   TH1D *h_recosliceid_pion_cuts;
+  TH1D *h_recoinisliceid_pion_cuts;
   TH1D *h_recosliceid_pioninelastic_cuts;
 
   double true_interactions[pi::nthinslices];
@@ -66,6 +71,8 @@ class ThinSlice {
 
   TH1D *htrue_sliceID[pi::nCuts][pi::nIntTypes+1];
   TH1D *hreco_sliceID[pi::nCuts][pi::nIntTypes+1];
+  //TH1D *htrue_inisliceID[pi::nCuts][pi::nIntTypes+1];
+  TH1D *hreco_inisliceID[pi::nCuts][pi::nIntTypes+1];
   TH1D *hreco_true_sliceID[pi::nCuts][pi::nIntTypes+1];
   TH2D *hreco_vs_true_sliceID[pi::nCuts][pi::nIntTypes+1];
   TH2D *hreco_true_vs_true_sliceID[pi::nCuts][pi::nIntTypes+1];
