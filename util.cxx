@@ -28,8 +28,8 @@ double CalWeight(const anavar & evt, const int &partype){
     
     // momentum reweight (how to cope with outliers?)
     double numo = exp(-pow((evt.beam_inst_P-mom_mu)/mom_sigma,2)/2);
-    weight *= numo;
-    weight /= deno;
+    //weight *= numo;
+    //weight /= deno;
   }
 
   return weight;
