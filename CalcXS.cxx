@@ -270,7 +270,7 @@ int main(int argc, char** argv){
   RooUnfoldResponse *response_SliceID_Int = (RooUnfoldResponse*)fmc->Get("response_SliceID_Int");
   RooUnfoldBayes unfold_Int (response_SliceID_Int, hsignal, 4);
   RooUnfoldResponse *response_SliceID_Ini = (RooUnfoldResponse*)fmc->Get("response_SliceID_Ini");
-  RooUnfoldBayes unfold_Ini (response_SliceID_Ini, hsigini, 4);
+  RooUnfoldBayes unfold_Ini (response_SliceID_Ini, hsigini, 8);
   
   TH1D *hsiginc_uf;
   TH1D *hsignal_uf;
@@ -285,10 +285,8 @@ int main(int argc, char** argv){
   // get Ninc and Nint
   double Ninc[pi::nthinslices] = {0};
   double Nint[pi::nthinslices] = {0};
-  double Nini[pi::nthinslices] = {0};
   double err_inc[pi::nthinslices] = {0};
   double err_int[pi::nthinslices] = {0};
-  double err_ini[pi::nthinslices] = {0};
   double SliceID[pi::nthinslices] = {0};
 
   for (int i = 0; i<pi::nthinslices; ++i){
@@ -353,12 +351,14 @@ int main(int argc, char** argv){
   c1->Print("recoxs.png");*/
   
   // test sample validation
-  //TH1D *hval_siginc_reco = (TH1D*)fmc->Get("h_recosliceid_pion_cuts");
-  //hval_siginc_reco->Write("hval_siginc_reco");
+  TH1D *hval_siginc_reco = (TH1D*)fmc->Get("h_recosliceid_pion_cuts");
+  hval_siginc_reco->Write("hval_siginc_reco");
+  TH1D *hval_signal_reco = (TH1D*)fmc->Get("h_recosliceid_pioninelastic_cuts");
+  hval_signal_reco->Write("hval_signal_reco");
+  TH1D *hval_sigini_reco = (TH1D*)fmc->Get("h_recoinisliceid_pion_cuts");
+  hval_sigini_reco->Write("hval_sigini_reco");
   TH1D *hval_trueinc = (TH1D*)fmc->Get("h_truesliceid_pion_all");
   hval_trueinc->Write("hval_trueinc");
-  //TH1D *hval_signal_reco = (TH1D*)fmc->Get("h_recosliceid_pioninelastic_cuts");
-  //hval_signal_reco->Write("hval_signal_reco");
   TH1D *hval_trueint = (TH1D*)fmc->Get("h_truesliceid_pioninelastic_all");
   hval_trueint->Write("hval_trueint");
   TH1D *hval_trueini = (TH1D*)fmc->Get("h_trueinisliceid_pion_all");

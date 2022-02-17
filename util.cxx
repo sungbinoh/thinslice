@@ -12,7 +12,7 @@ double CalWeight(const anavar & evt, const int &partype){
   double mufrac = 1.;//1.58;
   double mom_mu0 = 1.0111;
   double mom_sigma0 = 0.0725;
-  double deno = exp(-pow((evt.beam_inst_P-mom_mu0)/mom_sigma0,2)/2);
+  //double deno = exp(-pow((evt.beam_inst_P-mom_mu0)/mom_sigma0,2)/2);
   double mom_mu = 1.0111;//1.0323
   double mom_sigma = 0.0725;//0.0718
   
@@ -27,7 +27,7 @@ double CalWeight(const anavar & evt, const int &partype){
     }*/
     
     // momentum reweight (how to cope with outliers?)
-    double numo = exp(-pow((evt.beam_inst_P-mom_mu)/mom_sigma,2)/2);
+    //double numo = exp(-pow((evt.beam_inst_P-mom_mu)/mom_sigma,2)/2);
     //weight *= numo;
     //weight /= deno;
   }

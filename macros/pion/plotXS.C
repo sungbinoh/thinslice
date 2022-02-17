@@ -15,10 +15,15 @@ void plotXS(){
   TH1D *hval_sel_sig_int = (TH1D*)file->Get("hval_signal_reco");
   TH1D *h_sel_sig_int_uf = (TH1D*)file->Get("hsignal_uf");
   TH1D *hval_sel_sig_int_uf = (TH1D*)file->Get("hval_trueint");
+  TH1D *h_sel_data_ini = (TH1D*)file->Get("hdata_ini");
+  TH1D *h_sel_sig_ini = (TH1D*)file->Get("hsigini");
+  TH1D *hval_sel_sig_ini = (TH1D*)file->Get("hval_sigini_reco");
+  TH1D *h_sel_sig_ini_uf = (TH1D*)file->Get("hsigini_uf");
+  TH1D *hval_sel_sig_ini_uf = (TH1D*)file->Get("hval_trueini");
   TGraphErrors *gr_inc = (TGraphErrors*)file->Get("gr_inc");
   TGraphErrors *gr_int = (TGraphErrors*)file->Get("gr_int");
   
-  
+  // incident (all pion)
   TCanvas *c1 = new TCanvas("c1","c1");
   h_sel_data->SetLineColor(3);
   h_sel_data->SetMarkerColor(3);
@@ -50,6 +55,7 @@ void plotXS(){
   leg2->AddEntry(hval_sel_sig_inc_uf,"True pions","l");
   leg2->Draw();
 
+  // interaction (pion inelastic)
   TCanvas *c3 = new TCanvas("c3","c3"); // compared to c1, only miss a few pion elastic events
   h_sel_data->SetLineColor(3);
   h_sel_data->SetMarkerColor(3);
@@ -80,33 +86,67 @@ void plotXS(){
   leg4->AddEntry(h_sel_sig_int_uf,"After unfolding","ple");
   leg4->AddEntry(hval_sel_sig_int_uf,"True pions","l");
   leg4->Draw();
+  
+  // start
+  TCanvas *c5 = new TCanvas("c5","c5");
+  h_sel_data_ini->SetLineColor(3);
+  h_sel_data_ini->SetMarkerColor(3);
+  h_sel_data_ini->SetTitle("All Pions;Reco SliceID;Events");
+  h_sel_data_ini->DrawCopy();
+  h_sel_sig_ini->DrawCopy("same");
+  hval_sel_sig_ini->SetLineColor(2);
+  hval_sel_sig_ini->Draw("same hist");
+  TLegend *leg5 = new TLegend(0.5,0.6,0.8,0.9);
+  leg5->SetFillStyle(0);
+  leg5->AddEntry(h_sel_data_ini,"Selected","ple");
+  leg5->AddEntry(h_sel_sig_ini, "Selected #times purity","ple");
+  leg5->AddEntry(hval_sel_sig_ini,"Selected true pions","l");
+  leg5->Draw();
 
   TCanvas *c6 = new TCanvas("c6","c6");
+  h_sel_sig_ini_uf->SetLineColor(4);
+  h_sel_sig_ini_uf->SetMarkerColor(4);
+  h_sel_sig_ini_uf->SetTitle("All Pions; True SliceID; Events");
+  h_sel_sig_ini_uf->SetMinimum(0);
+  h_sel_sig_ini_uf->Draw();
+  h_sel_sig_ini->DrawCopy("same");
+  hval_sel_sig_ini_uf->SetLineColor(2);
+  hval_sel_sig_ini_uf->SetMarkerColor(2);
+  hval_sel_sig_ini_uf->Draw("same hist");
+  TLegend *leg6 = new TLegend(0.5,0.6,0.8,0.9);
+  leg6->SetFillStyle(0);
+  leg6->AddEntry(h_sel_sig_ini, "Selected #times purity","ple");
+  leg6->AddEntry(h_sel_sig_ini_uf,"Unfolded pions","ple");
+  leg6->AddEntry(hval_sel_sig_ini_uf,"True pions","l");
+  leg6->Draw();
+
+  // incident histogram
+  TCanvas *c7 = new TCanvas("c7","c7");
   gr_inc->SetTitle("");
   gr_inc->SetLineWidth(2);
   gr_inc->SetLineColor(4);
   gr_inc->SetMarkerColor(4);
   gr_inc->GetXaxis()->SetTitle("Slice ID");
   gr_inc->GetYaxis()->SetTitle("N_{Inc}");
-  gr_inc->GetXaxis()->SetRangeUser(0, 23);
+  gr_inc->GetXaxis()->SetRangeUser(0, 21);
   gr_inc->Draw("ape");
 
-  TCanvas *c7 = new TCanvas("c7","c7");
+  // interaction histogram
+  TCanvas *c8 = new TCanvas("c8","c8");
   gr_int->SetTitle("");
   gr_int->SetLineWidth(2);
   gr_int->SetLineColor(4);
   gr_int->SetMarkerColor(4);
   gr_int->GetXaxis()->SetTitle("Slice ID");
   gr_int->GetYaxis()->SetTitle("N_{Int}");
-  gr_int->GetXaxis()->SetRangeUser(0, 23);
+  gr_int->GetXaxis()->SetRangeUser(0, 21);
   gr_int->Draw("ape");
 
-
-  double xs[pi::nthinslices] = {0};
+  // cross-section
+  /*double xs[pi::nthinslices] = {0};
   double err_xs[pi::nthinslices] = {0};
   double incE[pi::nthinslices] = {0};
   double err_incE[pi::nthinslices] = {0};
-  
   TGraph *xs_new = (TGraph*)file->Get("gr_recoxs");
   TGraphErrors *gr_trueincE = (TGraphErrors*)file->Get("gr_trueincE");
   TGraphErrors *gr_truexs = (TGraphErrors*)file->Get("gr_truexs");
@@ -116,16 +156,19 @@ void plotXS(){
     incE[i] = gr_trueincE->GetPointY(i);
     err_incE[i] = gr_trueincE->GetErrorY(i);
   }
+  TGraphErrors *gr_recoxs = new TGraphErrors(pi::nthinslices, incE, xs, 0, err_xs);*/
+  
   TFile f2("../../files/exclusive_xsec.root");
   TGraph *total_inel_KE = (TGraph*)f2.Get("total_inel_KE");
+  TGraphErrors *gr_truexs = (TGraphErrors*)file->Get("gr_truexs");
+  TGraphErrors *gr_recoxs = (TGraphErrors*)file->Get("gr_recoxs");
 
-  TGraphErrors *gr_recoxs = new TGraphErrors(pi::nthinslices, incE, xs, 0, err_xs);
-  TCanvas *c5 = new TCanvas("c5", "c5");
+  TCanvas *c9 = new TCanvas("c9", "c9", 1200, 500);
   gr_recoxs->SetTitle("Pion Inelastic Cross Section");
   gr_recoxs->GetXaxis()->SetTitle("Pion Kinetic Energy (MeV)");
-  gr_recoxs->GetXaxis()->SetRangeUser(360, 900);
+  gr_recoxs->GetXaxis()->SetRangeUser(10, 1000);
   gr_recoxs->GetYaxis()->SetTitle("#sigma_{inelastic} (mb)");
-  gr_recoxs->GetYaxis()->SetRangeUser(400, 900);
+  gr_recoxs->GetYaxis()->SetRangeUser(0, 1000);
   gr_recoxs->SetLineWidth(2);
   gr_recoxs->Draw("ape");
   gr_truexs->SetMarkerColor(3);
@@ -133,28 +176,31 @@ void plotXS(){
   gr_truexs->Draw("pe");
   total_inel_KE->SetLineColor(2);
   total_inel_KE->Draw("c");
-  TLegend *leg5 = new TLegend(0.3,0.65,0.8,0.9);
-  leg5->SetFillStyle(0);
-  leg5->AddEntry(gr_recoxs, "MC with reconstruction", "pe");
-  leg5->AddEntry(gr_truexs, "MC truth", "pe");
-  leg5->AddEntry(total_inel_KE, "Geant4 (theory prediction)", "l");
-  leg5->Draw();
+  TLegend *leg9 = new TLegend(0.45,0.2,0.8,0.45);
+  leg9->SetFillStyle(0);
+  leg9->AddEntry(gr_recoxs, "MC with reconstruction", "pe");
+  leg9->AddEntry(gr_truexs, "MC truth", "pe");
+  leg9->AddEntry(total_inel_KE, "Geant4 (theory prediction)", "l");
+  leg9->Draw();
 
   c1->Print("plots/xs_sliceidinc_reco.pdf");
   c2->Print("plots/xs_sliceidinc_true.pdf");
   c3->Print("plots/xs_sliceidint_reco.pdf");
   c4->Print("plots/xs_sliceidint_true.pdf");
-  c5->Print("plots/xs_pi+inel.pdf");
-  c6->Print("plots/xs_Ninc.pdf");
-  c7->Print("plots/xs_Nint.pdf");
+  c5->Print("plots/xs_sliceidini_reco.pdf");
+  c6->Print("plots/xs_sliceidini_true.pdf");
+  c7->Print("plots/xs_Ninc.pdf");
+  c8->Print("plots/xs_Nint.pdf");
+  c9->Print("plots/xs_pi+inel.pdf");
 
   c1->Print("plots/xs_sliceidinc_reco.png");
   c2->Print("plots/xs_sliceidinc_true.png");
   c3->Print("plots/xs_sliceidint_reco.png");
   c4->Print("plots/xs_sliceidint_true.png");
-  c5->Print("plots/xs_pi+inel.png");
-  c6->Print("plots/xs_Ninc.png");
-  c7->Print("plots/xs_Nint.png");
-
+  c5->Print("plots/xs_sliceidini_reco.png");
+  c6->Print("plots/xs_sliceidini_true.png");
+  c7->Print("plots/xs_Ninc.png");
+  c8->Print("plots/xs_Nint.png");
+  c9->Print("plots/xs_pi+inel.png");
 }
   
