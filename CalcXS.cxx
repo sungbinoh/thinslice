@@ -282,17 +282,21 @@ int main(int argc, char** argv){
   hsigini_uf = (TH1D*)unfold_Ini.Hreco();
   hsigini_uf->SetNameTitle("hsigini_uf", "Unfolded initial signal;Slice ID;Events");
   
-  // get Ninc and Nint
+  // get Ninc, Nint, Nini
   double Ninc[pi::nthinslices] = {0};
   double Nint[pi::nthinslices] = {0};
+  double Nini[pi::nthinslices] = {0};
   double err_inc[pi::nthinslices] = {0};
   double err_int[pi::nthinslices] = {0};
+  double err_ini[pi::nthinslices] = {0};
   double SliceID[pi::nthinslices] = {0};
 
   for (int i = 0; i<pi::nthinslices; ++i){
     SliceID[i] = i+1;
     Nint[i] = hsignal_uf->GetBinContent(i+2);
     err_int[i] = hsignal_uf->GetBinError(i+2);
+    Nini[i] = hsigini_uf->GetBinContent(i+2);
+    err_ini[i] = hsigini_uf->GetBinError(i+2);
     for (int j = i; j<=pi::nthinslices; ++j){
       Ninc[i] += hsiginc_uf->GetBinContent(j+2);
       err_inc[i] += pow(hsiginc_uf->GetBinError(j+2),2);
@@ -309,6 +313,9 @@ int main(int argc, char** argv){
   TGraphErrors *gr_int = new TGraphErrors(pi::nthinslices, SliceID, Nint, 0, err_int);
   gr_int->SetNameTitle("gr_int", "Interaction number;Slice ID;Events");
   gr_int->Write();
+  TGraphErrors *gr_ini = new TGraphErrors(pi::nthinslices, SliceID, Nini, 0, err_ini);
+  gr_ini->SetNameTitle("gr_ini", "Initial number;Slice ID;Events");
+  gr_ini->Write();
   /*TGraphErrors *gr_trueincE = (TGraphErrors*)fmc->Get("gr_trueincE");
   gr_trueincE->SetNameTitle("gr_trueincE", "True incident energy;Slice ID;Energy (MeV)");
   gr_trueincE->Write();
