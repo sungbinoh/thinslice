@@ -264,14 +264,17 @@ void ThinSlice::ProcessEvent(const anavar & evt, Unfold & uf){
         h_diff_Eint->Fill(int_energy_true - int_energy_traj);
         //cout<<int_energy_true<<"\t"<<int_energy_traj<<endl;
       }
-      true_ini_sliceID = int( (pi::plim - hadana.true_ffKE)/pi::Eslicewidth + 0.5); // ignore the first imcomplete slice?
-      if (true_ini_sliceID < 0) true_ini_sliceID = 0;
+      true_ini_sliceID = int( (pi::plim - hadana.true_ffKE)/pi::Eslicewidth + 0.5);
+      if (true_ini_sliceID < 0) true_ini_sliceID = -1;
+      if (true_ini_sliceID >= pi::nthinslices) true_ini_sliceID = pi::nthinslices;
       true_sliceID = int( (pi::plim-int_energy_true)/pi::Eslicewidth );
       if (true_sliceID < 0) true_sliceID = -1;
-      if (evt.true_beam_endZ < 0) true_sliceID = -1;
+      //if (evt.true_beam_endZ < 0) true_sliceID = -1;
       if (true_sliceID >= pi::nthinslices) true_sliceID = pi::nthinslices;
       if (evt.true_beam_PDG == 211){
-        for (int i = true_ini_sliceID; i<=true_sliceID; ++i){
+        int starti = true_ini_sliceID;
+        if (starti == -1) starti = 0;
+        for (int i = starti; i<=true_sliceID; ++i){
           if (i<pi::nthinslices) ++true_incidents[i]; // count incident events
         }
       }
@@ -347,9 +350,11 @@ void ThinSlice::ProcessEvent(const anavar & evt, Unfold & uf){
       double inc_energy_reco = beam_inst_KE - 11.74;
       int_energy_reco = bb.KEAtLength(inc_energy_reco, hadana.reco_trklen);
       reco_ini_sliceID = int( (pi::plim - inc_energy_reco)/pi::Eslicewidth + 0.5);
+      if (reco_ini_sliceID < 0) reco_ini_sliceID = -1;
+      if (reco_ini_sliceID >= pi::nthinslices) reco_ini_sliceID = pi::nthinslices;
       reco_sliceID = int( (pi::plim-int_energy_reco)/pi::Eslicewidth );
       if (reco_sliceID < 0) reco_sliceID = -1;
-      if (evt.reco_beam_calo_endZ < 0) reco_sliceID = -1;
+      //if (evt.reco_beam_calo_endZ < 0) reco_sliceID = -1;
       if (reco_sliceID >= pi::nthinslices) reco_sliceID = pi::nthinslices;
     }
   }

@@ -270,7 +270,7 @@ int main(int argc, char** argv){
   RooUnfoldResponse *response_SliceID_Int = (RooUnfoldResponse*)fmc->Get("response_SliceID_Int");
   RooUnfoldBayes unfold_Int (response_SliceID_Int, hsignal, 4);
   RooUnfoldResponse *response_SliceID_Ini = (RooUnfoldResponse*)fmc->Get("response_SliceID_Ini");
-  RooUnfoldBayes unfold_Ini (response_SliceID_Ini, hsigini, 8);
+  RooUnfoldBayes unfold_Ini (response_SliceID_Ini, hsigini, 4);
   
   TH1D *hsiginc_uf;
   TH1D *hsignal_uf;
