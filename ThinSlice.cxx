@@ -255,20 +255,17 @@ void ThinSlice::ProcessEvent(const anavar & evt, Unfold & uf){
 
       if (hadana.true_ffKE < 999999) { // entered TPC
         int traj_max = evt.true_beam_traj_Z->size()-1;
-        double int_energy_traj = 999999.;
         if ((*evt.true_beam_traj_KE)[traj_max] != 0) {
-          int_energy_traj = (*evt.true_beam_traj_KE)[traj_max];
+          int_energy_true = (*evt.true_beam_traj_KE)[traj_max];
         }
         else {
           int temp = traj_max-1;
           while ((*evt.true_beam_traj_KE)[temp] == 0) temp--;
-          int_energy_traj = (*evt.true_beam_traj_KE)[temp] - 2*((hadana.true_trklen_accum)[traj_max]-(hadana.true_trklen_accum)[temp]); // 2 MeV/cm
+          int_energy_true = (*evt.true_beam_traj_KE)[temp] - 2*((hadana.true_trklen_accum)[traj_max]-(hadana.true_trklen_accum)[temp]); // 2 MeV/cm
         }
-        int_energy_true = bb.KEAtLength(hadana.true_ffKE, hadana.true_trklen);
-        //if (int_energy_true<0) int_energy_true = 0;
-        h_diff_Eint->Fill(int_energy_true - int_energy_traj);
-        h_diff_Eint_vs_true_Eint->Fill(int_energy_true, int_energy_true - int_energy_traj);
-        //cout<<int_energy_true<<"\t"<<int_energy_traj<<endl;
+        double int_energy_true_trklen = bb.KEAtLength(hadana.true_ffKE, hadana.true_trklen);
+        h_diff_Eint->Fill(int_energy_true_trklen - int_energy_true);
+        h_diff_Eint_vs_true_Eint->Fill(int_energy_true, int_energy_true_trklen - int_energy_true);
       }
       true_ini_sliceID = int( (pi::plim - hadana.true_ffKE)/pi::Eslicewidth + 0.5);
       if (true_ini_sliceID < 0) true_ini_sliceID = -1;
@@ -292,8 +289,8 @@ void ThinSlice::ProcessEvent(const anavar & evt, Unfold & uf){
         if (!(evt.reco_beam_calo_wire->empty()) && evt.reco_beam_true_byE_matched){ // truth matched. so it must be the true track?
           std::vector<std::vector<double>> vincE(pi::nthinslices);
           for (size_t i = 0; i<evt.reco_beam_calo_wire->size(); ++i){
-            //int this_sliceID = int((*evt.reco_beam_calo_Z)[i]/pi::thinslicewidth);
-            int this_sliceID = int((hadana.reco_trklen_accum)[i]/pi::thinslicewidth);
+            //int this_sliceID = int((hadana.reco_trklen_accum)[i]/pi::thinslicewidth);
+            int this_sliceID = int((*evt.reco_beam_incidentEnergies)[i]/pi::Eslicewidth);
             if (this_sliceID>=pi::nthinslices) continue;
             if (this_sliceID<0) continue;
             double this_incE = (*evt.reco_beam_incidentEnergies)[i];
@@ -323,8 +320,8 @@ void ThinSlice::ProcessEvent(const anavar & evt, Unfold & uf){
         if (!(evt.true_beam_traj_Z->empty())){
           std::vector<std::vector<double>> vincE(pi::nthinslices);
           for (size_t i = 0; i<evt.true_beam_traj_Z->size()-1; ++i){//last point always has KE = 0
-            //int this_sliceID = int((*evt.true_beam_traj_Z)[i]/pi::thinslicewidth);
-            int this_sliceID = int((hadana.true_trklen_accum)[i]/pi::thinslicewidth);
+            //int this_sliceID = int((hadana.true_trklen_accum)[i]/pi::thinslicewidth);
+            int this_sliceID = int((*evt.true_beam_traj_KE)[i]/pi::Eslicewidth);
             double this_incE = (*evt.true_beam_traj_KE)[i];
             if (this_sliceID>=pi::nthinslices) continue;
             if (this_sliceID<0) continue;
