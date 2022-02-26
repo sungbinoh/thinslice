@@ -131,7 +131,10 @@ class ThinSlice {
   TH1D *h_beam_inst_KE;
   TH1D *h_true_ffKE;
   TH1D *h_upstream_Eloss;
+  TH2D *h_upstream_Eloss_vs_true_Eff;
+  TH2D *h_upstream_Eloss_vs_Einst;
   TH1D *h_diff_Eint;
+  TH2D *h_diff_Eint_vs_true_Eint;
 
   std::string fOutputFileName;
   TFile *outputFile;
