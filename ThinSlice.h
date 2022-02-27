@@ -133,6 +133,8 @@ class ThinSlice {
   TH1D *h_upstream_Eloss;
   TH2D *h_upstream_Eloss_vs_true_Eff;
   TH2D *h_upstream_Eloss_vs_Einst;
+  TH2D *h_diff_startKE_vs_Einst;
+  TH2D *h_true_upstream_Eloss;
   TH1D *h_diff_Eint;
   TH2D *h_diff_Eint_vs_true_Eint;
 

@@ -215,8 +215,10 @@ void ThinSlice::BookHistograms(){
   h_true_ffKE->Sumw2();
   h_upstream_Eloss = new TH1D("h_upstream_Eloss","h_upstream_Eloss;MeV", 100, -100, 100);
   h_upstream_Eloss->Sumw2();
-  h_upstream_Eloss_vs_true_Eff = new TH2D("h_upstream_Eloss_vs_true_Eff","h_upstream_Eloss_vs_true_Eff;MeV;MeV", 100, 400, 1000, 100, -100, 100);
-  h_upstream_Eloss_vs_Einst = new TH2D("h_upstream_Eloss_vs_Einst","h_upstream_Eloss_vs_Einst;MeV;MeV", 100, 700, 1100, 100, -100, 100);
+  h_upstream_Eloss_vs_true_Eff = new TH2D("h_upstream_Eloss_vs_true_Eff","h_upstream_Eloss_vs_true_Eff;MeV;MeV", 100, 600, 1100, 100, -100, 100);
+  h_upstream_Eloss_vs_Einst = new TH2D("h_upstream_Eloss_vs_Einst","h_upstream_Eloss_vs_Einst;MeV;MeV", 100, 600, 1100, 100, -100, 100);
+  h_diff_startKE_vs_Einst = new TH2D("h_diff_startKE_vs_Einst","h_diff_startKE_vs_Einst;MeV;MeV", 100, 600, 1100, 100, -100, 100);
+  h_true_upstream_Eloss = new TH2D("h_true_upstream_Eloss","h_true_upstream_Eloss;MeV;MeV", 100, 600, 1100, 100, -100, 100);
   h_diff_Eint = new TH1D("h_diff_Eint","h_diff_Eint;MeV", 100, -100, 100);
   h_diff_Eint->Sumw2();
   h_diff_Eint_vs_true_Eint = new TH2D("h_diff_Eint_vs_true_Eint","h_diff_Eint_vs_true_Eint;MeV;MeV", 100, 0, 1000, 100, -100, 100);
@@ -247,13 +249,18 @@ void ThinSlice::ProcessEvent(const anavar & evt, Unfold & uf){
   else {//not using all track reconstruction
     double beam_inst_KE = sqrt(pow(evt.beam_inst_P*1000,2)+pow(139.57,2)) - 139.57;
     if (evt.MC){
-      h_beam_inst_KE->Fill(beam_inst_KE);
-      h_true_ffKE->Fill(hadana.true_ffKE);
-      h_upstream_Eloss->Fill(beam_inst_KE - hadana.true_ffKE);
-      h_upstream_Eloss_vs_true_Eff->Fill(hadana.true_ffKE, beam_inst_KE - hadana.true_ffKE);
-      h_upstream_Eloss_vs_Einst->Fill(beam_inst_KE, beam_inst_KE - hadana.true_ffKE);
-
       if (hadana.true_ffKE < 999999) { // entered TPC
+        if (evt.true_beam_PDG == 211) {
+          h_beam_inst_KE->Fill(beam_inst_KE);
+          h_true_ffKE->Fill(hadana.true_ffKE);
+          h_upstream_Eloss->Fill(beam_inst_KE - hadana.true_ffKE);
+          h_upstream_Eloss_vs_true_Eff->Fill(hadana.true_ffKE, beam_inst_KE - hadana.true_ffKE);
+          h_upstream_Eloss_vs_Einst->Fill(beam_inst_KE, beam_inst_KE - hadana.true_ffKE);
+          double true_beam_startKE = sqrt(pow(evt.true_beam_startP*1000,2)+pow(139.57,2)) - 139.57;
+          h_diff_startKE_vs_Einst->Fill(beam_inst_KE, beam_inst_KE - true_beam_startKE);
+          h_true_upstream_Eloss->Fill(hadana.true_ffKE, true_beam_startKE - hadana.true_ffKE);
+        }
+        
         int traj_max = evt.true_beam_traj_Z->size()-1;
         if ((*evt.true_beam_traj_KE)[traj_max] != 0) {
           int_energy_true = (*evt.true_beam_traj_KE)[traj_max];
@@ -261,7 +268,9 @@ void ThinSlice::ProcessEvent(const anavar & evt, Unfold & uf){
         else {
           int temp = traj_max-1;
           while ((*evt.true_beam_traj_KE)[temp] == 0) temp--;
-          int_energy_true = (*evt.true_beam_traj_KE)[temp] - 2*((hadana.true_trklen_accum)[traj_max]-(hadana.true_trklen_accum)[temp]); // 2 MeV/cm
+          //int_energy_true = bb.KEAtLength((*evt.true_beam_traj_KE)[temp], (hadana.true_trklen_accum)[traj_max]-(hadana.true_trklen_accum)[temp]);
+          int_energy_true = (*evt.true_beam_traj_KE)[temp] - 2.1*((hadana.true_trklen_accum)[traj_max]-(hadana.true_trklen_accum)[temp]); // 2.1 MeV/cm
+          //cout<<"int_energy_true"<<(*evt.true_beam_traj_KE)[temp]<<"\t"<<sqrt(pow(evt.true_beam_endP*1000,2)+pow(139.57,2)) - 139.57<<endl; // almost the same
         }
         double int_energy_true_trklen = bb.KEAtLength(hadana.true_ffKE, hadana.true_trklen);
         h_diff_Eint->Fill(int_energy_true_trklen - int_energy_true);
@@ -274,6 +283,7 @@ void ThinSlice::ProcessEvent(const anavar & evt, Unfold & uf){
       if (true_sliceID < 0) true_sliceID = -1;
       //if (evt.true_beam_endZ < 0) true_sliceID = -1;
       if (true_sliceID >= pi::nthinslices) true_sliceID = pi::nthinslices;
+      
       if (evt.true_beam_PDG == 211){
         int starti = true_ini_sliceID;
         if (starti == -1) starti = 0;
@@ -350,7 +360,7 @@ void ThinSlice::ProcessEvent(const anavar & evt, Unfold & uf){
     }
 
     if (!evt.reco_beam_calo_wire->empty()){
-      double inc_energy_reco = beam_inst_KE - 11.74;
+      double inc_energy_reco = beam_inst_KE - 12.74;
       int_energy_reco = bb.KEAtLength(inc_energy_reco, hadana.reco_trklen);
       reco_ini_sliceID = int( (pi::plim - inc_energy_reco)/pi::Eslicewidth + 0.5);
       if (reco_ini_sliceID < 0) reco_ini_sliceID = -1;
@@ -360,6 +370,8 @@ void ThinSlice::ProcessEvent(const anavar & evt, Unfold & uf){
       //if (evt.reco_beam_calo_endZ < 0) reco_sliceID = -1;
       if (reco_sliceID >= pi::nthinslices) reco_sliceID = pi::nthinslices;
     }
+    //for(int i=0;i<evt.reco_beam_incidentEnergies->size();i++) cout<<(*evt.reco_beam_incidentEnergies)[i]<<"\t";
+    //cout<<endl<<int_energy_reco<<endl; // very different with the last point of evt.reco_beam_incidentEnergies
   }
 
   if (evt.MC){
