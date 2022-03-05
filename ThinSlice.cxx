@@ -247,7 +247,8 @@ void ThinSlice::ProcessEvent(const anavar & evt, Unfold & uf){
 
   if (hadana.fAllTrackCheck) {} // removed for not in use
   else {//not using all track reconstruction
-    double beam_inst_KE = sqrt(pow(evt.beam_inst_P*1000,2)+pow(139.57,2)) - 139.57;
+    double pimass = 139.57;
+    double beam_inst_KE = sqrt(pow(evt.beam_inst_P*1000,2)+pow(pimass,2)) - pimass;
     if (evt.MC){
       if (hadana.true_ffKE < 999999) { // entered TPC
         if (evt.true_beam_PDG == 211) {
@@ -256,7 +257,7 @@ void ThinSlice::ProcessEvent(const anavar & evt, Unfold & uf){
           h_upstream_Eloss->Fill(beam_inst_KE - hadana.true_ffKE);
           h_upstream_Eloss_vs_true_Eff->Fill(hadana.true_ffKE, beam_inst_KE - hadana.true_ffKE);
           h_upstream_Eloss_vs_Einst->Fill(beam_inst_KE, beam_inst_KE - hadana.true_ffKE);
-          double true_beam_startKE = sqrt(pow(evt.true_beam_startP*1000,2)+pow(139.57,2)) - 139.57;
+          double true_beam_startKE = sqrt(pow(evt.true_beam_startP*1000,2)+pow(pimass,2)) - pimass;
           h_diff_startKE_vs_Einst->Fill(beam_inst_KE, beam_inst_KE - true_beam_startKE);
           h_true_upstream_Eloss->Fill(hadana.true_ffKE, true_beam_startKE - hadana.true_ffKE);
         }
@@ -361,6 +362,12 @@ void ThinSlice::ProcessEvent(const anavar & evt, Unfold & uf){
 
     if (!evt.reco_beam_calo_wire->empty()){
       double inc_energy_reco = beam_inst_KE - 12.74;
+      /*if (beam_inst_KE < 800) inc_energy_reco = beam_inst_KE - 0.95; // 0.9465 \pm 0.3051
+      else if (beam_inst_KE < 850) inc_energy_reco = beam_inst_KE - 7.12; // 7.119 \pm 0.210
+      else if (beam_inst_KE < 900) inc_energy_reco = beam_inst_KE - 11.87; // 11.87 \pm 0.22
+      else if (beam_inst_KE < 950) inc_energy_reco = beam_inst_KE - 17.31; // 17.31 \pm 0.27
+      else inc_energy_reco = beam_inst_KE - 29.28; // 29.28 \pm 0.37*/
+      
       int_energy_reco = bb.KEAtLength(inc_energy_reco, hadana.reco_trklen);
       reco_ini_sliceID = int( (pi::plim - inc_energy_reco)/pi::Eslicewidth + 0.5);
       if (reco_ini_sliceID < 0) reco_ini_sliceID = -1;
