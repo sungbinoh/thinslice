@@ -183,15 +183,22 @@ void plotXS(){
   gr_recoxs->GetXaxis()->SetTitle("Pion Kinetic Energy (MeV)");
   gr_recoxs->GetXaxis()->SetRangeUser(10, 1000);
   gr_recoxs->GetYaxis()->SetTitle("#sigma_{inelastic} (mb)");
-  gr_recoxs->GetYaxis()->SetRangeUser(0, 1000);
+  gr_recoxs->GetYaxis()->SetRangeUser(0, 1200);
   gr_recoxs->SetLineWidth(2);
   gr_recoxs->Draw("ape");
   gr_truexs->SetMarkerColor(3);
   gr_truexs->SetLineColor(3);
   gr_truexs->Draw("pe");
   total_inel_KE->SetLineColor(2);
-  total_inel_KE->Draw("c");
-  TLegend *leg10 = new TLegend(0.45,0.2,0.8,0.45);
+  /*for (int i=0;i<total_inel_KE->GetN();i++) {
+    if (total_inel_KE->GetX()[i] <= 476.44931) {
+      total_inel_KE->GetY()[i] *= 0.5;
+      if (total_inel_KE->GetX()[i] > 450) cout<<total_inel_KE->GetY()[i]<<endl;
+    }
+    else total_inel_KE->GetY()[i] *= 1.5;
+  }*/
+  total_inel_KE->Draw("L");
+  TLegend *leg10 = new TLegend(0.5,0.2,0.85,0.45);
   leg10->SetFillStyle(0);
   leg10->AddEntry(gr_recoxs, "MC with reconstruction", "pe");
   leg10->AddEntry(gr_truexs, "MC truth", "pe");

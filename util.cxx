@@ -38,6 +38,28 @@ double CalWeight(const anavar & evt, const int &partype){
   return weight;
 }
 
+double CalG4RW(const anavar & evt){
+  vector<double> tot_inel_0_600 = (*evt.g4rw_full_grid_piplus_coeffs)[7];
+  vector<double> tot_inel_600_2000 = (*evt.g4rw_full_grid_piplus_coeffs)[8];
+  double w_tot_inel_0_600 = 1; // KE 0 ~ 476.44931 MeV
+  double w_tot_inel_600_2000 = 1; // KE 476.44931 ~ 1865.2940 MeV
+  
+  double g4rw = 1;
+  if (evt.true_beam_PDG == 211 && (w_tot_inel_0_600 != 1 || w_tot_inel_600_2000 != 1)){
+    double g4rw_tot_inel_0_600 = 0;
+    for (size_t i = 0; i < tot_inel_0_600.size(); ++i) {
+      g4rw_tot_inel_0_600 += tot_inel_0_600[i] * pow(w_tot_inel_0_600, i);
+    }
+    double g4rw_tot_inel_600_2000 = 0;
+    for (size_t i = 0; i < tot_inel_600_2000.size(); ++i) {
+      g4rw_tot_inel_600_2000 += tot_inel_600_2000[i] * pow(w_tot_inel_600_2000, i);
+    }
+    g4rw *= g4rw_tot_inel_0_600;
+    g4rw *= g4rw_tot_inel_600_2000;
+  }
+  return g4rw;
+}
+
 void FillHistVec1D(TH1D *hist[pi::nIntTypes+1], const double &value, const int &partype, double weight, bool fill_underflow, bool fill_overflow){
   //hist[0]->Fill(value);
   if (partype>=0 && partype < pi::nIntTypes+1){

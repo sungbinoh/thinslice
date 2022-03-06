@@ -233,7 +233,7 @@ void ThinSlice::BookHistograms(){
 
 }
 
-void ThinSlice::ProcessEvent(const anavar & evt, Unfold & uf){
+void ThinSlice::ProcessEvent(const anavar & evt, Unfold & uf, double weight){
   hadana.ProcessEvent(evt);
   reco_sliceID = -1;
   true_sliceID = -1;
@@ -384,63 +384,63 @@ void ThinSlice::ProcessEvent(const anavar & evt, Unfold & uf){
   if (evt.MC){
     if (evt.true_beam_PDG == 211){ // true pion beam incident event
       if (isTestSample){ // fake data
-        h_truesliceid_pion_all->Fill(true_sliceID);
-        h_trueinisliceid_pion_all->Fill(true_ini_sliceID);
+        h_truesliceid_pion_all->Fill(true_sliceID, weight);
+        h_trueinisliceid_pion_all->Fill(true_ini_sliceID, weight);
       }
       else{
-        uf.eff_den_Inc->Fill(true_sliceID);
+        //uf.eff_den_Inc->Fill(true_sliceID);
       }
       if (hadana.PassPiCuts(evt) && evt.reco_beam_true_byE_matched){ // the beam pion passed full selections (reco_beam_true_byE_matched is used to veto secondary particles)
         if (isTestSample){
-          h_recosliceid_pion_cuts->Fill(reco_sliceID);
-          h_truesliceid_pion_cuts->Fill(true_sliceID);
-          h_recoinisliceid_pion_cuts->Fill(reco_ini_sliceID);
-          h_trueinisliceid_pion_cuts->Fill(true_ini_sliceID);
+          h_recosliceid_pion_cuts->Fill(reco_sliceID, weight);
+          h_truesliceid_pion_cuts->Fill(true_sliceID, weight);
+          h_recoinisliceid_pion_cuts->Fill(reco_ini_sliceID, weight);
+          h_trueinisliceid_pion_cuts->Fill(true_ini_sliceID, weight);
         }
         else{
-          uf.eff_num_Inc->Fill(true_sliceID);
-          uf.pur_num_Inc->Fill(reco_sliceID);
-          uf.response_SliceID_Inc.Fill(reco_sliceID, true_sliceID);
-          uf.response_SliceID_Ini.Fill(reco_ini_sliceID, true_ini_sliceID);
+          //uf.eff_num_Inc->Fill(true_sliceID);
+          //uf.pur_num_Inc->Fill(reco_sliceID);
+          uf.response_SliceID_Inc.Fill(reco_sliceID, true_sliceID, weight);
+          uf.response_SliceID_Ini.Fill(reco_ini_sliceID, true_ini_sliceID, weight);
         }
       }
       else { // this beam pion event is not selected
         if (!isTestSample) {
-          uf.response_SliceID_Inc.Miss(true_sliceID);
-          uf.response_SliceID_Ini.Miss(true_ini_sliceID);
+          uf.response_SliceID_Inc.Miss(true_sliceID, weight);
+          uf.response_SliceID_Ini.Miss(true_ini_sliceID, weight);
         }
       }
       
       if ((*evt.true_beam_endProcess) == "pi+Inelastic"){ // true pion beam interaction event (exclude elastics)
         if (isTestSample){
-          h_truesliceid_pioninelastic_all->Fill(true_sliceID);
+          h_truesliceid_pioninelastic_all->Fill(true_sliceID, weight);
         }
         else{
-          uf.eff_den_Int->Fill(true_sliceID);
+          //uf.eff_den_Int->Fill(true_sliceID);
         }
         if (hadana.PassPiCuts(evt) && evt.reco_beam_true_byE_matched){
           if (isTestSample){
-            h_recosliceid_pioninelastic_cuts->Fill(reco_sliceID);
-            h_truesliceid_pioninelastic_cuts->Fill(true_sliceID);
+            h_recosliceid_pioninelastic_cuts->Fill(reco_sliceID, weight);
+            h_truesliceid_pioninelastic_cuts->Fill(true_sliceID, weight);
           }
           else{
-            uf.eff_num_Int->Fill(true_sliceID);
-            uf.pur_num_Int->Fill(reco_sliceID);
-            uf.response_SliceID_Int.Fill(reco_sliceID, true_sliceID);
+            //uf.eff_num_Int->Fill(true_sliceID);
+            //uf.pur_num_Int->Fill(reco_sliceID);
+            uf.response_SliceID_Int.Fill(reco_sliceID, true_sliceID, weight);
           }
         }
         else{
-          if (!isTestSample) uf.response_SliceID_Int.Miss(true_sliceID);
+          if (!isTestSample) uf.response_SliceID_Int.Miss(true_sliceID, weight);
         }
       }
     }
     if (hadana.PassPiCuts(evt)){ // the event passed full selections
       if (isTestSample){
-        h_recosliceid_allevts_cuts->Fill(reco_sliceID);
-        h_recoinisliceid_allevts_cuts->Fill(reco_ini_sliceID);
+        h_recosliceid_allevts_cuts->Fill(reco_sliceID, weight);
+        h_recoinisliceid_allevts_cuts->Fill(reco_ini_sliceID, weight);
       }
       else {
-        uf.pur_den->Fill(reco_sliceID);
+        //uf.pur_den->Fill(reco_sliceID);
       }
     }
   }
@@ -737,9 +737,11 @@ void ThinSlice::Run(anavar & evt, Unfold & uf, Long64_t nentries=-1){
     else{
       if (!hadana.isSelectedPart(evt)) continue;
     }
-    ProcessEvent(evt, uf);
-    // can change order of cuts
     double weight = CalWeight(evt, hadana.pitype);
+    double g4rw = CalG4RW(evt);
+    weight *= g4rw;
+    ProcessEvent(evt, uf, g4rw);
+    // can change order of cuts
     FillHistograms(pi::kNocut, evt, weight);
     if (hadana.PassPandoraSliceCut(evt)){
       FillHistograms(pi::kPandoraSlice, evt, weight);
