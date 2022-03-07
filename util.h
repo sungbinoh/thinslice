@@ -7,7 +7,7 @@
 #include "TProfile.h"
 
 double CalWeight(const anavar & evt, const int &partype);
-
+double CalBkgW(const anavar & evt, const int &partype);
 double CalG4RW(const anavar & evt);
 
 void FillHistVec1D(TH1D *hist[pi::nIntTypes+1], const double &value, const int &partype, double weight=1, bool fill_underflow=true, bool fill_overflow=true);

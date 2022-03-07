@@ -9,24 +9,22 @@ using namespace std;
 
 double CalWeight(const anavar & evt, const int &partype){
   double weight = 1.;
+  
   double mufrac = 1.;//1.58;
+  
   double mom_mu0 = 1.0111;
   double mom_sigma0 = 0.0725;
   double mom_mu = 1.0111;//1.0323
   double mom_sigma = 0.0725;//0.0718
+  double wlimit = 1e-5;
   
   if (evt.MC) {
     // muon reweight
-    if (partype == 3) // kMuon
+    if (partype == 3) { // kMuon
       weight *= mufrac;
-    
-    /*if (partype == 0) { // fake data
-      if (evt.true_beam_PDG == -13)
-        weight = 1.6;
-    }*/
-    
+    }
+
     // momentum reweight (outlier weights are set to 1e-5)
-    double wlimit = 1e-5;
     double deno = exp(-pow((evt.beam_inst_P-mom_mu0)/mom_sigma0,2)/2);
     if (deno < wlimit) deno = wlimit;
     double numo = exp(-pow((evt.beam_inst_P-mom_mu)/mom_sigma,2)/2);
@@ -38,6 +36,34 @@ double CalWeight(const anavar & evt, const int &partype){
   return weight;
 }
 
+double CalBkgW(const anavar & evt, const int &partype){
+  double weight = 1.;
+  
+  double mu_weight = 1.;
+  double p_weight = 1.;
+  double spi_weight = 1.;
+  if (evt.MC) {
+    if (partype == 0) { // fake data
+      if (evt.reco_beam_true_byE_matched) {
+        if (evt.true_beam_PDG == -13) { // muon bkg
+          weight = mu_weight;
+        }
+      }
+      else {
+        if (evt.reco_beam_true_byE_PDG == -13) { // secondary muon bkg
+          weight = mu_weight;
+        }
+        else if (evt.reco_beam_true_byE_PDG == 2212) { // secondary proton bkg
+          weight = p_weight;
+        }
+        else if (evt.reco_beam_true_byE_PDG == 211) { // secondary pion bkg
+          weight = spi_weight;
+        }
+      }
+    }
+  }
+  return weight;
+}
 double CalG4RW(const anavar & evt){
   vector<double> tot_inel_0_600 = (*evt.g4rw_full_grid_piplus_coeffs)[7];
   vector<double> tot_inel_600_2000 = (*evt.g4rw_full_grid_piplus_coeffs)[8];
