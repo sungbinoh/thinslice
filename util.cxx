@@ -9,6 +9,7 @@ using namespace std;
 
 double CalWeight(const anavar & evt, const int &partype){
   double weight = 1.;
+  return weight;
   
   double mufrac = 1.;//1.58;
   
