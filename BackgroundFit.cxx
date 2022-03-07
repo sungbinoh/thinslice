@@ -53,11 +53,11 @@ double bkgFit_mu(TFile *fmc, TFile *fdata, string outfile){
   
   double totaldata = 0;
   double totalmc = 0;
-  double ndata[pi::nthinslices] = {0};
-  double nmc[pi::nthinslices] = {0};
+  //double ndata[pi::nthinslices] = {0};
+  //double nmc[pi::nthinslices] = {0};
   TH1D *hvarSlice[pi::nthinslices][pi::nCuts][pi::nIntTypes+1];
   TH1D *hvar[pi::nCuts][pi::nIntTypes+1];
-  TH1D *hsliceID[pi::nCuts][pi::nIntTypes+1];
+  //TH1D *hsliceID[pi::nCuts][pi::nIntTypes+1];
  
   for (int i = 0; i < pi::nCuts; ++i){
     for (int j = 0; j < pi::nIntTypes+1; ++j){
@@ -73,19 +73,19 @@ double bkgFit_mu(TFile *fmc, TFile *fdata, string outfile){
         if (k==0){
           if (j==0){ // data
             hvar[i][j] = (TH1D*)fdata->Get(Form("h%s_bkg_%d_%d",varname,i,j));
-            hsliceID[i][j] = (TH1D*)fdata->Get(Form("hreco_sliceID_%d_%d",i,j));
+            //hsliceID[i][j] = (TH1D*)fdata->Get(Form("hreco_sliceID_%d_%d",i,j));
           }
           else{ // MC
             hvar[i][j] = (TH1D*)fmc->Get(Form("h%s_bkg_%d_%d",varname,i,j));
-            hsliceID[i][j] = (TH1D*)fmc->Get(Form("hreco_sliceID_%d_%d",i,j));
+            //hsliceID[i][j] = (TH1D*)fmc->Get(Form("hreco_sliceID_%d_%d",i,j));
           }
         }
         if (i==6){
           if (j==0){// data
-            ndata[k] += hsliceID[i][j]->GetBinContent(hsliceID[i][j]->FindBin(k+0.5));
+            //ndata[k] += hsliceID[i][j]->GetBinContent(hsliceID[i][j]->FindBin(k+0.5));
           }
           else {//MC
-            nmc[k] += hsliceID[i][j]->GetBinContent(hsliceID[i][j]->FindBin(k+0.5));
+            //nmc[k] += hsliceID[i][j]->GetBinContent(hsliceID[i][j]->FindBin(k+0.5));
           }
         }
       }

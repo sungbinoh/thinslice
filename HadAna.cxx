@@ -89,11 +89,11 @@ int HadAna::GetPiParType(const anavar& evt){
   else if (evt.event%2){ // divide half of MC as fake data
     return pi::kData;
   }
-  else if (!evt.reco_beam_true_byE_matched){ // mismatched
+  else if (!evt.reco_beam_true_byE_matched){ // the true beam track is not selected
     if (evt.reco_beam_true_byE_origin == 2) {
       return pi::kMIDcosmic;
     }
-    else if (std::abs(evt.reco_beam_true_byE_PDG) == 211){ // mistakenly recognized as pion
+    else if (std::abs(evt.reco_beam_true_byE_PDG) == 211){ // the selected track is a pion (but not true beam pion, so it is a secondary pion)
       return pi::kMIDpi;
     }
     else if (evt.reco_beam_true_byE_PDG == 2212){
@@ -107,7 +107,7 @@ int HadAna::GetPiParType(const anavar& evt){
       return pi::kMIDeg;
     }
     else {
-      //std::cout<<reco_beam_true_byE_PDG<<std::endl;
+      //cout<<evt.reco_beam_true_byE_PDG<<endl;
       return pi::kMIDother;
     }
   }
