@@ -372,11 +372,15 @@ int main(int argc, char** argv){
   hval_trueini->Write("hval_trueini");
   double Ninc_t[pi::nthinslices] = {0};
   double Nint_t[pi::nthinslices] = {0};
+  double Nini_t[pi::nthinslices] = {0};
   double err_inc_t[pi::nthinslices] = {0};
   double err_int_t[pi::nthinslices] = {0};
+  double err_ini_t[pi::nthinslices] = {0};
   for (int i = 0; i<pi::nthinslices; ++i){
     Nint_t[i] = hval_trueint->GetBinContent(i+2);
     err_int_t[i] = hval_trueint->GetBinError(i+2);
+    Nini_t[i] = hval_trueini->GetBinContent(i+2);
+    err_ini_t[i] = hval_trueini->GetBinError(i+2);
     for (int j = i; j<=pi::nthinslices; ++j){
       Ninc_t[i] += hval_trueinc->GetBinContent(j+2);
       err_inc_t[i] += pow(hval_trueinc->GetBinError(j+2),2);
@@ -387,6 +391,15 @@ int main(int argc, char** argv){
     }
     err_inc_t[i] = sqrt(err_inc_t[i]);
   }
+  TGraphErrors *gr_inc_t = new TGraphErrors(pi::nthinslices, SliceID, Ninc_t, 0, err_inc_t);
+  gr_inc_t->SetNameTitle("gr_inc_t", "Incident number;Slice ID;Events");
+  gr_inc_t->Write();
+  TGraphErrors *gr_int_t = new TGraphErrors(pi::nthinslices, SliceID, Nint_t, 0, err_int_t);
+  gr_int_t->SetNameTitle("gr_int_t", "Interaction number;Slice ID;Events");
+  gr_int_t->Write();
+  TGraphErrors *gr_ini_t = new TGraphErrors(pi::nthinslices, SliceID, Nini_t, 0, err_ini_t);
+  gr_ini_t->SetNameTitle("gr_ini_t", "Initial number;Slice ID;Events");
+  gr_ini_t->Write();
   double xs_t[pi::nthinslices] = {0};
   double err_xs_t[pi::nthinslices] = {0};
   for (int i = 0; i<pi::nthinslices; ++i){

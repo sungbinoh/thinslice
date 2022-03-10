@@ -23,6 +23,9 @@ void plotXS(){
   TGraphErrors *gr_inc = (TGraphErrors*)file->Get("gr_inc");
   TGraphErrors *gr_int = (TGraphErrors*)file->Get("gr_int");
   TGraphErrors *gr_ini = (TGraphErrors*)file->Get("gr_ini");
+  TGraphErrors *gr_inc_t = (TGraphErrors*)file->Get("gr_inc_t");
+  TGraphErrors *gr_int_t = (TGraphErrors*)file->Get("gr_int_t");
+  TGraphErrors *gr_ini_t = (TGraphErrors*)file->Get("gr_ini_t");
   
   // incident (all pion)
   TCanvas *c1 = new TCanvas("c1","c1");
@@ -125,37 +128,43 @@ void plotXS(){
   TCanvas *c7 = new TCanvas("c7","c7");
   gr_inc->SetTitle("");
   gr_inc->SetLineWidth(2);
-  gr_inc->SetLineColor(4);
-  gr_inc->SetMarkerColor(4);
   gr_inc->GetXaxis()->SetTitle("Slice ID");
   gr_inc->GetYaxis()->SetTitle("N_{Inc}");
   gr_inc->GetXaxis()->SetRangeUser(0, 21);
   gr_inc->SetMinimum(0);
   gr_inc->Draw("ape");
+  gr_inc_t->SetLineWidth(2);
+  gr_inc_t->SetLineColor(3);
+  gr_inc_t->SetMarkerColor(3);
+  gr_inc_t->Draw("pe");
 
   // interaction histogram
   TCanvas *c8 = new TCanvas("c8","c8");
   gr_int->SetTitle("");
   gr_int->SetLineWidth(2);
-  gr_int->SetLineColor(4);
-  gr_int->SetMarkerColor(4);
   gr_int->GetXaxis()->SetTitle("Slice ID");
   gr_int->GetYaxis()->SetTitle("N_{Int}");
   gr_int->GetXaxis()->SetRangeUser(0, 21);
   gr_int->SetMinimum(0);
   gr_int->Draw("ape");
+  gr_int_t->SetLineWidth(2);
+  gr_int_t->SetLineColor(3);
+  gr_int_t->SetMarkerColor(3);
+  gr_int_t->Draw("pe");
   
   // initial histogram
   TCanvas *c9 = new TCanvas("c9","c9");
   gr_ini->SetTitle("");
   gr_ini->SetLineWidth(2);
-  gr_ini->SetLineColor(4);
-  gr_ini->SetMarkerColor(4);
   gr_ini->GetXaxis()->SetTitle("Slice ID");
   gr_ini->GetYaxis()->SetTitle("N_{Ini}");
   gr_ini->GetXaxis()->SetRangeUser(0, 21);
   gr_ini->SetMinimum(0);
   gr_ini->Draw("ape");
+  gr_ini_t->SetLineWidth(2);
+  gr_ini_t->SetLineColor(3);
+  gr_ini_t->SetMarkerColor(3);
+  gr_ini_t->Draw("pe");
 
   // cross-section
   /*double xs[pi::nthinslices] = {0};
@@ -192,13 +201,12 @@ void plotXS(){
   total_inel_KE->SetLineColor(2);
   /*for (int i=0;i<total_inel_KE->GetN();i++) {
     if (total_inel_KE->GetX()[i] <= 476.44931) {
-      total_inel_KE->GetY()[i] *= 0.5;
-      if (total_inel_KE->GetX()[i] > 450) cout<<total_inel_KE->GetY()[i]<<endl;
+      total_inel_KE->GetY()[i] *= 1;
     }
-    else total_inel_KE->GetY()[i] *= 1.5;
+    else total_inel_KE->GetY()[i] *= 1;
   }*/
   total_inel_KE->Draw("L");
-  TLegend *leg10 = new TLegend(0.5,0.2,0.85,0.45);
+  TLegend *leg10 = new TLegend(0.5,0.15,0.85,0.4);
   leg10->SetFillStyle(0);
   leg10->AddEntry(gr_recoxs, "MC with reconstruction", "pe");
   leg10->AddEntry(gr_truexs, "MC truth", "pe");
