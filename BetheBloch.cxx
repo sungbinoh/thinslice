@@ -202,7 +202,7 @@ double BetheBloch::KEAtLength(double KE0, double tracklength){
 
   double deltaE = spmap[iKE]->Eval(tracklength);
 
-  if (deltaE < 0) return 999999.;//cout<<"Negative delta E: "<<deltaE<<endl;
+  if (deltaE < 0) return 0;//cout<<"Negative delta E: "<<deltaE<<endl;
   if (KE0 - deltaE < 0) return 0;//cout<<"Negative KE: "<<KE0 - deltaE<<endl;
   
   return KE0 - deltaE;

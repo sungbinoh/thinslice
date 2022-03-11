@@ -235,10 +235,10 @@ void ThinSlice::BookHistograms(){
 
 void ThinSlice::ProcessEvent(const anavar & evt, Unfold & uf, double g4rw, double bkgw){
   //hadana.ProcessEvent(evt);
-  reco_sliceID = -1;
-  true_sliceID = -1;
-  reco_ini_sliceID = -1;
-  true_ini_sliceID = -1;
+  reco_sliceID = -99;
+  true_sliceID = -99;
+  reco_ini_sliceID = -99;
+  true_ini_sliceID = -99;
   int_energy_reco = 999999.;
   int_energy_true = 999999.;
 
@@ -277,85 +277,94 @@ void ThinSlice::ProcessEvent(const anavar & evt, Unfold & uf, double g4rw, doubl
         h_diff_Eint->Fill(int_energy_true_trklen - int_energy_true);
         h_diff_Eint_vs_true_Eint->Fill(int_energy_true, int_energy_true_trklen - int_energy_true);
       }
-      true_ini_sliceID = int( (pi::plim - hadana.true_ffKE)/pi::Eslicewidth + 0.5);
-      if (true_ini_sliceID < 0) true_ini_sliceID = -1;
-      if (true_ini_sliceID >= pi::nthinslices) true_ini_sliceID = pi::nthinslices;
-      true_sliceID = int( (pi::plim-int_energy_true)/pi::Eslicewidth );
-      if (true_sliceID < 0) true_sliceID = -1;
-      //if (evt.true_beam_endZ < 0) true_sliceID = -1;
-      if (true_sliceID >= pi::nthinslices) true_sliceID = pi::nthinslices;
-      
+      // true initial sliceID
+      true_ini_sliceID = int(ceil( (pi::plim - hadana.true_ffKE)/pi::Eslicewidth )); // ignore incomplete slices
+      //if (true_ini_sliceID <= -99) true_ini_sliceID = -99;
+      if (true_ini_sliceID < 0) true_ini_sliceID = -1; // both physical and unphysical underflow
+      if (true_ini_sliceID >= pi::nthinslices) true_ini_sliceID = pi::nthinslices; // overflow (Eff<pi::Eslicewidth)
+      // true interaction sliceID
+      true_sliceID = int(floor( (pi::plim-int_energy_true)/pi::Eslicewidth ));
+      //if (true_sliceID <= -99) true_sliceID = -99;
+      if (true_sliceID < 0) true_sliceID = -1; // unphysical underflow
+      if (true_sliceID >= pi::nthinslices) true_sliceID = pi::nthinslices; // overflow (Eint<0)
+      // ignore incomplete slices
+      if (true_sliceID < true_ini_sliceID) {
+        true_ini_sliceID = -1;
+        true_sliceID = -1;
+      } // if true_sliceID==-1, this event should not be used when calculating true XS (but should it be used in unfolding???)
+
       if (evt.true_beam_PDG == 211){
         int starti = true_ini_sliceID;
         if (starti == -1) starti = 0;
         for (int i = starti; i<=true_sliceID; ++i){
           if (i<pi::nthinslices) ++true_incidents[i]; // count incident events
         }
-      }
-      if ((*evt.true_beam_endProcess) == "pi+Inelastic"){
-        if (true_sliceID < pi::nthinslices && true_sliceID>=0){
-          ++true_interactions[true_sliceID]; // count interaction events
-        }
-        // Reco info
-        if (!(evt.reco_beam_calo_wire->empty()) && evt.reco_beam_true_byE_matched){ // truth matched. so it must be the true track?
-          std::vector<std::vector<double>> vincE(pi::nthinslices);
-          for (size_t i = 0; i<evt.reco_beam_calo_wire->size(); ++i){
-            //int this_sliceID = int((hadana.reco_trklen_accum)[i]/pi::thinslicewidth);
-            int this_sliceID = int((*evt.reco_beam_incidentEnergies)[i]/pi::Eslicewidth);
-            if (this_sliceID>=pi::nthinslices) continue;
-            if (this_sliceID<0) continue;
-            double this_incE = (*evt.reco_beam_incidentEnergies)[i];
-            vincE[this_sliceID].push_back(this_incE);
+        
+        if ((*evt.true_beam_endProcess) == "pi+Inelastic"){
+          if (true_sliceID >= starti){
+            ++true_interactions[true_sliceID]; // count interaction events
           }
-          for (size_t i = 0; i<vincE.size(); ++i){
-            if (!vincE[i].empty()){
-              double sum_incE = 0;
-              for (size_t j = 0; j<vincE[i].size(); ++j){
-                sum_incE += vincE[i][j];
-              }
-              reco_incE[i]->Fill(sum_incE/vincE[i].size());
+          // Reco info
+          if (!(evt.reco_beam_calo_wire->empty()) && evt.reco_beam_true_byE_matched){ // truth matched. so it must be the true track?
+            std::vector<std::vector<double>> vincE(pi::nthinslices);
+            for (size_t i = 0; i<evt.reco_beam_calo_wire->size(); ++i){
+              //int this_sliceID = int((hadana.reco_trklen_accum)[i]/pi::thinslicewidth);
+              int this_sliceID = int((*evt.reco_beam_incidentEnergies)[i]/pi::Eslicewidth);
+              if (this_sliceID>=pi::nthinslices) continue;
+              if (this_sliceID<0) continue;
+              double this_incE = (*evt.reco_beam_incidentEnergies)[i];
+              vincE[this_sliceID].push_back(this_incE);
             }
+            for (size_t i = 0; i<vincE.size(); ++i){
+              if (!vincE[i].empty()){
+                double sum_incE = 0;
+                for (size_t j = 0; j<vincE[i].size(); ++j){
+                  sum_incE += vincE[i][j];
+                }
+                reco_incE[i]->Fill(sum_incE/vincE[i].size());
+              }
+            }
+            TVector3 pt0(evt.reco_beam_calo_startX,
+                         evt.reco_beam_calo_startY,
+                         evt.reco_beam_calo_startZ);
+            TVector3 pt1(evt.reco_beam_calo_endX,
+                         evt.reco_beam_calo_endY,
+                         evt.reco_beam_calo_endZ);
+            TVector3 dir = pt1 - pt0; // direction of the track is determine by the start/end point
+            dir = dir.Unit();
+            reco_AngCorr->Fill(dir.Z()); // projection to Z of the direction of the track
           }
-          TVector3 pt0(evt.reco_beam_calo_startX,
-                       evt.reco_beam_calo_startY,
-                       evt.reco_beam_calo_startZ);
-          TVector3 pt1(evt.reco_beam_calo_endX,
-                       evt.reco_beam_calo_endY,
-                       evt.reco_beam_calo_endZ);
-          TVector3 dir = pt1 - pt0; // direction of the track is determine by the start/end point
-          dir = dir.Unit();
-          reco_AngCorr->Fill(dir.Z()); // projection to Z of the direction of the track
-        }
 
-        // True info
-        if (!(evt.true_beam_traj_Z->empty())){
-          std::vector<std::vector<double>> vincE(pi::nthinslices);
-          for (size_t i = 0; i<evt.true_beam_traj_Z->size()-1; ++i){//last point always has KE = 0
-            //int this_sliceID = int((hadana.true_trklen_accum)[i]/pi::thinslicewidth);
-            int this_sliceID = int((*evt.true_beam_traj_KE)[i]/pi::Eslicewidth);
-            double this_incE = (*evt.true_beam_traj_KE)[i];
-            if (this_sliceID>=pi::nthinslices) continue;
-            if (this_sliceID<0) continue;
-            vincE[this_sliceID].push_back(this_incE);
-          }
-          for (size_t i = 0; i<vincE.size(); ++i){
-            if (!vincE[i].empty()){
-              double sum_incE = 0;
-              for (size_t j = 0; j<vincE[i].size(); ++j){
-                sum_incE += vincE[i][j];
-              }
-              true_incE[i]->Fill(sum_incE/vincE[i].size());
+          // True info
+          if (!(evt.true_beam_traj_Z->empty())){
+            std::vector<std::vector<double>> vincE(pi::nthinslices);
+            for (size_t i = 0; i<evt.true_beam_traj_Z->size()-1; ++i){//last point always has KE = 0
+              //int this_sliceID = int((hadana.true_trklen_accum)[i]/pi::thinslicewidth);
+              int this_sliceID = int((*evt.true_beam_traj_KE)[i]/pi::Eslicewidth);
+              double this_incE = (*evt.true_beam_traj_KE)[i];
+              if (this_sliceID>=pi::nthinslices) continue;
+              if (this_sliceID<0) continue;
+              vincE[this_sliceID].push_back(this_incE);
             }
+            for (size_t i = 0; i<vincE.size(); ++i){
+              if (!vincE[i].empty()){
+                double sum_incE = 0;
+                for (size_t j = 0; j<vincE[i].size(); ++j){
+                  sum_incE += vincE[i][j];
+                }
+                true_incE[i]->Fill(sum_incE/vincE[i].size());
+              }
+            }
+            TVector3 pt0(evt.true_beam_startX,
+                         evt.true_beam_startY,
+                         evt.true_beam_startZ);
+            TVector3 pt1(evt.true_beam_endX,
+                         evt.true_beam_endY,
+                         evt.true_beam_endZ);
+            TVector3 dir = pt1 - pt0;
+            dir = dir.Unit();
+            true_AngCorr->Fill(dir.Z());
           }
-          TVector3 pt0(evt.true_beam_startX,
-                       evt.true_beam_startY,
-                       evt.true_beam_startZ);
-          TVector3 pt1(evt.true_beam_endX,
-                       evt.true_beam_endY,
-                       evt.true_beam_endZ);
-          TVector3 dir = pt1 - pt0;
-          dir = dir.Unit();
-          true_AngCorr->Fill(dir.Z());
         }
       }
     }
@@ -367,15 +376,21 @@ void ThinSlice::ProcessEvent(const anavar & evt, Unfold & uf, double g4rw, doubl
       else if (beam_inst_KE < 900) inc_energy_reco = beam_inst_KE - 11.87; // 11.87 \pm 0.22
       else if (beam_inst_KE < 950) inc_energy_reco = beam_inst_KE - 17.31; // 17.31 \pm 0.27
       else inc_energy_reco = beam_inst_KE - 29.28; // 29.28 \pm 0.37*/
-      
+
       int_energy_reco = bb.KEAtLength(inc_energy_reco, hadana.reco_trklen);
-      reco_ini_sliceID = int( (pi::plim - inc_energy_reco)/pi::Eslicewidth + 0.5);
+      // reco initial sliceID
+      reco_ini_sliceID = int(ceil( (pi::plim - inc_energy_reco)/pi::Eslicewidth ));
       if (reco_ini_sliceID < 0) reco_ini_sliceID = -1;
       if (reco_ini_sliceID >= pi::nthinslices) reco_ini_sliceID = pi::nthinslices;
-      reco_sliceID = int( (pi::plim-int_energy_reco)/pi::Eslicewidth );
+      // reco interaction sliceID
+      reco_sliceID = int(floor( (pi::plim-int_energy_reco)/pi::Eslicewidth ));
       if (reco_sliceID < 0) reco_sliceID = -1;
-      //if (evt.reco_beam_calo_endZ < 0) reco_sliceID = -1;
       if (reco_sliceID >= pi::nthinslices) reco_sliceID = pi::nthinslices;
+      // ignore incomplete slices
+      if (reco_sliceID < reco_ini_sliceID) {
+        reco_ini_sliceID = -1;
+        reco_sliceID = -1;
+      } // if reco_sliceID==-1, this event should not be used when calculating reco XS
     }
     //for(int i=0;i<evt.reco_beam_incidentEnergies->size();i++) cout<<(*evt.reco_beam_incidentEnergies)[i]<<"\t";
     //cout<<endl<<int_energy_reco<<endl; // very different with the last point of evt.reco_beam_incidentEnergies
