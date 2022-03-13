@@ -23,9 +23,16 @@ void plotXS(){
   TGraphErrors *gr_inc = (TGraphErrors*)file->Get("gr_inc");
   TGraphErrors *gr_int = (TGraphErrors*)file->Get("gr_int");
   TGraphErrors *gr_ini = (TGraphErrors*)file->Get("gr_ini");
+  TGraphErrors *gr_ina = (TGraphErrors*)file->Get("gr_ina");
   TGraphErrors *gr_inc_t = (TGraphErrors*)file->Get("gr_inc_t");
   TGraphErrors *gr_int_t = (TGraphErrors*)file->Get("gr_int_t");
   TGraphErrors *gr_ini_t = (TGraphErrors*)file->Get("gr_ini_t");
+  TGraphErrors *gr_ina_t = (TGraphErrors*)file->Get("gr_ina_t");
+  
+  /*for (int i=0; i<pi::nthinslices; ++i){
+    cout<<gr_inc->GetPointY(i)<<",";
+    //cout<<hval_sel_sig_int_uf->GetBinContent(i+2)<<",";
+  }*/
   
   // incident (all pion)
   TCanvas *c1 = new TCanvas("c1","c1");
@@ -190,7 +197,7 @@ void plotXS(){
   TCanvas *c10 = new TCanvas("c10", "c10", 1200, 500);
   gr_recoxs->SetTitle("Pion Inelastic Cross Section");
   gr_recoxs->GetXaxis()->SetTitle("Pion Kinetic Energy (MeV)");
-  gr_recoxs->GetXaxis()->SetRangeUser(10, 1000);
+  gr_recoxs->GetXaxis()->SetRangeUser(0, 1000);
   gr_recoxs->GetYaxis()->SetTitle("#sigma_{inelastic} (mb)");
   gr_recoxs->GetYaxis()->SetRangeUser(0, 1200);
   gr_recoxs->SetLineWidth(2);

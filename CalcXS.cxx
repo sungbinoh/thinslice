@@ -286,9 +286,11 @@ int main(int argc, char** argv){
   double Ninc[pi::nthinslices] = {0};
   double Nint[pi::nthinslices] = {0};
   double Nini[pi::nthinslices] = {0};
+  double Nina[pi::nthinslices] = {0};
   double err_inc[pi::nthinslices] = {0};
   double err_int[pi::nthinslices] = {0};
   double err_ini[pi::nthinslices] = {0};
+  double err_ina[pi::nthinslices] = {0};
   double SliceID[pi::nthinslices] = {0};
 
   for (int i = 0; i<pi::nthinslices; ++i){
@@ -297,6 +299,8 @@ int main(int argc, char** argv){
     err_int[i] = hsignal_uf->GetBinError(i+2);
     Nini[i] = hsigini_uf->GetBinContent(i+2);
     err_ini[i] = hsigini_uf->GetBinError(i+2);
+    Nina[i] = hsiginc_uf->GetBinContent(i+2);
+    err_ina[i] = hsiginc_uf->GetBinError(i+2);
     for (int j = i; j<=pi::nthinslices; ++j){
       Ninc[i] += hsiginc_uf->GetBinContent(j+2);
       err_inc[i] += pow(hsiginc_uf->GetBinError(j+2),2);
@@ -316,6 +320,9 @@ int main(int argc, char** argv){
   TGraphErrors *gr_ini = new TGraphErrors(pi::nthinslices, SliceID, Nini, 0, err_ini);
   gr_ini->SetNameTitle("gr_ini", "Initial number;Slice ID;Events");
   gr_ini->Write();
+  TGraphErrors *gr_ina = new TGraphErrors(pi::nthinslices, SliceID, Nina, 0, err_ina);
+  gr_ina->SetNameTitle("gr_ina", "Interaction_allpion number;Slice ID;Events");
+  gr_ina->Write();
   /*TGraphErrors *gr_trueincE = (TGraphErrors*)fmc->Get("gr_trueincE");
   gr_trueincE->SetNameTitle("gr_trueincE", "True incident energy;Slice ID;Energy (MeV)");
   gr_trueincE->Write();
@@ -373,14 +380,18 @@ int main(int argc, char** argv){
   double Ninc_t[pi::nthinslices] = {0};
   double Nint_t[pi::nthinslices] = {0};
   double Nini_t[pi::nthinslices] = {0};
+  double Nina_t[pi::nthinslices] = {0};
   double err_inc_t[pi::nthinslices] = {0};
   double err_int_t[pi::nthinslices] = {0};
   double err_ini_t[pi::nthinslices] = {0};
+  double err_ina_t[pi::nthinslices] = {0};
   for (int i = 0; i<pi::nthinslices; ++i){
     Nint_t[i] = hval_trueint->GetBinContent(i+2);
     err_int_t[i] = hval_trueint->GetBinError(i+2);
     Nini_t[i] = hval_trueini->GetBinContent(i+2);
     err_ini_t[i] = hval_trueini->GetBinError(i+2);
+    Nina_t[i] = hval_trueinc->GetBinContent(i+2);
+    err_ina_t[i] = hval_trueinc->GetBinError(i+2);
     for (int j = i; j<=pi::nthinslices; ++j){
       Ninc_t[i] += hval_trueinc->GetBinContent(j+2);
       err_inc_t[i] += pow(hval_trueinc->GetBinError(j+2),2);
@@ -400,6 +411,9 @@ int main(int argc, char** argv){
   TGraphErrors *gr_ini_t = new TGraphErrors(pi::nthinslices, SliceID, Nini_t, 0, err_ini_t);
   gr_ini_t->SetNameTitle("gr_ini_t", "Initial number;Slice ID;Events");
   gr_ini_t->Write();
+  TGraphErrors *gr_ina_t = new TGraphErrors(pi::nthinslices, SliceID, Nina_t, 0, err_ina_t);
+  gr_ina_t->SetNameTitle("gr_ina_t", "Interaction_allpion number;Slice ID;Events");
+  gr_ina_t->Write();
   double xs_t[pi::nthinslices] = {0};
   double err_xs_t[pi::nthinslices] = {0};
   for (int i = 0; i<pi::nthinslices; ++i){
