@@ -759,10 +759,12 @@ void ThinSlice::Run(anavar & evt, Unfold & uf, Long64_t nentries=-1){
     double weight = CalWeight(evt, hadana.pitype); // muon reweight; momentum reweight (to reconcile real data and MC)
     double g4rw = CalG4RW(evt); // geant4reweight (to fake data for test; it turns out it should also be applied to true MC to make unfolding reliable)
     double bkgw = CalBkgW(evt, hadana.pitype); // bkg fraction variation (to fake data for test)
-    weight *= g4rw;
-    weight *= bkgw;
     
     ProcessEvent(evt, uf, g4rw, bkgw);
+    if (evt.MC && hadana.pitype == 0) { // fake data
+      weight *= g4rw;
+      weight *= bkgw;
+    }
     // can change order of cuts
     FillHistograms(pi::kNocut, evt, weight);
     if (hadana.PassPandoraSliceCut(evt)){
