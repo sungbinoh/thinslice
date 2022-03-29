@@ -20,6 +20,7 @@ class ThinSlice {
   BetheBloch bb;
 
   int reco_sliceID;
+  int reco_end_sliceID; // differ with reco_sliceID if reco_beam_calo_endZ > 220
   int true_sliceID;
   int reco_ini_sliceID;
   int true_ini_sliceID;
@@ -72,6 +73,7 @@ class ThinSlice {
   TH1D *htrue_sliceID[pi::nCuts][pi::nIntTypes+1];
   TH1D *hreco_sliceID[pi::nCuts][pi::nIntTypes+1];
   //TH1D *htrue_inisliceID[pi::nCuts][pi::nIntTypes+1];
+  TH1D *hreco_incsliceID[pi::nCuts][pi::nIntTypes+1];
   TH1D *hreco_inisliceID[pi::nCuts][pi::nIntTypes+1];
   TH1D *hreco_true_sliceID[pi::nCuts][pi::nIntTypes+1];
   TH2D *hreco_vs_true_sliceID[pi::nCuts][pi::nIntTypes+1];

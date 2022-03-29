@@ -85,6 +85,21 @@ int main(int argc, char** argv){
   hspi->Sumw2();
   hpiel->Sumw2();
   hother->Sumw2();
+  
+  TH1D *hincsliceID[pi::nIntTypes+1];
+  TH1D *hdata_inc = new TH1D("hdata_inc","Data_inc;Slice ID;Events",pi::nthinslices+2,-1,pi::nthinslices+1);
+  TH1D *hproton_inc = new TH1D("hproton_inc","Proton_inc background;Slice ID;Events",pi::nthinslices+2,-1,pi::nthinslices+1);
+  TH1D *hmu_inc = new TH1D("hmu_inc","Muon_inc background;Slice ID;Events",pi::nthinslices+2,-1,pi::nthinslices+1);
+  TH1D *hspi_inc = new TH1D("hspi_inc","Secondary pion_inc background;Slice ID;Events",pi::nthinslices+2,-1,pi::nthinslices+1);
+  //TH1D *hpiel_inc = new TH1D("hpiel_inc","Pion elastic_inc;Slice ID;Events",pi::nthinslices+2,-1,pi::nthinslices+1);
+  TH1D *hother_inc = new TH1D("hother_inc","Other_inc backgrounds;Slice ID;Events",pi::nthinslices+2,-1,pi::nthinslices+1);
+  hdata_inc->Sumw2();
+  hproton_inc->Sumw2();
+  hmu_inc->Sumw2();
+  hspi_inc->Sumw2();
+  //hpiel_inc->Sumw2();
+  hother_inc->Sumw2();
+  
   TH1D *hinisliceID[pi::nIntTypes+1];
   TH1D *hdata_ini = new TH1D("hdata_ini","Data_ini;Slice ID;Events",pi::nthinslices+2,-1,pi::nthinslices+1);
   TH1D *hproton_ini = new TH1D("hproton_ini","Proton_ini background;Slice ID;Events",pi::nthinslices+2,-1,pi::nthinslices+1);
@@ -103,15 +118,19 @@ int main(int argc, char** argv){
   for (int i = 0; i < pi::nIntTypes+1; ++i){
     if (i==0){
       hsliceID[i] = (TH1D*)fdata->Get(Form("hreco_sliceID_%d_%d",pi::nCuts-1,i));
+      hincsliceID[i] = (TH1D*)fdata->Get(Form("hreco_incsliceID_%d_%d",pi::nCuts-1,i));
       hinisliceID[i] = (TH1D*)fdata->Get(Form("hreco_inisliceID_%d_%d",pi::nCuts-1,i));
     }
     else {
       hsliceID[i] = (TH1D*)fmc->Get(Form("hreco_sliceID_%d_%d",pi::nCuts-1,i));
+      hincsliceID[i] = (TH1D*)fmc->Get(Form("hreco_incsliceID_%d_%d",pi::nCuts-1,i));
       hinisliceID[i] = (TH1D*)fmc->Get(Form("hreco_inisliceID_%d_%d",pi::nCuts-1,i));
     }
   }
   TH1D *hmc = new TH1D("hmc","MC;Slice ID;Events",hsliceID[0]->GetNbinsX(),-1,hsliceID[0]->GetNbinsX()-1);
   hmc->Sumw2();
+  TH1D *hmc_inc = new TH1D("hmc_inc","MC_inc;Slice ID;Events",hsliceID[0]->GetNbinsX(),-1,hsliceID[0]->GetNbinsX()-1);
+  hmc_inc->Sumw2();
   TH1D *hmc_ini = new TH1D("hmc_ini","MC_ini;Slice ID;Events",hsliceID[0]->GetNbinsX(),-1,hsliceID[0]->GetNbinsX()-1);
   hmc_ini->Sumw2();
   for (int j = 0; j < pi::nthinslices+2; ++j){
@@ -124,6 +143,15 @@ int main(int argc, char** argv){
     }
     hmc->SetBinContent(j+1, nmc);
     hmc->SetBinError(j+1, sqrt(nmc));
+    
+    hdata_inc->SetBinContent(j+1, hincsliceID[0]->GetBinContent(bin));
+    hdata_inc->SetBinError(j+1, hincsliceID[0]->GetBinError(bin));
+    nmc = 0;
+    for (int i = 1; i < pi::nIntTypes+1; ++i){
+      nmc += hincsliceID[i]->GetBinContent(bin);
+    }
+    hmc_inc->SetBinContent(j+1, nmc);
+    hmc_inc->SetBinError(j+1, sqrt(nmc));
     
     hdata_ini->SetBinContent(j+1, hinisliceID[0]->GetBinContent(bin));
     hdata_ini->SetBinError(j+1, hinisliceID[0]->GetBinError(bin));
@@ -145,6 +173,8 @@ int main(int argc, char** argv){
       //hsliceID[i]->Scale(totaldata/totalmc);
       hsliceID[i]->Multiply(hsliceID[0]);
       hsliceID[i]->Divide(hmc);
+      hincsliceID[i]->Multiply(hincsliceID[0]);
+      hincsliceID[i]->Divide(hmc_inc);
       hinisliceID[i]->Multiply(hinisliceID[0]);
       hinisliceID[i]->Divide(hmc_ini);
     }
@@ -162,6 +192,15 @@ int main(int argc, char** argv){
                       + pow(hsliceID[i]->GetBinContent(bin)*(*sf_mu)[1],2));
           hmu->SetBinContent(j+1, binc);
           hmu->SetBinError(j+1, bine);
+          
+          binc = hmu_inc->GetBinContent(bin);
+          bine = hmu_inc->GetBinError(bin);
+          binc += hincsliceID[i]->GetBinContent(bin)*(*sf_mu)[0];
+          bine = sqrt(pow(bine,2)
+                      + pow(hincsliceID[i]->GetBinError(bin)*(*sf_mu)[0],2)
+                      + pow(hincsliceID[i]->GetBinContent(bin)*(*sf_mu)[1],2));
+          hmu_inc->SetBinContent(j+1, binc);
+          hmu_inc->SetBinError(j+1, bine);
           
           binc = hmu_ini->GetBinContent(bin);
           bine = hmu_ini->GetBinError(bin);
@@ -182,6 +221,15 @@ int main(int argc, char** argv){
           hproton->SetBinContent(j+1, binc);
           hproton->SetBinError(j+1, bine);
           
+          binc = hproton_inc->GetBinContent(bin);
+          bine = hproton_inc->GetBinError(bin);
+          binc += hincsliceID[i]->GetBinContent(bin)*(*sf_p)[0];
+          bine = sqrt(pow(bine,2)
+                      + pow(hincsliceID[i]->GetBinError(bin)*(*sf_p)[0],2)
+                      + pow(hincsliceID[i]->GetBinContent(bin)*(*sf_p)[1],2));
+          hproton_inc->SetBinContent(j+1, binc);
+          hproton_inc->SetBinError(j+1, bine);
+          
           binc = hproton_ini->GetBinContent(bin);
           bine = hproton_ini->GetBinError(bin);
           binc += hinisliceID[i]->GetBinContent(bin)*(*sf_p)[0];
@@ -200,6 +248,15 @@ int main(int argc, char** argv){
                       + pow(hsliceID[i]->GetBinContent(bin)*(*sf_spi)[1],2));
           hspi->SetBinContent(j+1, binc);
           hspi->SetBinError(j+1, bine);
+          
+          binc = hspi_inc->GetBinContent(bin);
+          bine = hspi_inc->GetBinError(bin);
+          binc += hincsliceID[i]->GetBinContent(bin)*(*sf_spi)[0];
+          bine = sqrt(pow(bine,2)
+                      + pow(hincsliceID[i]->GetBinError(bin)*(*sf_spi)[0],2)
+                      + pow(hincsliceID[i]->GetBinContent(bin)*(*sf_spi)[1],2));
+          hspi_inc->SetBinContent(j+1, binc);
+          hspi_inc->SetBinError(j+1, bine);
           
           binc = hspi_ini->GetBinContent(bin);
           bine = hspi_ini->GetBinError(bin);
@@ -236,6 +293,14 @@ int main(int argc, char** argv){
           hother->SetBinContent(j+1, binc);
           hother->SetBinError(j+1, bine);
           
+          binc = hother_inc->GetBinContent(bin);
+          bine = hother_inc->GetBinError(bin);
+          binc += hincsliceID[i]->GetBinContent(bin);
+          bine = sqrt(pow(bine,2)
+                      + pow(hincsliceID[i]->GetBinError(bin),2));
+          hother_inc->SetBinContent(j+1, binc);
+          hother_inc->SetBinError(j+1, bine);
+          
           binc = hother_ini->GetBinContent(bin);
           bine = hother_ini->GetBinError(bin);
           binc += hinisliceID[i]->GetBinContent(bin);
@@ -248,17 +313,23 @@ int main(int argc, char** argv){
     }
   }
 
-  TH1D *hsiginc = (TH1D*)hdata->Clone("hsiginc");
-  hsiginc->SetTitle("Pion incident signal;Slice ID;Events");
-  hsiginc->Add(hmu,-1);
-  hsiginc->Add(hproton,-1);
-  hsiginc->Add(hspi,-1);
-  hsiginc->Add(hother,-1);
-  TH1D *hsignal = (TH1D*)hsiginc->Clone("hsignal");
+  TH1D *hsignal = (TH1D*)hdata->Clone("hsignal");
   hsignal->SetTitle("Pion interaction signal;Slice ID;Events");
+  hsignal->Add(hmu,-1);
+  hsignal->Add(hproton,-1);
+  hsignal->Add(hspi,-1);
   hsignal->Add(hpiel,-1);
+  hsignal->Add(hother,-1);
+  
+  TH1D *hsiginc = (TH1D*)hdata_inc->Clone("hsiginc");
+  hsiginc->SetTitle("All pion incident;Slice ID;Events");
+  hsiginc->Add(hmu_inc,-1);
+  hsiginc->Add(hproton_inc,-1);
+  hsiginc->Add(hspi_inc,-1);
+  hsiginc->Add(hother_inc,-1);
   
   TH1D *hsigini = (TH1D*)hdata_ini->Clone("hsigini");
+  hsigini->SetTitle("All pion initial;Slice ID;Events");
   hsigini->Add(hmu_ini,-1);
   hsigini->Add(hproton_ini,-1);
   hsigini->Add(hspi_ini,-1);

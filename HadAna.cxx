@@ -211,7 +211,7 @@ bool HadAna::PassBeamQualityCut(bool has_angle_cut) const{ // cut on beam entran
 }
 
 bool HadAna::PassAPA3Cut(const anavar& evt) const{ // only use track in the first TPC
-
+  return true;
   double cutAPA3_Z = 220.;
   
   if (fAllTrackCheck) return evt.reco_beam_calo_endZ_allTrack < cutAPA3_Z;
