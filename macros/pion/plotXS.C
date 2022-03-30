@@ -7,14 +7,15 @@ void plotXS(){
   TFile *file = TFile::Open("../../build/XSMC.root");
   
   TH1D *h_sel_data = (TH1D*)file->Get("hdata");
-  TH1D *h_sel_sig_inc = (TH1D*)file->Get("hsiginc");
-  TH1D *hval_sel_sig_inc = (TH1D*)file->Get("hval_siginc_reco");
-  TH1D *h_sel_sig_inc_uf = (TH1D*)file->Get("hsiginc_uf");
-  TH1D *hval_sel_sig_inc_uf = (TH1D*)file->Get("hval_trueinc");
   TH1D *h_sel_sig_int = (TH1D*)file->Get("hsignal");
   TH1D *hval_sel_sig_int = (TH1D*)file->Get("hval_signal_reco");
   TH1D *h_sel_sig_int_uf = (TH1D*)file->Get("hsignal_uf");
   TH1D *hval_sel_sig_int_uf = (TH1D*)file->Get("hval_trueint");
+  TH1D *h_sel_data_inc = (TH1D*)file->Get("hdata_inc");
+  TH1D *h_sel_sig_inc = (TH1D*)file->Get("hsiginc");
+  TH1D *hval_sel_sig_inc = (TH1D*)file->Get("hval_siginc_reco");
+  TH1D *h_sel_sig_inc_uf = (TH1D*)file->Get("hsiginc_uf");
+  TH1D *hval_sel_sig_inc_uf = (TH1D*)file->Get("hval_trueinc");
   TH1D *h_sel_data_ini = (TH1D*)file->Get("hdata_ini");
   TH1D *h_sel_sig_ini = (TH1D*)file->Get("hsigini");
   TH1D *hval_sel_sig_ini = (TH1D*)file->Get("hval_sigini_reco");
@@ -36,8 +37,8 @@ void plotXS(){
   
   // incident (all pion)
   TCanvas *c1 = new TCanvas("c1","c1");
-  h_sel_data->SetTitle("All Pions;Reco SliceID;Events");
-  h_sel_data->DrawCopy();
+  h_sel_data_inc->SetTitle("All Pions;Reco SliceID;Events");
+  h_sel_data_inc->DrawCopy();
   h_sel_sig_inc->SetLineColor(3);
   h_sel_sig_inc->SetMarkerColor(3);
   h_sel_sig_inc->DrawCopy("same");
@@ -45,7 +46,7 @@ void plotXS(){
   hval_sel_sig_inc->Draw("same hist");
   TLegend *leg1 = new TLegend(0.5,0.6,0.8,0.9);
   leg1->SetFillStyle(0);
-  leg1->AddEntry(h_sel_data,"Selected data","ple");
+  leg1->AddEntry(h_sel_data_inc,"Selected data","ple");
   leg1->AddEntry(h_sel_sig_inc, "After bkg subtraction","ple");
   leg1->AddEntry(hval_sel_sig_inc,"Selected true pions","l");
   leg1->Draw();
