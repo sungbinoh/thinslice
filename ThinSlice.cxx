@@ -442,14 +442,14 @@ void ThinSlice::ProcessEvent(const anavar & evt, Unfold & uf, double g4rw, doubl
         else{
           //uf.eff_num_Inc->Fill(true_sliceID);
           //uf.pur_num_Inc->Fill(reco_sliceID);
-          uf.response_SliceID_Inc.Fill(reco_end_sliceID, true_sliceID);//, g4rw);
-          uf.response_SliceID_Ini.Fill(reco_ini_sliceID, true_ini_sliceID);//, g4rw);
+          uf.response_SliceID_Inc.Fill(reco_end_sliceID, true_sliceID, g4rw);
+          uf.response_SliceID_Ini.Fill(reco_ini_sliceID, true_ini_sliceID, g4rw);
         }
       }
       else { // this beam pion event is not selected
         if (!isTestSample) {
-          uf.response_SliceID_Inc.Miss(true_sliceID);//, weight);
-          uf.response_SliceID_Ini.Miss(true_ini_sliceID);//, weight);
+          uf.response_SliceID_Inc.Miss(true_sliceID, weight); // missed event need bkgw
+          uf.response_SliceID_Ini.Miss(true_ini_sliceID, weight);
         }
       }
       
@@ -468,11 +468,11 @@ void ThinSlice::ProcessEvent(const anavar & evt, Unfold & uf, double g4rw, doubl
           else{
             //uf.eff_num_Int->Fill(true_sliceID);
             //uf.pur_num_Int->Fill(reco_sliceID);
-            uf.response_SliceID_Int.Fill(reco_sliceID, true_sliceID);//, g4rw);
+            uf.response_SliceID_Int.Fill(reco_sliceID, true_sliceID, g4rw);
           }
         }
         else{
-          if (!isTestSample) uf.response_SliceID_Int.Miss(true_sliceID);//, weight);
+          if (!isTestSample) uf.response_SliceID_Int.Miss(true_sliceID, weight);
         }
       }
     }
@@ -784,14 +784,22 @@ void ThinSlice::Run(anavar & evt, Unfold & uf, Long64_t nentries=-1){
     hadana.ProcessEvent(evt); // hadana.pitype is assigned in this step
     
     double weight = CalWeight(evt, hadana.pitype); // muon reweight; momentum reweight (to reconcile real data and MC)
-    double g4rw = CalG4RW(evt); // geant4reweight (to fake data for test; it turns out it should also be applied to true MC to make unfolding reliable)
-    double bkgw = CalBkgW(evt, hadana.pitype); // bkg fraction variation (to fake data for test)
+    double g4rw = 1; // geant4reweight (to fake data for test; it turns out it should also be applied to true MC to make unfolding reliable)
+    double bkgw = 1; // bkg fraction variation (to fake data for test)
     
-    ProcessEvent(evt, uf, g4rw, bkgw);
-    if (evt.MC && hadana.pitype == 0) { // fake data
-      weight *= g4rw;
-      weight *= bkgw;
+    if (evt.MC) {
+      if (hadana.pitype == 0) { // fake data
+        g4rw = CalG4RW(evt, 1., 1.);
+        bkgw = CalBkgW(evt, 1., 1., 1.);
+      }
+      else { // true MC
+        g4rw = CalG4RW(evt, 1., 1.);
+        bkgw = CalBkgW(evt);
+      }
     }
+    ProcessEvent(evt, uf, g4rw, bkgw);
+    weight *= g4rw;
+    weight *= bkgw;
     // can change order of cuts
     FillHistograms(pi::kNocut, evt, weight);
     if (hadana.PassPandoraSliceCut(evt)){

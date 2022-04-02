@@ -37,39 +37,35 @@ double CalWeight(const anavar & evt, const int &partype){
   return weight;
 }
 
-double CalBkgW(const anavar & evt, const int &partype){
+double CalBkgW(const anavar & evt, double mu_weight, double p_weight, double spi_weight){
   double weight = 1.;
-  
-  double mu_weight = 1.;
-  double p_weight = 1.;
-  double spi_weight = 1.;
+
   if (evt.MC) {
-    if (partype == 0) { // fake data
-      if (evt.reco_beam_true_byE_matched) {
-        if (evt.true_beam_PDG == -13) { // muon bkg
-          weight = mu_weight;
-        }
+    // if (fakedata) { // it seems true MC does not need bkgw
+    if (evt.reco_beam_true_byE_matched) {
+      if (evt.true_beam_PDG == -13) { // muon bkg
+        weight = mu_weight;
       }
-      else {
-        if (evt.reco_beam_true_byE_PDG == -13) { // secondary muon bkg
-          weight = mu_weight;
-        }
-        else if (evt.reco_beam_true_byE_PDG == 2212) { // secondary proton bkg
-          weight = p_weight;
-        }
-        else if (evt.reco_beam_true_byE_PDG == 211) { // secondary pion bkg
-          weight = spi_weight;
-        }
+    }
+    else {
+      if (evt.reco_beam_true_byE_PDG == -13) { // secondary muon bkg
+        weight = mu_weight;
+      }
+      else if (evt.reco_beam_true_byE_PDG == 2212) { // secondary proton bkg
+        weight = p_weight;
+      }
+      else if (evt.reco_beam_true_byE_PDG == 211) { // secondary pion bkg
+        weight = spi_weight;
       }
     }
   }
   return weight;
 }
-double CalG4RW(const anavar & evt){
+double CalG4RW(const anavar & evt, const double w1, const double w2){
   vector<double> tot_inel_0_600 = (*evt.g4rw_full_grid_piplus_coeffs)[7];
   vector<double> tot_inel_600_2000 = (*evt.g4rw_full_grid_piplus_coeffs)[8];
-  double w_tot_inel_0_600 = 1; // KE 0 ~ 476.44931 MeV
-  double w_tot_inel_600_2000 = 1; // KE 476.44931 ~ 1865.2940 MeV
+  double w_tot_inel_0_600 = w1; // KE 0 ~ 476.44931 MeV
+  double w_tot_inel_600_2000 = w2; // KE 476.44931 ~ 1865.2940 MeV
   
   double g4rw = 1;
   if (evt.true_beam_PDG == 211 && (w_tot_inel_0_600 != 1 || w_tot_inel_600_2000 != 1)){
