@@ -207,12 +207,31 @@ void plotXS(){
   gr_truexs->SetLineColor(3);
   gr_truexs->Draw("pe");
   total_inel_KE->SetLineColor(2);
+  
   /*for (int i=0;i<total_inel_KE->GetN();i++) {
     if (total_inel_KE->GetX()[i] <= 476.44931) {
       total_inel_KE->GetY()[i] *= 1;
     }
     else total_inel_KE->GetY()[i] *= 1;
   }*/
+  double chi2 = 0;
+  int nbins = 0;
+  cout<<"KE\tData XS\t\tMC XS\t\tData XS_err\tChi2"<<endl;
+  for (int i=1; i<19; ++i) {
+    double KE = 975 - 50*i;
+    double xs_MC = total_inel_KE->Eval(KE);
+    double xs_data = gr_recoxs->GetPointY(i);
+    double xserr_data = gr_recoxs->GetErrorY(i);
+    double c2 = 0;
+    if (i != 10) {
+      c2 = pow( (xs_data-xs_MC)/xserr_data , 2);
+      chi2 += c2;
+      ++nbins;
+    }
+    cout<<KE<<"\t"<<xs_data<<"\t\t"<<xs_MC<<"\t\t"<<xserr_data<<"\t\t"<<c2<<endl;
+  }
+  cout<<"Chi2/Ndf = "<<chi2/nbins<<endl;
+  
   total_inel_KE->Draw("L");
   TLegend *leg10 = new TLegend(0.5,0.15,0.85,0.4);
   leg10->SetFillStyle(0);
