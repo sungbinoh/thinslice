@@ -68,7 +68,7 @@ double CalG4RW(const anavar & evt, const double w1, const double w2){
   double w_tot_inel_600_2000 = w2; // KE 476.44931 ~ 1865.2940 MeV
   
   double g4rw = 1;
-  if (evt.true_beam_PDG == 211 && (w_tot_inel_0_600 != 1 || w_tot_inel_600_2000 != 1)){
+  if (evt.true_beam_PDG == 211 && (tot_inel_0_600.size() > 0) && (tot_inel_600_2000.size() > 0) && (w_tot_inel_0_600 != 1 || w_tot_inel_600_2000 != 1)){
     double g4rw_tot_inel_0_600 = 0;
     for (size_t i = 0; i < tot_inel_0_600.size(); ++i) {
       g4rw_tot_inel_0_600 += tot_inel_0_600[i] * pow(w_tot_inel_0_600, i);
