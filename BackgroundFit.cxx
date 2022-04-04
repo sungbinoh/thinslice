@@ -23,20 +23,27 @@ static void show_usage(std::string name)
             << std::endl;
 }
 
-void save_results(vector<double> vslice, vector<double> vcorr, vector<double> vcorrerr, double par, double parerr, const char* particle, string outfile){
+void save_results(vector<double> vslice, vector<double> vcorr, vector<double> vcorrerr, const char* particle, string outfile, double par=1, double parerr=0){
   TCanvas *c1 = new TCanvas("c1","c1");
   c1->SetGrid();
   TGraphErrors *gr_corr = new TGraphErrors(vslice.size(), &vslice[0], &vcorr[0], 0, &vcorrerr[0]);
   gr_corr->SetMarkerStyle(106);
-  gr_corr->SetTitle(Form("%s bkg constraint", particle));
+  gr_corr->SetTitle(Form("%s bkg constraint (overall fit %.2f #pm  %.2f)", particle, par, parerr));
   gr_corr->GetXaxis()->SetTitle("Slice");
   gr_corr->GetXaxis()->SetLimits(-1, pi::nthinslices+1);
   gr_corr->GetYaxis()->SetTitle("Scale factor");
   gr_corr->Draw("AP");
-  TLine *line = new TLine(-1, 1, pi::nthinslices+1, 1);
+  TLine *line = new TLine(-1, par, pi::nthinslices+1, par);
   line->SetLineColor(kRed);
-  line->SetLineStyle(2);
   line->Draw("same");
+  TLine *line_upp = new TLine(-1, par+parerr, pi::nthinslices+1, par+parerr);
+  line_upp->SetLineColor(kRed);
+  line_upp->SetLineStyle(2);
+  line_upp->Draw("same");
+  TLine *line_low = new TLine(-1, par-parerr, pi::nthinslices+1, par-parerr);
+  line_low->SetLineColor(kRed);
+  line_low->SetLineStyle(2);
+  line_low->Draw("same");
   c1->Print(Form("%s_%s.png", outfile.substr(0,outfile.find(".root")).c_str(), particle));
   c1->Print(Form("%s_%s.pdf", outfile.substr(0,outfile.find(".root")).c_str(), particle));
   gr_corr->Write(Form("gr_corr_%s", particle));
@@ -145,9 +152,11 @@ double bkgFit_mu(TFile *fmc, TFile *fdata, string outfile){
   fitter.SetHistograms(h0, h1, h2);
   fitter.SetFitRange(h0->FindBin(0.6), h0->FindBin(0.9));
   fitter.Fit();
-  std::cout<<fitter.GetPar()<<" "<<fitter.GetParError()<<std::endl;
-
-  save_results(vslice, vcorr, vcorrerr, fitter.GetPar(), fitter.GetParError(), particle, outfile);
+  double par = fitter.GetPar();
+  double parerr = fitter.GetParError();
+  std::cout<<par<<" "<<parerr<<std::endl;
+  
+  save_results(vslice, vcorr, vcorrerr, particle, outfile, par, parerr);
   return fitter.GetPar();
 }
 
@@ -238,9 +247,11 @@ double bkgFit_p(TFile *fmc, TFile *fdata, string outfile, double muscale = 1.){
   fitter.SetHistograms(h0, h1, h2);
   fitter.SetFitRange(h0->FindBin(20), h0->FindBin(70));
   fitter.Fit();
-  std::cout<<fitter.GetPar()<<" "<<fitter.GetParError()<<std::endl;
+  double par = fitter.GetPar();
+  double parerr = fitter.GetParError();
+  std::cout<<par<<" "<<parerr<<std::endl;
   
-  save_results(vslice, vcorr, vcorrerr, fitter.GetPar(), fitter.GetParError(), particle, outfile);
+  save_results(vslice, vcorr, vcorrerr, particle, outfile, par, parerr);
   return fitter.GetPar();
 }
 
@@ -335,9 +346,11 @@ double bkgFit_spi(TFile *fmc, TFile *fdata, string outfile, double muscale = 1.,
   fitter.SetHistograms(h0, h1, h2);
   fitter.SetFitRange(h0->FindBin(0.9), h0->FindBin(0.95));
   fitter.Fit();
-  std::cout<<fitter.GetPar()<<" "<<fitter.GetParError()<<std::endl;
+  double par = fitter.GetPar();
+  double parerr = fitter.GetParError();
+  std::cout<<par<<" "<<parerr<<std::endl;
   
-  save_results(vslice, vcorr, vcorrerr, fitter.GetPar(), fitter.GetParError(), particle, outfile);
+  save_results(vslice, vcorr, vcorrerr, particle, outfile, par, parerr);
   return fitter.GetPar();
 }
 
