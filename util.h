@@ -8,7 +8,8 @@
 
 double CalWeight(const anavar & evt, const int &partype);
 double CalBkgW(const anavar & evt, double mu_weight=1., double p_weight=1., double spi_weight=1.);
-double CalG4RW(const anavar & evt, const double w1=1., const double w2=1.);
+double CalG4RW_ori(const anavar & evt, const double w1=1., const double w2=1.);
+double CalG4RW(const anavar & evt, double weight[]);
 
 void FillHistVec1D(TH1D *hist[pi::nIntTypes+1], const double &value, const int &partype, double weight=1, bool fill_underflow=true, bool fill_overflow=true);
 

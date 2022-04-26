@@ -200,7 +200,7 @@ void plotXS(){
   gr_recoxs->GetXaxis()->SetTitle("Pion Kinetic Energy (MeV)");
   gr_recoxs->GetXaxis()->SetRangeUser(0, 1000);
   gr_recoxs->GetYaxis()->SetTitle("#sigma_{inelastic} (mb)");
-  gr_recoxs->GetYaxis()->SetRangeUser(0, 1200);
+  gr_recoxs->GetYaxis()->SetRangeUser(0, 2000);
   gr_recoxs->SetLineWidth(2);
   gr_recoxs->Draw("ape");
   gr_truexs->SetMarkerColor(3);
@@ -216,19 +216,21 @@ void plotXS(){
   }*/
   double chi2 = 0;
   int nbins = 0;
-  cout<<"KE\tData XS\t\tMC XS\t\tData XS_err\tChi2"<<endl;
-  for (int i=1; i<19; ++i) {
+  cout<<"KE\tData XS\t\tData XS_err\t\tMC XS\t\tMC XS_err\t\tChi2"<<endl;
+  for (int i=0; i<20; ++i) {
     double KE = 975 - 50*i;
-    double xs_MC = total_inel_KE->Eval(KE);
+    double xs_curve = total_inel_KE->Eval(KE);
+    double xs_MC = gr_truexs->GetPointY(i);
+    double xserr_MC = gr_truexs->GetErrorY(i);
     double xs_data = gr_recoxs->GetPointY(i);
     double xserr_data = gr_recoxs->GetErrorY(i);
     double c2 = 0;
-    if (i != 10) {
-      c2 = pow( (xs_data-xs_MC)/xserr_data , 2);
+    if (true) {
+      c2 = pow( (xs_data-xs_MC)/sqrt(pow(xserr_data,2)+pow(xserr_MC,2)) , 2);
       chi2 += c2;
       ++nbins;
     }
-    cout<<KE<<"\t"<<xs_data<<"\t\t"<<xs_MC<<"\t\t"<<xserr_data<<"\t\t"<<c2<<endl;
+    cout<<KE<<"\t"<<xs_data<<"\t\t"<<xserr_data<<"\t\t\t"<<xs_MC<<"\t\t"<<xserr_MC<<"\t\t\t"<<c2<<endl;
   }
   cout<<"Chi2/Ndf = "<<chi2/nbins<<endl;
   
@@ -237,7 +239,7 @@ void plotXS(){
   leg10->SetFillStyle(0);
   leg10->AddEntry(gr_recoxs, "MC with reconstruction", "pe");
   leg10->AddEntry(gr_truexs, "MC truth", "pe");
-  leg10->AddEntry(total_inel_KE, "Geant4 (theory prediction)", "l");
+  //leg10->AddEntry(total_inel_KE, "Geant4 (theory prediction)", "l");
   leg10->Draw();
 
   c1->Print("plots/xs_sliceidinc_reco.pdf");

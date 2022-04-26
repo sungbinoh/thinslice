@@ -788,12 +788,24 @@ void ThinSlice::Run(anavar & evt, Unfold & uf, Long64_t nentries=-1){
     double bkgw = 1; // bkg fraction variation (to fake data for test)
     
     if (evt.MC) {
+      double weiarr_fd[20] = {
+        0.5,  1.5,  0.5,  1.5,  0.5,
+        1.5,  0.5,  1.5,  0.5,  1.5,
+        0.5,  1.5,  0.5,  1.5,  0.5,
+        1.5,  0.5,  1.5,  0.5,  1.5,
+      };
+      double weiarr_mc[20] = {
+        0.5,  1.5,  0.5,  1.5,  0.5,
+        1.5,  0.5,  1.5,  0.5,  1.5,
+        0.5,  1.5,  0.5,  1.5,  0.5,
+        1.5,  0.5,  1.5,  0.5,  1.5,
+      };
       if (hadana.pitype == 0) { // fake data
-        g4rw = CalG4RW(evt, 1., 1.);
+        g4rw = CalG4RW(evt, weiarr_fd);
         bkgw = CalBkgW(evt, 1., 1., 1.);
       }
       else { // true MC
-        g4rw = CalG4RW(evt, 1., 1.);
+        g4rw = CalG4RW(evt, weiarr_mc);
         bkgw = CalBkgW(evt);
       }
     }

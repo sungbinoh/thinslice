@@ -63,10 +63,10 @@ int main(int argc, char** argv){
   TFile *fout  = TFile::Open(root["outfile"].asString().c_str(), "recreate");
 
   // background constraint
-  //TVectorD sf(2); sf[0] = 1.; sf[1] = 0.;
-  TVectorD *sf_mu = (TVectorD*)fbkg->Get("sf_mu");
-  TVectorD *sf_p = (TVectorD*)fbkg->Get("sf_p");
-  TVectorD *sf_spi = (TVectorD*)fbkg->Get("sf_spi");
+  TVectorD sf(2); sf[0] = 1.; sf[1] = 0.;
+  TVectorD *sf_mu = &sf;//(TVectorD*)fbkg->Get("sf_mu");
+  TVectorD *sf_p = &sf;//(TVectorD*)fbkg->Get("sf_p");
+  TVectorD *sf_spi = &sf;//(TVectorD*)fbkg->Get("sf_spi");
 
   cout<<"Muon scaling factor: "<<(*sf_mu)[0]<<"+-"<<(*sf_mu)[1]<<endl;
   cout<<"Proton scaling factor: "<<(*sf_p)[0]<<"+-"<<(*sf_p)[1]<<endl;

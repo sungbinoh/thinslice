@@ -61,7 +61,7 @@ double CalBkgW(const anavar & evt, double mu_weight, double p_weight, double spi
   }
   return weight;
 }
-double CalG4RW(const anavar & evt, const double w1, const double w2){
+double CalG4RW_ori(const anavar & evt, const double w1, const double w2){
   vector<double> tot_inel_0_600 = (*evt.g4rw_full_grid_piplus_coeffs)[7];
   vector<double> tot_inel_600_2000 = (*evt.g4rw_full_grid_piplus_coeffs)[8];
   double w_tot_inel_0_600 = w1; // KE 0 ~ 476.44931 MeV
@@ -80,6 +80,34 @@ double CalG4RW(const anavar & evt, const double w1, const double w2){
     g4rw *= g4rw_tot_inel_0_600;
     g4rw *= g4rw_tot_inel_600_2000;
   }
+  return g4rw;
+}
+double CalG4RW(const anavar & evt, double weight[]){
+  vector<vector<double>> tot_inel;
+
+  double g4rw = 1;
+  if (evt.true_beam_PDG == 211) {
+    for (int i=0; i<20; ++i) {
+      double g4rw_tot_inel = 0;
+      tot_inel.push_back((*evt.g4rw_full_grid_piplus_coeffs)[i]);
+      if (tot_inel[i].size() > 0) {
+        double sum = 0;
+        for (size_t j = 0; j < tot_inel[i].size(); ++j) {
+          sum += tot_inel[i][j];
+          g4rw_tot_inel += tot_inel[i][j] * pow(weight[i], j);
+        }
+
+        if (abs(sum-1)>0.1) {
+          cout<<"$$$$$"<<i<<"\t"<<sum<<endl;
+          cout<<(*evt.g4rw_full_grid_piplus_weights)[i][9]<<endl;
+          cout<<evt.run<<"\t"<<evt.subrun<<"\t"<<evt.event<<endl;
+          g4rw_tot_inel = 1;
+        }
+        g4rw *= g4rw_tot_inel;
+      }
+    }
+  }
+  
   return g4rw;
 }
 
