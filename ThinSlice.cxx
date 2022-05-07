@@ -150,6 +150,12 @@ void ThinSlice::BookHistograms(){
 
       hdeltay[i][j] = new TH1D(Form("hdeltay_%d_%d",i,j), Form("deltay, %s, %s;#Deltay/#sigma_{y}", pi::cutName[i], pi::intTypeName[j]), 100, -10, 10);
       hdeltay[i][j]->Sumw2();
+      
+      hdeltax_inst[i][j] = new TH1D(Form("hdeltax_inst_%d_%d",i,j), Form("deltax_inst, %s, %s;#Deltax_inst/#sigma_{x}", pi::cutName[i], pi::intTypeName[j]), 100, -45, -15);
+      hdeltax_inst[i][j]->Sumw2();
+      hdeltay_inst[i][j] = new TH1D(Form("hdeltay_inst_%d_%d",i,j), Form("deltay_inst, %s, %s;#Deltay_inst/#sigma_{y}", pi::cutName[i], pi::intTypeName[j]), 100, 405, 440);
+      hdeltay_inst[i][j]->Sumw2();
+      hxy_inst[i][j] = new TH2D(Form("hxy_inst_%d_%d",i,j), Form("%s, %s;x (cm);y (cm)", pi::cutName[i], pi::intTypeName[j]), 100, -45, -15, 100, 405, 440);
 
       hdeltaz[i][j] = new TH1D(Form("hdeltaz_%d_%d",i,j), Form("deltaz, %s, %s;#Deltaz/#sigma_{z}", pi::cutName[i], pi::intTypeName[j]), 100, -10, 10);
       hdeltaz[i][j]->Sumw2();
@@ -294,7 +300,7 @@ void ThinSlice::ProcessEvent(const anavar & evt, Unfold & uf, double g4rw, doubl
       if (true_sliceID < true_ini_sliceID) {
         true_ini_sliceID = -1;
         true_sliceID = -1;
-      } // if true_sliceID==-1, this event should not be used when calculating true XS (but should it be used in unfolding???)
+      } // if true_sliceID==-1, this event should not be used when calculating true XS (but should it be used in unfolding???)*/
 
       if (evt.true_beam_PDG == 211){
         int starti = true_ini_sliceID;
@@ -388,7 +394,7 @@ void ThinSlice::ProcessEvent(const anavar & evt, Unfold & uf, double g4rw, doubl
       // reco interaction sliceID
       reco_sliceID = int(floor( (pi::plim-int_energy_reco)/pi::Eslicewidth ));
       if (reco_sliceID < 0) reco_sliceID = -1;
-      if (hadana.reco_trklen < 0) reco_sliceID = -1;
+      //if (hadana.reco_trklen < 0) reco_sliceID = -1;
       if (reco_sliceID >= pi::nthinslices) { // overflow (int_energy_reco <= 0)
         reco_sliceID = pi::nthinslices;
         //cout<<"reco_sliceID >= pi::nthinslices"<<int_energy_reco<<endl;
@@ -398,9 +404,9 @@ void ThinSlice::ProcessEvent(const anavar & evt, Unfold & uf, double g4rw, doubl
       if (reco_sliceID < reco_ini_sliceID) {
         reco_ini_sliceID = -1;
         reco_sliceID = -1;
-      } // if reco_sliceID==-1, this event should not be used when calculating reco XS
+      } // if reco_sliceID==-1, this event should not be used when calculating reco XS*/
       reco_end_sliceID = reco_sliceID;
-      if (evt.reco_beam_calo_endZ > 220) { // APA3 cut
+      /*if (evt.reco_beam_calo_endZ > 220) { // APA3 cut
         int idx = evt.reco_beam_calo_Z->size()-1;
         for (; (*evt.reco_beam_calo_Z)[idx]>220; --idx) {}
         double energy_reco = bb.KEAtLength(inc_energy_reco, hadana.reco_trklen_accum[idx]);
@@ -416,7 +422,7 @@ void ThinSlice::ProcessEvent(const anavar & evt, Unfold & uf, double g4rw, doubl
         //reco_ini_sliceID = -1;
         //reco_end_sliceID = -1;
         //reco_sliceID = -1;
-      }
+      }*/
     }
     //for(int i=0;i<evt.reco_beam_incidentEnergies->size();i++) cout<<(*evt.reco_beam_incidentEnergies)[i]<<"\t";
     //cout<<endl<<int_energy_reco<<endl; // very different with the last point of evt.reco_beam_incidentEnergies
@@ -569,6 +575,9 @@ void ThinSlice::FillHistograms(int cut, const anavar & evt, double weight){
       FillHistVec1D(hdeltay[cut], hadana.beam_dy, hadana.pitype, weight);
       FillHistVec1D(hdeltaz[cut], hadana.beam_dz, hadana.pitype, weight);
       FillHistVec1D(hcostheta[cut], hadana.beam_costh, hadana.pitype, weight);
+      FillHistVec1D(hdeltax_inst[cut], evt.beam_inst_X, hadana.pitype, weight);
+      FillHistVec1D(hdeltay_inst[cut], evt.beam_inst_Y, hadana.pitype, weight);
+      FillHistVec2D(hxy_inst[cut], evt.beam_inst_X, evt.beam_inst_Y, hadana.pitype, weight);
 
       FillHistVec1D(hreco_beam_true_byE_matched[cut], evt.reco_beam_true_byE_matched, hadana.pitype, weight);
       FillHistVec1D(hreco_trklen[cut], hadana.reco_trklen, hadana.pitype, weight);
@@ -788,17 +797,25 @@ void ThinSlice::Run(anavar & evt, Unfold & uf, Long64_t nentries=-1){
     double bkgw = 1; // bkg fraction variation (to fake data for test)
     
     if (evt.MC) {
-      double weiarr_fd[20] = {
-        0.5,  1.5,  0.5,  1.5,  0.5,
-        1.5,  0.5,  1.5,  0.5,  1.5,
-        0.5,  1.5,  0.5,  1.5,  0.5,
-        1.5,  0.5,  1.5,  0.5,  1.5,
+      /*double weiarr_fd[20] = {
+        1,1,1,1,1,1,1,1,1,1,
+        1,1,1,1,1,1,1,1,1,1,
       };
       double weiarr_mc[20] = {
-        0.5,  1.5,  0.5,  1.5,  0.5,
-        1.5,  0.5,  1.5,  0.5,  1.5,
-        0.5,  1.5,  0.5,  1.5,  0.5,
-        1.5,  0.5,  1.5,  0.5,  1.5,
+        1,1,1,1,1,1,1,1,1,1,
+        1,1,1,1,1,1,1,1,1,1,
+      };*/
+      double weiarr_fd[20] = {
+        1.80, 1.80, 1.80, 1.80, 1.70,
+        1.60, 1.50, 1.40, 1.30, 1.20,
+        1.10, 1.00, 0.90, 0.84, 0.78,
+        0.80, 0.83, 0.85, 0.86, 0.90,
+      };
+      double weiarr_mc[20] = {
+        1.80, 1.80, 1.80, 1.80, 1.70,
+        1.60, 1.50, 1.40, 1.30, 1.20,
+        1.10, 1.00, 0.90, 0.84, 0.78,
+        0.80, 0.83, 0.85, 0.86, 0.90,
       };
       if (hadana.pitype == 0) { // fake data
         g4rw = CalG4RW(evt, weiarr_fd);
@@ -818,7 +835,7 @@ void ThinSlice::Run(anavar & evt, Unfold & uf, Long64_t nentries=-1){
       FillHistograms(pi::kPandoraSlice, evt, weight);
       if (hadana.PassCaloSizeCut(evt)){
         FillHistograms(pi::kCaloSize, evt, weight);
-        if (hadana.PassBeamQualityCut()){
+        if (hadana.PassBeamQualityCut(evt)){
           FillHistograms(pi::kBeamQuality, evt, weight);
           if (hadana.PassProtonCut()){
             FillHistograms(pi::kProtonCut, evt, weight);
@@ -832,13 +849,13 @@ void ThinSlice::Run(anavar & evt, Unfold & uf, Long64_t nentries=-1){
         }
         // for background constraints
         if (hadana.PassAPA3Cut(evt)){
-          if (hadana.PassBeamQualityCut() && hadana.PassProtonCut()) { // to constrain muon
+          if (hadana.PassBeamQualityCut(evt) && hadana.PassProtonCut()) { // to constrain muon
             FillSliceHist(evt, 1, weight);
           }
-          if (hadana.PassBeamQualityCut() && hadana.PassMichelScoreCut()) { // to constrain proton
+          if (hadana.PassBeamQualityCut(evt) && hadana.PassMichelScoreCut()) { // to constrain proton
             FillSliceHist(evt, 2, weight);
           }
-          if (hadana.PassBeamQualityCut(false) && hadana.PassProtonCut() && hadana.PassMichelScoreCut()) { // to constrain secondary pion
+          if (hadana.PassBeamQualityCut(evt, false) && hadana.PassProtonCut() && hadana.PassMichelScoreCut()) { // to constrain secondary pion
             FillSliceHist(evt, 3, weight);
           }
         }

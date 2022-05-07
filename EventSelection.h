@@ -64,4 +64,14 @@ const double beam_angleX_mc = 101.579;
 const double beam_angleY_mc = 101.212;
 const double beam_angleZ_mc = 16.5822;
 
+const double beam_startX_data_inst = -28.3483;
+const double beam_startY_data_inst = 424.553;
+const double beam_startX_rms_data_inst = 4.63594;
+const double beam_startY_rms_data_inst = 5.21649;
+
+const double beam_startX_mc_inst = -29.08;
+const double beam_startY_mc_inst = 421.7;
+const double beam_startX_rms_mc_inst = 4.331;
+const double beam_startY_rms_mc_inst = 3.924;
+
 #endif

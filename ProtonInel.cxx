@@ -510,7 +510,7 @@ void ProtonInel::Run(anavar & evt, Unfold & uf){
       FillHistograms(p::kPandoraSlice, evt);
       if (hadana.PassCaloSizeCut(evt)){
         FillHistograms(p::kCaloSize, evt);
-        if (hadana.PassBeamQualityCut()){
+        if (hadana.PassBeamQualityCut(evt)){
           FillHistograms(p::kBeamQuality, evt);
             /*
             if (evt.GetParType() == kPiInel && hadana.daughter_michel_score > 0.99){

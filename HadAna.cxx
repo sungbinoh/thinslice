@@ -170,9 +170,9 @@ bool HadAna::PassPandoraSliceCut(const anavar& evt) const{ // whether recognized
   else return (evt.reco_beam_type == pandora_slice_pdg);
 }
 
-bool HadAna::PassBeamQualityCut(bool has_angle_cut) const{ // cut on beam entrance location and beam angle
+bool HadAna::PassBeamQualityCut(const anavar& evt, bool has_angle_cut, bool has_beam_cut) const{ // cut on beam entrance location and beam angle
 
-  if (beamcut_dx_min<beamcut_dx_max){
+  /*if (beamcut_dx_min<beamcut_dx_max){
     if (beam_dx<beamcut_dx_min)
       return false;
     if (beam_dx>beamcut_dx_max)
@@ -184,7 +184,7 @@ bool HadAna::PassBeamQualityCut(bool has_angle_cut) const{ // cut on beam entran
       return false;
     if (beam_dy>beamcut_dy_max)
       return false;
-  }
+  }*/
 
   if (beamcut_dz_min<beamcut_dz_max){
     if (beam_dz<beamcut_dz_min)
@@ -204,6 +204,12 @@ bool HadAna::PassBeamQualityCut(bool has_angle_cut) const{ // cut on beam entran
     if (beam_costh<beamcut_costh_min)
       return false;
     if (beam_costh>beamcut_costh_max)
+      return false;
+  }
+  
+  if (has_beam_cut) { // currently it's hard coded MC values
+    double dxy = pow( (evt.beam_inst_X-beam_startX_mc_inst)/beam_startX_rms_mc_inst, 2) + pow( (evt.beam_inst_Y-beam_startY_mc_inst)/beam_startY_rms_mc_inst, 2);
+    if (dxy > 4.5)
       return false;
   }
 
@@ -237,7 +243,7 @@ bool HadAna::PassProtonCut() const{ // to remove proton background
 bool HadAna::PassPiCuts(const anavar& evt) const{
   return PassPandoraSliceCut(evt)&&
     PassCaloSizeCut(evt)&&
-    PassBeamQualityCut()&&
+    PassBeamQualityCut(evt)&&
     PassAPA3Cut(evt)&&
     PassMichelScoreCut()&&
     PassProtonCut();
@@ -246,7 +252,7 @@ bool HadAna::PassPiCuts(const anavar& evt) const{
 bool HadAna::PassPCuts(const anavar& evt) const{
   return PassPandoraSliceCut(evt)&&
     PassCaloSizeCut(evt)&&
-    PassBeamQualityCut();
+    PassBeamQualityCut(evt);
 }
 
 void HadAna::ProcessEvent(const anavar& evt){

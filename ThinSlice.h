@@ -103,6 +103,9 @@ class ThinSlice {
   TH1D *hdeltay[pi::nCuts][pi::nIntTypes+1];
   TH1D *hdeltaz[pi::nCuts][pi::nIntTypes+1];
   TH1D *hcostheta[pi::nCuts][pi::nIntTypes+1];
+  TH1D *hdeltax_inst[pi::nCuts][pi::nIntTypes+1];
+  TH1D *hdeltay_inst[pi::nCuts][pi::nIntTypes+1];
+  TH2D *hxy_inst[pi::nCuts][pi::nIntTypes+1];
 
   TH1D *hreco_beam_true_byE_matched[pi::nCuts][pi::nIntTypes+1];
   TH1D *hreco_trklen[pi::nCuts][pi::nIntTypes+1];
