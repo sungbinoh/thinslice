@@ -9,7 +9,7 @@ void plotXS_data(){
   TGraphErrors *gr_truexs = (TGraphErrors*)file->Get("gr_truexs");
   TGraphErrors *gr_recoxs = (TGraphErrors*)file->Get("gr_recoxs");
   
-  TFile f2("/dune/app/users/yinrui/thinslice/files/exclusive_xsec.root");
+  TFile f2("../files/exclusive_xsec.root");
   TGraph *total_inel_KE = (TGraph*)f2.Get("total_inel_KE");
   
   /*for (int i: {0, 12, 12, 12, 12, 12, 12, 12}) {
