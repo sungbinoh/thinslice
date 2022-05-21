@@ -4,7 +4,7 @@ void plotXS_data(){
 
   gStyle->SetOptStat(0);
 
-  TFile *file = TFile::Open("/dune/app/users/yinrui/thinslice/build/XS.root");
+  TFile *file = TFile::Open("XS.root");
   
   TGraphErrors *gr_truexs = (TGraphErrors*)file->Get("gr_truexs");
   TGraphErrors *gr_recoxs = (TGraphErrors*)file->Get("gr_recoxs");
@@ -25,13 +25,22 @@ void plotXS_data(){
   };
   for (int i=0; i<pi::nthinslices; ++i) {
     double KE = gr_recoxs->GetPointX(i);
+    double xs_true = total_inel_KE->Eval(KE)*MCg4rw[i];
+    //bool cover = abs(xs - xs_true) < xs_err;
+    cout<<xs_true<<"\t";
+  }
+  cout<<endl;
+  for (int i=0; i<pi::nthinslices; ++i) {
     double xs = gr_recoxs->GetPointY(i);
-    double xs_err = gr_recoxs->GetErrorY(i);
-    double xs_true = total_inel_KE->Eval(KE);
-    bool cover = abs(xs - xs_true) < xs_err;
-    myfile<<cover<<", ";
+    myfile<<xs<<"\t";
   }
   myfile<<endl;
+  for (int i=0; i<pi::nthinslices; ++i) {
+    double xs_err = gr_recoxs->GetErrorY(i);
+    myfile<<xs_err<<"\t";
+  }
+  myfile<<endl;
+  
   myfile.close();
 }
   

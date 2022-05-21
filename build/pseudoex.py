@@ -1,6 +1,6 @@
 import os
 
-for i in range(20):
+for i in range(5):
     os.system("./../install/bin/RunCrossSection -c ../json/config.json")
     os.system("./../install/bin/BackgroundFit -c ../json/bkgfit.json")
     os.system("./../install/bin/RunCalcXS -c ../json/xs.json")
