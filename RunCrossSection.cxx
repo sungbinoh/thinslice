@@ -53,19 +53,19 @@ int main(int argc, char ** argv){
 
   Unfold uf(pi::nthinslices+2, -1, pi::nthinslices+1);
 
-  anavar mcevt(mcchain);
+  /*anavar mcevt(mcchain);
 
   ThinSlice mcths;
   mcths.SetOutputFileName(root["mcoutfile"].asString());
-  mcths.Run(mcevt, uf, -1);
+  mcths.Run(mcevt, uf, -1);*/
 
-  /*anavar dataevt(datachain);
+  anavar dataevt(datachain);
 
   ThinSlice dataths;
   dataths.SetOutputFileName(root["dataoutfile"].asString());
-  dataths.Run(dataevt, uf, -1);
+  dataths.Run(dataevt, uf, 50000, true);
 
-  ThinSlice cosmicsths;
+  /*ThinSlice cosmicsths;
   cosmicsths.SetSelectCosmics(true);
   cosmicsths.SetOutputFileName(root["cosmicsoutfile"].asString());
   cosmicsths.Run(dataevt, uf, -1);*/

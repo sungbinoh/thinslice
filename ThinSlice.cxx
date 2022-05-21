@@ -3,6 +3,7 @@
 #include "anavar.h"
 #include "TGraphErrors.h"
 #include "TVector3.h"
+#include "TRandom3.h"
 #include "RooUnfoldBayes.h"
 #include "RooUnfoldSvd.h"
 #include "util.h"
@@ -287,7 +288,7 @@ void ThinSlice::ProcessEvent(const anavar & evt, Unfold & uf, double g4rw, doubl
         h_diff_Eint_vs_true_Eint->Fill(int_energy_true, int_energy_true_trklen - int_energy_true);
       }
       // true initial sliceID
-      true_ini_sliceID = int(ceil( (pi::plim - hadana.true_ffKE)/pi::Eslicewidth )); // ignore incomplete slices
+      true_ini_sliceID = int(floor( (pi::plim - hadana.true_ffKE)/pi::Eslicewidth +0.5)); // ignore incomplete slices
       //if (true_ini_sliceID <= -99) true_ini_sliceID = -99;
       if (true_ini_sliceID < 0) true_ini_sliceID = -1; // both physical and unphysical underflow
       if (true_ini_sliceID >= pi::nthinslices) true_ini_sliceID = pi::nthinslices; // overflow (Eff<pi::Eslicewidth)
@@ -297,7 +298,7 @@ void ThinSlice::ProcessEvent(const anavar & evt, Unfold & uf, double g4rw, doubl
       if (true_sliceID < 0) true_sliceID = -1; // unphysical underflow
       if (true_sliceID >= pi::nthinslices) true_sliceID = pi::nthinslices; // overflow (int_energy_true <= 0)
       // ignore incomplete slices
-      if (true_sliceID < true_ini_sliceID) {
+      /*if (true_sliceID < true_ini_sliceID) {
         true_ini_sliceID = -1;
         true_sliceID = -1;
       } // if true_sliceID==-1, this event should not be used when calculating true XS (but should it be used in unfolding???)*/
@@ -388,7 +389,7 @@ void ThinSlice::ProcessEvent(const anavar & evt, Unfold & uf, double g4rw, doubl
 
       int_energy_reco = bb.KEAtLength(inc_energy_reco, hadana.reco_trklen);
       // reco initial sliceID
-      reco_ini_sliceID = int(ceil( (pi::plim - inc_energy_reco)/pi::Eslicewidth ));
+      reco_ini_sliceID = int(floor( (pi::plim - inc_energy_reco)/pi::Eslicewidth +0.5));
       if (reco_ini_sliceID < 0) reco_ini_sliceID = -1;
       if (reco_ini_sliceID >= pi::nthinslices) reco_ini_sliceID = pi::nthinslices;
       // reco interaction sliceID
@@ -401,7 +402,7 @@ void ThinSlice::ProcessEvent(const anavar & evt, Unfold & uf, double g4rw, doubl
         //cout<<inc_energy_reco<<"\t"<<hadana.reco_trklen<<endl;
       }
       // ignore incomplete slices
-      if (reco_sliceID < reco_ini_sliceID) {
+      /*if (reco_sliceID < reco_ini_sliceID) {
         reco_ini_sliceID = -1;
         reco_sliceID = -1;
       } // if reco_sliceID==-1, this event should not be used when calculating reco XS*/
@@ -767,7 +768,7 @@ void ThinSlice::CalcXS(const Unfold & uf){
   //h_trueinisliceid_pion_uf = (TH1D*) unfold_Ini.Hreco();
 }
 
-void ThinSlice::Run(anavar & evt, Unfold & uf, Long64_t nentries=-1){
+void ThinSlice::Run(anavar & evt, Unfold & uf, Long64_t nentries, bool random){
 
   BookHistograms();
 
@@ -775,8 +776,12 @@ void ThinSlice::Run(anavar & evt, Unfold & uf, Long64_t nentries=-1){
   if (nentries == -1) nentries = evt.fChain->GetEntries();
   
   Long64_t nbytes = 0, nb = 0;
-  for (Long64_t jentry=0; jentry<nentries;jentry++) {
-    if (jentry%10000==0) std::cout<<jentry<<"/"<<nentries<<std::endl;
+  TRandom3 *r3 = new TRandom3(0);
+  for (Long64_t num=0; num<nentries; num++) {
+    if (num%10000==0) std::cout<<num<<"/"<<nentries<<std::endl;
+    Long64_t jentry = num;
+    if (random) jentry = TMath::FloorNint(r3->Rndm()*nentries);
+    //cout<<jentry<<endl;
     Long64_t ientry = evt.LoadTree(jentry);
     if (ientry < 0) break;
     nb = evt.fChain->GetEntry(jentry);   nbytes += nb;
@@ -797,15 +802,15 @@ void ThinSlice::Run(anavar & evt, Unfold & uf, Long64_t nentries=-1){
     double bkgw = 1; // bkg fraction variation (to fake data for test)
     
     if (evt.MC) {
-      /*double weiarr_fd[20] = {
-        1,1,1,1,1,1,1,1,1,1,
-        1,1,1,1,1,1,1,1,1,1,
-      };
-      double weiarr_mc[20] = {
-        1,1,1,1,1,1,1,1,1,1,
-        1,1,1,1,1,1,1,1,1,1,
-      };*/
       double weiarr_fd[20] = {
+        1,1,1,1,1,1,1,1,1,1,
+        1,1,1,1,1,1,1,1,1,1,
+      };
+      double weiarr_mc[20] = {
+        1,1,1,1,1,1,1,1,1,1,
+        1,1,1,1,1,1,1,1,1,1,
+      };
+      /*double weiarr_fd[20] = {
         1.80, 1.80, 1.80, 1.80, 1.70,
         1.60, 1.50, 1.40, 1.30, 1.20,
         1.10, 1.00, 0.90, 0.84, 0.78,
@@ -816,7 +821,7 @@ void ThinSlice::Run(anavar & evt, Unfold & uf, Long64_t nentries=-1){
         1.60, 1.50, 1.40, 1.30, 1.20,
         1.10, 1.00, 0.90, 0.84, 0.78,
         0.80, 0.83, 0.85, 0.86, 0.90,
-      };
+      };*/
       if (hadana.pitype == 0) { // fake data
         g4rw = CalG4RW(evt, weiarr_fd);
         bkgw = CalBkgW(evt, 1., 1., 1.);
