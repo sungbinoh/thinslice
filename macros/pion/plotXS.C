@@ -4,7 +4,7 @@ void plotXS(){
 
   gStyle->SetOptStat(0);
 
-  TFile *file = TFile::Open("../../build/XSMC.root");
+  TFile *file = TFile::Open("../../build/XS.root");
   
   TH1D *h_sel_data = (TH1D*)file->Get("hdata");
   TH1D *h_sel_sig_int = (TH1D*)file->Get("hsignal");
@@ -200,7 +200,7 @@ void plotXS(){
   gr_recoxs->GetXaxis()->SetTitle("Pion Kinetic Energy (MeV)");
   gr_recoxs->GetXaxis()->SetRangeUser(0, 1000);
   gr_recoxs->GetYaxis()->SetTitle("#sigma_{inelastic} (mb)");
-  gr_recoxs->GetYaxis()->SetRangeUser(0, 2000);
+  gr_recoxs->GetYaxis()->SetRangeUser(0, 1000);
   gr_recoxs->SetLineWidth(2);
   gr_recoxs->Draw("ape");
   gr_truexs->SetMarkerColor(3);
@@ -242,6 +242,8 @@ void plotXS(){
   //leg10->AddEntry(total_inel_KE, "Geant4 (theory prediction)", "l");
   leg10->Draw();
 
+  gSystem->Exec("rm -rf plots");
+  gSystem->Exec("mkdir plots");
   c1->Print("plots/xs_sliceidinc_reco.pdf");
   c2->Print("plots/xs_sliceidinc_true.pdf");
   c3->Print("plots/xs_sliceidint_reco.pdf");

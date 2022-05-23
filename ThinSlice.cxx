@@ -780,7 +780,7 @@ void ThinSlice::Run(anavar & evt, Unfold & uf, Long64_t nentries, bool random){
   for (Long64_t num=0; num<nentries; num++) {
     if (num%10000==0) std::cout<<num<<"/"<<nentries<<std::endl;
     Long64_t jentry = num;
-    if (random) jentry = TMath::FloorNint(r3->Rndm()*nentries);
+    if (random) jentry = TMath::FloorNint(r3->Rndm()*302141);
     //cout<<jentry<<endl;
     Long64_t ientry = evt.LoadTree(jentry);
     if (ientry < 0) break;

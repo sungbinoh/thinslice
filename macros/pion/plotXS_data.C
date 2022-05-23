@@ -19,7 +19,29 @@ void plotXS_data(){
   ofstream myfile;
   myfile.open ("toys/example.txt", ios::app);
   
-  double MCg4rw[20] = {
+  //Ninc
+  for (int i=0; i<pi::nthinslices; ++i) {
+    double ninc = gr_inc->GetPointY(i);
+    myfile<<ninc<<"\t";
+  }
+  myfile<<endl;
+  for (int i=0; i<pi::nthinslices; ++i) {
+    double ninc_err = gr_inc->GetErrorY(i);
+    myfile<<ninc_err<<"\t";
+  }
+  myfile<<endl;
+  //Nint
+  for (int i=0; i<pi::nthinslices; ++i) {
+    double nint = gr_int->GetPointY(i);
+    myfile<<nint<<"\t";
+  }
+  myfile<<endl;
+  for (int i=0; i<pi::nthinslices; ++i) {
+    double nint_err = gr_int->GetErrorY(i);
+    myfile<<nint_err<<"\t";
+  }
+  myfile<<endl;
+  /*double MCg4rw[20] = {
     1,1,1,1,1,1,1,1,1,1,
     1,1,1,1,1,1,1,1,1,1,
   };
@@ -29,7 +51,8 @@ void plotXS_data(){
     //bool cover = abs(xs - xs_true) < xs_err;
     cout<<xs_true<<"\t";
   }
-  cout<<endl;
+  cout<<endl;*/
+  //XS
   for (int i=0; i<pi::nthinslices; ++i) {
     double xs = gr_recoxs->GetPointY(i);
     myfile<<xs<<"\t";
@@ -41,6 +64,6 @@ void plotXS_data(){
   }
   myfile<<endl;
   
+  myfile<<endl;
   myfile.close();
 }
-  
