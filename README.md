@@ -18,7 +18,7 @@ make -j4
 
 cd ../..
 
-git clone https://github.com/yangtj207/thinslice.git
+git clone git@github.com:fnal-dunephysics/thinslice.git
 
 cd thinslice
 
