@@ -6,7 +6,7 @@ setup dunetpc v09_25_00 -q e20:prof
 
 setup cmake v3_19_6
 
-git clone https://gitlab.cern.ch/RooUnfold/RooUnfold.git
+git clone -b 2.1 https://gitlab.cern.ch/RooUnfold/RooUnfold.git
 
 mkdir RooUnfold/build
 
