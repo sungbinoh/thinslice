@@ -347,7 +347,7 @@ void HadAna::Fit_Hit_dEdx_Bethe_Bloch(const anavar& evt, int PID){
       residuals.push_back(this_residual);
     }
     
-    TH1D * this_residual_h = new TH1D(Form("Event%d_PID%d_iKE%d", evt.event, PID, i), Form("Event%d_PID%d_iKE%d", evt.event, PID, i), 100, -1., 1.);
+    TH1D * this_residual_h = new TH1D(Form("Run%d_Event%d_PID%d_iKE%d", evt.run, evt.event, PID, i), Form("Run%d_Event%d_PID%d_iKE%d", evt.run, evt.event, PID, i), 100, -1., 1.);
     for(unsigned int j = 0; j < residuals.size(); j++){
       this_residual_h -> Fill(residuals.at(j));
     }

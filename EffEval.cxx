@@ -307,8 +307,8 @@ void EffEval::Run(anavar & evt, Long64_t nentries=-1){
     ProcessEvent(evt);
     double KE = evt.reco_beam_true_byE_startE - sqrt(pow(evt.reco_beam_true_byE_startE, 2) - pow(evt.reco_beam_true_byHits_startP, 2));
     cout << "true_beam_PDG : " << evt.reco_beam_true_byE_PDG << ", true_beam_startE : " << evt.reco_beam_true_byE_startE * 1000. << ", KE : " << KE * 1000. << endl; 
-    if(evt.reco_beam_true_byE_PDG == 211) N_target_PDG++;
-    if(N_target_PDG > 1000) break;
+    if(evt.reco_beam_true_byE_PDG == 211 || evt.reco_beam_true_byE_PDG == 2212) N_target_PDG++;
+    if(N_target_PDG > 100) break;
     if (!hadana.PassPiCuts(evt)) continue;
     FillHistograms(evt);
   }
