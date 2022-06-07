@@ -1,7 +1,7 @@
 {
     "mcfile" : "root://fndca1.fnal.gov:1094/pnfs/fnal.gov/usr/dune/archive/sam_managed_users/tjyang/data/e/1/4/6/f52abbdc-f3f1-4b1e-9b05-0e25fd4bd232-whole_mc.root",
     "mcoutfile" : "effval.root",
-    "nevents" : -1
-//    "nevents" : 10000
+//    "nevents" : -1
+    "nevents" : 100000
 
 }

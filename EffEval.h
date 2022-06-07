@@ -1,6 +1,5 @@
 #ifndef EFFEVAL_H
 #define EFFEVAL_H
-
 #include "TFile.h"
 #include "SliceParams.h"
 #include "HadAna.h"

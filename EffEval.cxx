@@ -125,7 +125,7 @@ void EffEval::ProcessEvent(const anavar & evt){
 
 void EffEval::FillHistograms(const anavar & evt){
   for (size_t i = 0; i<evt.true_beam_daughter_ID->size(); ++i){
-    //Only look at pion
+    // == Only look at pion and proton
     if (std::abs((*evt.true_beam_daughter_PDG)[i]) != 211 &&
         (*evt.true_beam_daughter_PDG)[i] != 2212) continue;
     double true_mom = (*evt.true_beam_daughter_startP)[i]*1000;
@@ -294,6 +294,7 @@ void EffEval::Run(anavar & evt, Long64_t nentries=-1){
   if (nentries == -1) nentries = evt.fChain->GetEntries();
   
   Long64_t nbytes = 0, nb = 0;
+  int N_target_PDG = 0;
   for (Long64_t jentry=0; jentry<nentries;jentry++) {
     if (jentry%10000==0) std::cout<<jentry<<"/"<<nentries<<std::endl;
     Long64_t ientry = evt.LoadTree(jentry);
@@ -304,6 +305,10 @@ void EffEval::Run(anavar & evt, Long64_t nentries=-1){
     //std::cout<<GetParType(ana)<<std::endl;
     if (!hadana.isSelectedPart(evt)) continue;
     ProcessEvent(evt);
+    double KE = evt.reco_beam_true_byE_startE - sqrt(pow(evt.reco_beam_true_byE_startE, 2) - pow(evt.reco_beam_true_byHits_startP, 2));
+    cout << "true_beam_PDG : " << evt.reco_beam_true_byE_PDG << ", true_beam_startE : " << evt.reco_beam_true_byE_startE * 1000. << ", KE : " << KE * 1000. << endl; 
+    if(evt.reco_beam_true_byE_PDG == 211) N_target_PDG++;
+    if(N_target_PDG > 1000) break;
     if (!hadana.PassPiCuts(evt)) continue;
     FillHistograms(evt);
   }

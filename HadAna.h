@@ -65,6 +65,13 @@ class HadAna{
   std::vector<double> reco_trklen_accum;
   double true_ffKE;
   
+  // == Energy measurement using beam pion and its track's part
+  double Density_Correction(double beta, double gamma);
+  double dEdx_Bethe_Bloch(double KE, double mass);
+  double dpdx_Bethe_Bloch(double KE, double dx, double mass);
+  double best_fit_KE;
+  void Fit_Hit_dEdx_Bethe_Bloch(const anavar& evt, int PID);
+
   double trklen_csda_proton;
   double beam_score;
   double energy_calorimetry_SCE;

@@ -1,6 +1,7 @@
 #include "anavar.h"
 #include "HadAna.h"
 #include "TMath.h"
+#include "TH1D.h"
 #include "TVector3.h"
 #include <iostream>
 
@@ -249,8 +250,128 @@ bool HadAna::PassPCuts(const anavar& evt) const{
     PassBeamQualityCut();
 }
 
-void HadAna::ProcessEvent(const anavar& evt){
+// == Bethe-Bloch parameters, https://indico.fnal.gov/event/14933/contributions/28526/attachments/17961/22583/Final_SIST_Paper.pdf
+const double rho = 1.39; // [g/cm3], density of LAr
+const double K = 0.307075; // [MeV cm2 / mol]
+const double A = 39.948; // [g / mol], atomic mass of Ar
+const double I = 188.0e-6; // [eV], mean excitation energy
+const double Me = 0.511; // [Mev], mass of electron 
+const double density_C = 5.2146;
+const double density_y0 = 0.2;
+const double density_y1 = 3.0;
+const double density_a = 0.19559;
+const double density_k = 3.0;
+double HadAna::Density_Correction(double beta, double gamma){
+  // == Estimate the density correction
+  double density_y = TMath::Log10(beta * gamma);
+  double ln10 = TMath::Log(10);
+  double this_delta = 0.;
+  if(density_y > density_y1){
+    this_delta = 2.0 * ln10 * density_y - density_C;
+  }
+  else if (density_y < density_y0){
+    this_delta = 0.;
+  }
+  else{
+    this_delta = 2.0 * ln10 * density_y - density_C + density_a * pow(density_y1 - density_y, density_k);
+  }
 
+  return this_delta;
+}
+double HadAna::dEdx_Bethe_Bloch(double KE, double mass){
+  double gamma = (KE/mass)+1.0;
+  double beta = TMath::Sqrt(1-(1.0/(gamma*gamma)));
+  double Wmax = (2.0 * Me * pow(beta * gamma, 2)) / (1.0 + 2.0 * Me * (gamma / mass) + pow((Me / mass),2));
+  double delta = Density_Correction(beta, gamma);
+
+  // == dE/dx with the density correction
+  double f = rho * K * (18.0 / A) * pow(1. / beta, 2);
+  double a0 = 0.5 * TMath::Log(2.0 * Me * pow(beta * gamma, 2) * Wmax / (I * I));
+  double this_dEdx = f * ( a0 - pow(beta, 2) - delta / 2.0); // [MeV/cm]
+
+  return this_dEdx;
+}
+double HadAna::dpdx_Bethe_Bloch(double KE, double dx, double mass){ // == Energy loss by a single particle should be described by the Landau-Vavilov distribution, https://pdg.lbl.gov/2021/reviews/rpp2020-rev-passage-particles-matter.pdf
+  double gamma = (KE/mass)+1.0;
+  double beta = TMath::Sqrt(1-(1.0/(gamma*gamma)));
+  double delta = Density_Correction(beta, gamma);
+  double xi = dx * 0.5 * K * (18.0 / A) * pow(1. / beta, 2);
+  double a0 = 2.0 * Me * pow(beta * gamma, 2) / I;
+  double this_dpdx = rho * (xi / dx) * (TMath::Log(a0) + + TMath::Log(xi / I) + 0.2 - pow(beta, 2) - Density_Correction(beta, gamma)) ;
+
+  return this_dpdx;
+}
+
+void HadAna::Fit_Hit_dEdx_Bethe_Bloch(const anavar& evt, int PID){
+
+  double this_KE = 0.; // == default KE value : 0 MeV
+  int N_max = 1000; // == Maximum number of hits used for the Bethe-Bloch fitting
+
+  // == PID input : mass hypothesis
+  double this_mass = 105.658; // == default : muon mass, https://pdg.lbl.gov/2022/listings/rpp2022-list-muon.pdf
+
+  if(PID == 2212) this_mass = 938.272; // == https://pdg.lbl.gov/2022/listings/rpp2022-list-p.pdf
+  else if(abs(PID) == 211) this_mass = 139.57; // == https://pdg.lbl.gov/2022/listings/rpp2022-list-pi-plus-minus.pdf
+  else best_fit_KE = this_KE;
+
+  // == Scan KE and fit
+  double initial_KE = 100.0; // [MeV]
+  double final_KE = 10000.0; // [MeV], 10 GeV
+  double KE_step = 10.0; // [MeV]
+  int N_KE_trial = (final_KE - initial_KE) / KE_step;
+  int this_N_calo = evt.reco_beam_calo_Z->size();
+  int this_N_hits = TMath::Min(this_N_calo - 50, N_max);
+  vector<double> fit_score;
+  fit_score.reserve(N_KE_trial);
+  for(int i = 0; i < N_KE_trial; i++){
+  label_i_KE : 
+    double this_KE = initial_KE + KE_step * (i + 0.);
+    double dEdx_measured = 0.;
+    vector<double> residuals;
+    for(int j = 0; j < this_N_hits; j++){
+      this_KE = this_KE - dEdx_measured;
+      
+      if(this_KE < 0.){ // == leave this int j for loop
+	residuals.clear();
+	i = i + 1;
+	j = 0;
+	goto label_i_KE;
+      }
+      double this_pitch = (*evt.reco_beam_TrkPitch_SCE)[j];
+      dEdx_measured =  (*evt.reco_beam_calibrated_dEdX_SCE)[j];
+      //double this_dEdx_theory = dEdx_Bethe_Bloch(this_KE, this_mass);
+      double this_dEdx_theory = dpdx_Bethe_Bloch(this_KE, this_pitch, this_mass);
+      //cout << "SB debug, dEdx_measured : " << dEdx_measured << ", this_dEdx_theory : " << this_dEdx_theory << ", this_KE : " << this_KE << " / " << initial_KE + KE_step * (i + 0.) << endl;
+      //double this_residual = (dEdx_measured - this_dEdx_theory) / this_dEdx_theory;
+      double this_residual = (dEdx_measured - this_dEdx_theory);
+      residuals.push_back(this_residual);
+    }
+    
+    TH1D * this_residual_h = new TH1D(Form("Event%d_PID%d_iKE%d", evt.event, PID, i), Form("Event%d_PID%d_iKE%d", evt.event, PID, i), 100, -1., 1.);
+    for(unsigned int j = 0; j < residuals.size(); j++){
+      this_residual_h -> Fill(residuals.at(j));
+    }
+    this_residual_h -> Write();
+    residuals.clear();
+  }
+
+  /*
+  int this_five_hits = TMath::Min(evt.reco_beam_calo_Z->size(), 5);
+  double mean_five_dEdx = 0.;
+  for (int i = 0; i < this_five_hits; i++){
+    double this_reco_dEdx = *evt.reco_beam_calibrated_dEdX_SCE[i];
+    mean_five_dEdx = mean_five_dEdx + this_reco_dEdx;    
+  }
+  if(mean_five_dEdx > 0) mean_five_dEdx = mean_five_dEdx / this_five_hits;
+  else best_fit_KE = this_KE;
+  */
+  
+  
+  return;
+}
+
+void HadAna::ProcessEvent(const anavar& evt){
+  
   pitype = GetPiParType(evt);
   ptype = GetPParType(evt);
 
@@ -281,6 +402,9 @@ void HadAna::ProcessEvent(const anavar& evt){
     beam_costh = -999;
 
     if (!evt.reco_beam_calo_wire->empty()){
+
+      if(evt.reco_beam_true_byE_PDG == 211) Fit_Hit_dEdx_Bethe_Bloch(evt, 211);
+      if(evt.reco_beam_true_byE_PDG == 2212) Fit_Hit_dEdx_Bethe_Bloch(evt, 2212);
 
       /*TVector3 pt0(evt.reco_beam_calo_startX,
                    evt.reco_beam_calo_startY,
