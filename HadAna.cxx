@@ -2,6 +2,7 @@
 #include "HadAna.h"
 #include "TMath.h"
 #include "TH1D.h"
+#include "TF1.h"
 #include "TVector3.h"
 #include <iostream>
 
@@ -254,7 +255,7 @@ bool HadAna::PassPCuts(const anavar& evt) const{
 const double rho = 1.39; // [g/cm3], density of LAr
 const double K = 0.307075; // [MeV cm2 / mol]
 const double A = 39.948; // [g / mol], atomic mass of Ar
-const double I = 188.0e-6; // [eV], mean excitation energy
+const double I = 188.0e-6; // [MeV], mean excitation energy
 const double Me = 0.511; // [Mev], mass of electron 
 const double density_C = 5.2146;
 const double density_y0 = 0.2;
@@ -291,22 +292,74 @@ double HadAna::dEdx_Bethe_Bloch(double KE, double mass){
 
   return this_dEdx;
 }
-double HadAna::dpdx_Bethe_Bloch(double KE, double dx, double mass){ // == Energy loss by a single particle should be described by the Landau-Vavilov distribution, https://pdg.lbl.gov/2021/reviews/rpp2020-rev-passage-particles-matter.pdf
+double HadAna::Get_Landau_xi(double KE, double dx, double mass){
+  double gamma = (KE/mass)+1.0;
+  double beta = TMath::Sqrt(1-(1.0/(gamma*gamma)));
+  double xi = rho * dx * 0.5 * K * (18.0 / A) * pow(1. / beta, 2);
+  return xi;
+}
+double HadAna::dpdx_Bethe_Bloch(double KE, double dx, double mass){
+  // == Energy loss by a single particle should be described by the Landau-Vavilov distribution
+  // == It provides MPV of dE/dx for a pitch
+  // == https://pdg.lbl.gov/2021/reviews/rpp2020-rev-passage-particles-matter.pdf
   double gamma = (KE/mass)+1.0;
   double beta = TMath::Sqrt(1-(1.0/(gamma*gamma)));
   double delta = Density_Correction(beta, gamma);
-  double xi = dx * 0.5 * K * (18.0 / A) * pow(1. / beta, 2);
+  double xi = rho * dx * 0.5 * K * (18.0 / A) * pow(1. / beta, 2);
   double a0 = 2.0 * Me * pow(beta * gamma, 2) / I;
-  double this_dpdx = rho * (xi / dx) * (TMath::Log(a0) + + TMath::Log(xi / I) + 0.2 - pow(beta, 2) - Density_Correction(beta, gamma)) ;
+  double this_dpdx = (xi / dx) * (TMath::Log(a0) + + TMath::Log(xi / I) + 0.2 - pow(beta, 2) - Density_Correction(beta, gamma)) ;
 
   return this_dpdx;
 }
 
-void HadAna::Fit_Hit_dEdx_Bethe_Bloch(const anavar& evt, int PID){
+void HadAna::Draw_dpdx_vs_KE(double dx, double mass, TString suffix){
+
+  double KE_min = 100; 
+  double KE_max = 10000; // 10 GeV
+  double KE_step = 10.0;
+  int N_Step = (KE_max - KE_min) / KE_step + 1;
+  vector<double> dpdx_collection;
+  vector<double> KE_collection;
+  for(int i = 0; i < N_Step; i++){
+    double this_KE = KE_min + KE_step * (i + 0.);
+    double this_dpdx = dpdx_Bethe_Bloch(this_KE, dx, mass);
+    KE_collection.push_back(this_KE);
+    dpdx_collection.push_back(this_dpdx);
+  }
+  TGraph *dpdx_vs_KE_gr = new TGraph(N_Step, &KE_collection[0], &dpdx_collection[0]);
+  dpdx_vs_KE_gr -> SetName("dpdx_vs_KE_gr_" + suffix);
+  dpdx_vs_KE_gr -> Write();
+  dpdx_collection.clear();
+  KE_collection.clear();
+
+}
+
+double HadAna::Get_Landau_P(double MPV, double FWHM, double x){
+
+  TF1 *this_landau = new TF1("landauDistr", "TMath::Landau(x,[0],[1],1)", 0, 10);
+  this_landau -> SetParameter(0, MPV);
+  this_landau -> SetParameter(1, FWHM);
+  int N_step = 1000;
+  double x_step = 10. / N_step;
+  double area = 0.;
+  for(int i = 0; i < N_step; i++){
+    double this_x = 0. + (i + 0.) * x_step;
+    double this_y = this_landau -> Eval(this_x);
+    area = area + this_y * x_step;
+    if(this_x > x) break;
+  }
+  
+  delete this_landau;
+
+  return area;
+
+}
+
+double HadAna::Fit_Beam_Hit_dEdx_Bethe_Bloch(const anavar& evt, int PID){
 
   double this_KE = 0.; // == default KE value : 0 MeV
-  int N_max = 1000; // == Maximum number of hits used for the Bethe-Bloch fitting
-
+  int N_max = 100; // == Maximum number of hits used for the Bethe-Bloch fitting
+  
   // == PID input : mass hypothesis
   double this_mass = 105.658; // == default : muon mass, https://pdg.lbl.gov/2022/listings/rpp2022-list-muon.pdf
 
@@ -315,59 +368,99 @@ void HadAna::Fit_Hit_dEdx_Bethe_Bloch(const anavar& evt, int PID){
   else best_fit_KE = this_KE;
 
   // == Scan KE and fit
+  double best_KE = 100.0; // [MeV]
+  double best_likelihood = 99999.;
   double initial_KE = 100.0; // [MeV]
   double final_KE = 10000.0; // [MeV], 10 GeV
   double KE_step = 10.0; // [MeV]
   int N_KE_trial = (final_KE - initial_KE) / KE_step;
   int this_N_calo = evt.reco_beam_calo_Z->size();
-  int this_N_hits = TMath::Min(this_N_calo - 50, N_max);
-  vector<double> fit_score;
-  fit_score.reserve(N_KE_trial);
+  int this_N_hits = TMath::Min(this_N_calo, N_max);
+  vector<double> likelihood_vector;
+  vector<double> KE_vector;
+
   for(int i = 0; i < N_KE_trial; i++){
-  label_i_KE : 
+    label_i_KE : 
     double this_KE = initial_KE + KE_step * (i + 0.);
     double dEdx_measured = 0.;
-    vector<double> residuals;
+    double dE_measured = 0.;
+    double this_KE_likelihood = 0.;
     for(int j = 0; j < this_N_hits; j++){
-      this_KE = this_KE - dEdx_measured;
-      
+      this_KE = this_KE - dE_measured;
       if(this_KE < 0.){ // == leave this int j for loop
-	residuals.clear();
 	i = i + 1;
 	j = 0;
 	goto label_i_KE;
       }
       double this_pitch = (*evt.reco_beam_TrkPitch_SCE)[j];
       dEdx_measured =  (*evt.reco_beam_calibrated_dEdX_SCE)[j];
-      //double this_dEdx_theory = dEdx_Bethe_Bloch(this_KE, this_mass);
       double this_dEdx_theory = dpdx_Bethe_Bloch(this_KE, this_pitch, this_mass);
-      //cout << "SB debug, dEdx_measured : " << dEdx_measured << ", this_dEdx_theory : " << this_dEdx_theory << ", this_KE : " << this_KE << " / " << initial_KE + KE_step * (i + 0.) << endl;
-      //double this_residual = (dEdx_measured - this_dEdx_theory) / this_dEdx_theory;
-      double this_residual = (dEdx_measured - this_dEdx_theory);
-      residuals.push_back(this_residual);
+      double FWHM = 4 * Get_Landau_xi(this_KE, this_pitch, this_mass);
+      double P_MPV = Get_Landau_P(this_dEdx_theory, FWHM, this_dEdx_theory);
+      double P_dEdx_measured = Get_Landau_P(this_dEdx_theory, FWHM, dEdx_measured);
+      if(dEdx_measured > this_dEdx_theory){
+	P_dEdx_measured = 1 - P_dEdx_measured;
+	P_MPV = 1 - P_MPV;
+      }
+      double this_likelihood = TMath::Log(P_dEdx_measured / P_MPV);
+      this_KE_likelihood = this_KE_likelihood + this_likelihood;
+      //cout << "SB debug, dEdx_measured : " << dEdx_measured << ", this_dEdx_theory : " << this_dEdx_theory << ", this_KE : " << this_KE << " / " << initial_KE + KE_step * (i + 0.) << ", this_pitch : " << this_pitch << endl;
+      //cout << "SB debug, this_likelihood : " << this_likelihood << endl;
+      dE_measured = dEdx_measured * this_pitch;
     }
-    
-    TH1D * this_residual_h = new TH1D(Form("Run%d_Event%d_PID%d_iKE%d", evt.run, evt.event, PID, i), Form("Run%d_Event%d_PID%d_iKE%d", evt.run, evt.event, PID, i), 100, -1., 1.);
-    for(unsigned int j = 0; j < residuals.size(); j++){
-      this_residual_h -> Fill(residuals.at(j));
+
+    this_KE_likelihood = -2.0 * this_KE_likelihood;
+    //cout << "SB debug, " << initial_KE + KE_step * (i + 0.) << ", this_KE_likelihood : " << this_KE_likelihood << endl;
+    if(this_KE_likelihood < best_likelihood){
+      best_likelihood = this_KE_likelihood;
+      best_KE = initial_KE + KE_step * (i + 0.);
     }
-    this_residual_h -> Write();
-    residuals.clear();
+    likelihood_vector.push_back(this_KE_likelihood);
+    KE_vector.push_back(initial_KE + KE_step * (i + 0.));
   }
 
-  /*
-  int this_five_hits = TMath::Min(evt.reco_beam_calo_Z->size(), 5);
-  double mean_five_dEdx = 0.;
-  for (int i = 0; i < this_five_hits; i++){
-    double this_reco_dEdx = *evt.reco_beam_calibrated_dEdX_SCE[i];
-    mean_five_dEdx = mean_five_dEdx + this_reco_dEdx;    
+  for(unsigned int i = 0; i < likelihood_vector.size(); i++){
+    likelihood_vector[i] = likelihood_vector[i] - best_likelihood;
   }
-  if(mean_five_dEdx > 0) mean_five_dEdx = mean_five_dEdx / this_five_hits;
-  else best_fit_KE = this_KE;
-  */
+
+  double best_mom = sqrt(pow(best_KE, 2) + 2.0 * best_KE * this_mass);
+  cout << "SB debug, [" << evt.run << ":" << evt.event << "] best_KE : " << best_KE << ", best_likelihood : " << best_likelihood << ", best_mom : " << best_mom << ", this_mass : " << this_mass << endl;
+
+  TGraph *likelihood_gr = new TGraph(KE_vector.size(), &KE_vector[0], &likelihood_vector[0]);
+  likelihood_gr -> SetName(Form("Run%d_Evt%d_PID%d", evt.run, evt.event, PID));
+  //likelihood_gr -> Write();
   
+  likelihood_vector.clear();
+  KE_vector.clear();
+
+  delete likelihood_gr;
+
+  return best_mom;
+}
+
+void HadAna::Draw_Landau(double KE, double mass, TString suffix){
+
+  double MPV = dpdx_Bethe_Bloch(KE, 0.65, mass);
+  double FWHM = 4 * Get_Landau_xi(KE, 0.65, mass);
+
+  TF1 *landauDistr = new TF1("landauDistr", "TMath::Landau(x,[0],[1],1)", 0, 10);
+  landauDistr -> SetName("Landau_" + suffix);
+  landauDistr -> SetParameter(0, MPV);
+  landauDistr -> SetParameter(1, FWHM);
+  landauDistr -> Write();
+
+  int N_step = 1000;
+  double x_step = 10. / N_step;
+  double area = 0.;
+  for(int i = 0; i < N_step; i++){
+    double this_x = 0. + (i + 0.) * x_step;
+    double this_y = landauDistr -> Eval(this_x);
+    area = area + this_y * x_step;
+    //cout << "SB debug, KE : " << KE << ", mass : " << mass << ", (x / MPV, y) : (" << this_x << " / " << MPV << ", " << this_y << "), area = " << area << endl;
+  }
+
+  delete landauDistr;
   
-  return;
 }
 
 void HadAna::ProcessEvent(const anavar& evt){
@@ -403,8 +496,8 @@ void HadAna::ProcessEvent(const anavar& evt){
 
     if (!evt.reco_beam_calo_wire->empty()){
 
-      if(evt.reco_beam_true_byE_PDG == 211) Fit_Hit_dEdx_Bethe_Bloch(evt, 211);
-      if(evt.reco_beam_true_byE_PDG == 2212) Fit_Hit_dEdx_Bethe_Bloch(evt, 2212);
+      //if(evt.reco_beam_true_byE_PDG == 211) Fit_Hit_dEdx_Bethe_Bloch(evt, 211);
+      //if(evt.reco_beam_true_byE_PDG == 2212) Fit_Hit_dEdx_Bethe_Bloch(evt, 2212);
 
       /*TVector3 pt0(evt.reco_beam_calo_startX,
                    evt.reco_beam_calo_startY,

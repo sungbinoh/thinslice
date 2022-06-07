@@ -68,9 +68,13 @@ class HadAna{
   // == Energy measurement using beam pion and its track's part
   double Density_Correction(double beta, double gamma);
   double dEdx_Bethe_Bloch(double KE, double mass);
+  double Get_Landau_xi(double KE, double dx, double mass);
   double dpdx_Bethe_Bloch(double KE, double dx, double mass);
   double best_fit_KE;
-  void Fit_Hit_dEdx_Bethe_Bloch(const anavar& evt, int PID);
+  void Draw_Landau(double KE, double mass, TString suffix);
+  void Draw_dpdx_vs_KE(double dx, double mass, TString suffix);
+  double Get_Landau_P(double MPV, double FWHM, double x);
+  double Fit_Beam_Hit_dEdx_Bethe_Bloch(const anavar& evt, int PID);
 
   double trklen_csda_proton;
   double beam_score;
