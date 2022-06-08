@@ -74,6 +74,7 @@ class HadAna{
   void Draw_Landau(double KE, double mass, TString suffix);
   void Draw_dpdx_vs_KE(double dx, double mass, TString suffix);
   double Get_Landau_P(double MPV, double FWHM, double x);
+  double Get_Landau_y(double MPV, double FWHM, double x);
   double Fit_Beam_Hit_dEdx_Bethe_Bloch(const anavar& evt, int PID);
 
   double trklen_csda_proton;

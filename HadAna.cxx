@@ -355,6 +355,19 @@ double HadAna::Get_Landau_P(double MPV, double FWHM, double x){
 
 }
 
+double HadAna::Get_Landau_y(double MPV, double FWHM, double x){
+
+  TF1 *this_landau = new TF1("landauDistr", "TMath::Landau(x,[0],[1],1)", 0, 10);
+  this_landau -> SetParameter(0, MPV);
+  this_landau -> SetParameter(1, FWHM);
+  double this_y = this_landau -> Eval(x);
+
+  delete this_landau;
+
+  return this_y;
+
+}
+
 double HadAna::Fit_Beam_Hit_dEdx_Bethe_Bloch(const anavar& evt, int PID){
 
   double this_KE = 0.; // == default KE value : 0 MeV
@@ -394,15 +407,31 @@ double HadAna::Fit_Beam_Hit_dEdx_Bethe_Bloch(const anavar& evt, int PID){
       }
       double this_pitch = (*evt.reco_beam_TrkPitch_SCE)[j];
       dEdx_measured =  (*evt.reco_beam_calibrated_dEdX_SCE)[j];
-      double this_dEdx_theory = dpdx_Bethe_Bloch(this_KE, this_pitch, this_mass);
-      double FWHM = 4 * Get_Landau_xi(this_KE, this_pitch, this_mass);
-      double P_MPV = Get_Landau_P(this_dEdx_theory, FWHM, this_dEdx_theory);
-      double P_dEdx_measured = Get_Landau_P(this_dEdx_theory, FWHM, dEdx_measured);
-      if(dEdx_measured > this_dEdx_theory){
-	P_dEdx_measured = 1 - P_dEdx_measured;
-	P_MPV = 1 - P_MPV;
+      double this_likelihood = 0.;
+      if(dEdx_measured > 0.5 && dEdx_measured < 10.0){ 
+	double this_dEdx_theory = dpdx_Bethe_Bloch(this_KE, this_pitch, this_mass);
+	double FWHM = 4 * Get_Landau_xi(this_KE, this_pitch, this_mass);
+
+	// == TMath::Landau has MPV offset, We need to apply a correction on input MPV to get proper MPV
+	// == L65 of https://root.cern.ch/doc/master/langaus_8C_source.html
+	double mpv_shift = -0.22278298;
+	double corrected_mpv = this_dEdx_theory - FWHM * mpv_shift;
+	// == Likelihood : area of normalized Landau distribution
+	//double P_MPV = Get_Landau_P(corrected_mpv, FWHM, this_dEdx_theory);
+	//double P_dEdx_measured = Get_Landau_P(corrected_mpv, FWHM, dEdx_measured);
+	
+	// == Likelihood : height of normalized Landau distribution
+	double P_MPV = Get_Landau_y(corrected_mpv, FWHM, this_dEdx_theory);
+	double P_dEdx_measured = Get_Landau_y(corrected_mpv, FWHM, dEdx_measured);
+	cout << "SB debug, P_MPV : " << P_MPV << ", P_dEdx_measured : " << P_dEdx_measured << endl;
+	/* // == For area Likelihood
+	if(dEdx_measured > this_dEdx_theory){
+	  P_dEdx_measured = 1 - P_dEdx_measured;
+	  P_MPV = 1 - P_MPV;
+	}
+	*/
+	this_likelihood = TMath::Log(P_dEdx_measured / P_MPV);
       }
-      double this_likelihood = TMath::Log(P_dEdx_measured / P_MPV);
       this_KE_likelihood = this_KE_likelihood + this_likelihood;
       //cout << "SB debug, dEdx_measured : " << dEdx_measured << ", this_dEdx_theory : " << this_dEdx_theory << ", this_KE : " << this_KE << " / " << initial_KE + KE_step * (i + 0.) << ", this_pitch : " << this_pitch << endl;
       //cout << "SB debug, this_likelihood : " << this_likelihood << endl;
@@ -428,7 +457,7 @@ double HadAna::Fit_Beam_Hit_dEdx_Bethe_Bloch(const anavar& evt, int PID){
 
   TGraph *likelihood_gr = new TGraph(KE_vector.size(), &KE_vector[0], &likelihood_vector[0]);
   likelihood_gr -> SetName(Form("Run%d_Evt%d_PID%d", evt.run, evt.event, PID));
-  //likelihood_gr -> Write();
+  likelihood_gr -> Write();
   
   likelihood_vector.clear();
   KE_vector.clear();

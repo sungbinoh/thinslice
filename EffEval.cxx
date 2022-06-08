@@ -344,7 +344,7 @@ void EffEval::Run(anavar & evt, Long64_t nentries=-1){
     cout << "SB debug, [" << evt.run << ":" << evt.event << "," << N_target_PDG << "] true_beam_PDG : " << evt.reco_beam_true_byHits_PDG << ", this_beam_true_mom : " << this_beam_true_mom << ", this_beam_reco_mom : " << this_beam_reco_mom << ". this_beam_mom_res : " << this_beam_mom_res << endl;
 
     beam_mom_res_500 -> Fill(this_beam_mom_res);
-    if(N_target_PDG > 500) break;
+    if(N_target_PDG > 200) break;
 
     FillHistograms(evt);
   }
