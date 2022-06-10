@@ -307,6 +307,7 @@ void EffEval::Run(anavar & evt, Long64_t nentries=-1){
   TH1D *beam_P = new TH1D("beam_reco_P", "beam_reco_P", 1000,0., 10000);
   TH1D *true_beam_P = new TH1D("beam_true_P", "beam_true_P", 1000, 0., 10000); 
   TH1D *beam_mom_res_500 = new TH1D("beam_mom_res_pion_bellow500", "beam_mom_res_pion_bellow500", 40, -1., 1.);
+  TH2D *beam_mom_true_vs_mom_res = new TH2D("beam_mom_true_vs_mom_res", "beam_mom_true_vs_mom_res", 300, 0., 1500., 40, -1., 1.);
   Long64_t nbytes = 0, nb = 0;
   int N_target_PDG = 0;
   for (Long64_t jentry=0; jentry<nentries;jentry++) {
@@ -329,22 +330,25 @@ void EffEval::Run(anavar & evt, Long64_t nentries=-1){
     double this_beam_mass = 1000. * sqrt(pow(evt.reco_beam_true_byHits_startE, 2) - pow(evt.reco_beam_true_byHits_startP, 2));
     double KE = evt.reco_beam_true_byHits_startE - sqrt(pow(evt.reco_beam_true_byHits_startE, 2) - pow(evt.reco_beam_true_byHits_startP, 2));
     KE = KE * 1000.;
-    if(KE > 500.) continue;
+    //if(KE > 500.) continue;
     N_target_PDG++;
-    cout << "SB debug, [" << evt.run << ":" << evt.event << "] true_beam_PDG : " << evt.reco_beam_true_byHits_PDG << ", true_beam_startP : " << evt.reco_beam_true_byHits_startP * 1000. << ", KE : " << KE  << ", this_beam_mass : " << this_beam_mass << endl;
+    //cout << "SB debug, [" << evt.run << ":" << evt.event << "] true_beam_PDG : " << evt.reco_beam_true_byHits_PDG << ", true_beam_startP : " << evt.reco_beam_true_byHits_startP * 1000. << ", KE : " << KE  << ", this_beam_mass : " << this_beam_mass << endl;
     //if(evt.reco_beam_true_byHits_PDG == 211) hadana.Fit_Hit_dEdx_Bethe_Bloch(evt, 211);
     //if(evt.reco_beam_true_byHits_PDG == 2212) hadana.Fit_Hit_dEdx_Bethe_Bloch(evt, 2212);
     beam_P -> Fill(evt.reco_beam_true_byHits_startP*1000.);
     true_beam_P -> Fill(evt.true_beam_startP * 1000.);
     
-    double this_beam_true_mom = evt.reco_beam_true_byHits_startP * 1000.;
+    //double this_beam_true_mom = evt.reco_beam_true_byHits_startP * 1000.;
+    double this_beam_true_KE = true_beam_traj_KE * 1000.;
+    double this_beam_true_mom = sqrt(pow(this_beam_true_KE, 2) + 2.0 * this_beam_true_KE * this_beam_mass);
     double this_beam_reco_mom = hadana.Fit_Beam_Hit_dEdx_Bethe_Bloch(evt, 211);
     double this_beam_mom_res = (this_beam_reco_mom - this_beam_true_mom) / this_beam_true_mom;
-
-    cout << "SB debug, [" << evt.run << ":" << evt.event << "," << N_target_PDG << "] true_beam_PDG : " << evt.reco_beam_true_byHits_PDG << ", this_beam_true_mom : " << this_beam_true_mom << ", this_beam_reco_mom : " << this_beam_reco_mom << ". this_beam_mom_res : " << this_beam_mom_res << endl;
+    int this_N_hit = evt.reco_beam_calo_Z->size();
+    cout << "SB debug, [" << evt.run << ":" << evt.event << "," << N_target_PDG << "] true_beam_PDG : " << evt.reco_beam_true_byHits_PDG << ", this_beam_true_mom : " << this_beam_true_mom << ", this_beam_reco_mom : " << this_beam_reco_mom << ". this_beam_mom_res : " << this_beam_mom_res << ", this_N_hit : " << this_N_hit << endl;
 
     beam_mom_res_500 -> Fill(this_beam_mom_res);
-    if(N_target_PDG > 200) break;
+    beam_mom_true_vs_mom_res -> Fill(this_beam_true_mom, this_beam_mom_res);
+    if(N_target_PDG > 1000) break;
 
     FillHistograms(evt);
   }
@@ -353,4 +357,5 @@ void EffEval::Run(anavar & evt, Long64_t nentries=-1){
   beam_P -> Write();
   true_beam_P -> Write();
   beam_mom_res_500 -> Write();
+  beam_mom_true_vs_mom_res -> Write();
 }

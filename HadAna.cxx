@@ -314,9 +314,9 @@ double HadAna::dpdx_Bethe_Bloch(double KE, double dx, double mass){
 
 void HadAna::Draw_dpdx_vs_KE(double dx, double mass, TString suffix){
 
-  double KE_min = 100; 
+  double KE_min = 1; 
   double KE_max = 10000; // 10 GeV
-  double KE_step = 10.0;
+  double KE_step = 1.0;
   int N_Step = (KE_max - KE_min) / KE_step + 1;
   vector<double> dpdx_collection;
   vector<double> KE_collection;
@@ -357,10 +357,26 @@ double HadAna::Get_Landau_P(double MPV, double FWHM, double x){
 
 double HadAna::Get_Landau_y(double MPV, double FWHM, double x){
 
+  // == Truncate too small or too large dE/dx
+  if(x < 0.5 || x > 10.0) return 0.;
+
   TF1 *this_landau = new TF1("landauDistr", "TMath::Landau(x,[0],[1],1)", 0, 10);
   this_landau -> SetParameter(0, MPV);
   this_landau -> SetParameter(1, FWHM);
-  double this_y = this_landau -> Eval(x);
+
+  // == Normalize the Landau distribution in [0.5, 1.0] range
+  double area = 0.;
+  int N_step = 1000;
+  double x_low = 0.5;
+  double x_high = 10.0;
+  double x_step = (x_high - x_low) / N_step;
+  for(int i = 0; i < N_step; i++){
+    double this_x = 0.5 + (i + 0.) * x_step;
+    double this_y = this_landau -> Eval(this_x);
+    area = area + this_y * x_step;
+  }
+  
+  double this_y = (this_landau -> Eval(x)) / area;
 
   delete this_landau;
 
@@ -381,11 +397,12 @@ double HadAna::Fit_Beam_Hit_dEdx_Bethe_Bloch(const anavar& evt, int PID){
   else best_fit_KE = this_KE;
 
   // == Scan KE and fit
-  double best_KE = 100.0; // [MeV]
+  double best_KE = 50.0; // [MeV]
   double best_likelihood = 99999.;
-  double initial_KE = 100.0; // [MeV]
-  double final_KE = 10000.0; // [MeV], 10 GeV
-  double KE_step = 10.0; // [MeV]
+  double initial_KE = 50.0; // [MeV]
+  //double final_KE = 10000.0; // [MeV], 10 GeV
+  double final_KE = 1500.0; // [MeV], 1.5 GeV
+  double KE_step = 5.0; // [MeV]
   int N_KE_trial = (final_KE - initial_KE) / KE_step;
   int this_N_calo = evt.reco_beam_calo_Z->size();
   int this_N_hits = TMath::Min(this_N_calo, N_max);
@@ -393,18 +410,20 @@ double HadAna::Fit_Beam_Hit_dEdx_Bethe_Bloch(const anavar& evt, int PID){
   vector<double> KE_vector;
 
   for(int i = 0; i < N_KE_trial; i++){
-    label_i_KE : 
+    //label_i_KE : 
     double this_KE = initial_KE + KE_step * (i + 0.);
     double dEdx_measured = 0.;
     double dE_measured = 0.;
     double this_KE_likelihood = 0.;
     for(int j = 0; j < this_N_hits; j++){
       this_KE = this_KE - dE_measured;
+      /*
       if(this_KE < 0.){ // == leave this int j for loop
 	i = i + 1;
 	j = 0;
 	goto label_i_KE;
       }
+      */
       double this_pitch = (*evt.reco_beam_TrkPitch_SCE)[j];
       dEdx_measured =  (*evt.reco_beam_calibrated_dEdX_SCE)[j];
       double this_likelihood = 0.;
@@ -417,19 +436,19 @@ double HadAna::Fit_Beam_Hit_dEdx_Bethe_Bloch(const anavar& evt, int PID){
 	double mpv_shift = -0.22278298;
 	double corrected_mpv = this_dEdx_theory - FWHM * mpv_shift;
 	// == Likelihood : area of normalized Landau distribution
-	//double P_MPV = Get_Landau_P(corrected_mpv, FWHM, this_dEdx_theory);
-	//double P_dEdx_measured = Get_Landau_P(corrected_mpv, FWHM, dEdx_measured);
+	double P_MPV = Get_Landau_P(corrected_mpv, FWHM, this_dEdx_theory);
+	double P_dEdx_measured = Get_Landau_P(corrected_mpv, FWHM, dEdx_measured);
 	
 	// == Likelihood : height of normalized Landau distribution
-	double P_MPV = Get_Landau_y(corrected_mpv, FWHM, this_dEdx_theory);
-	double P_dEdx_measured = Get_Landau_y(corrected_mpv, FWHM, dEdx_measured);
-	cout << "SB debug, P_MPV : " << P_MPV << ", P_dEdx_measured : " << P_dEdx_measured << endl;
-	/* // == For area Likelihood
+	//double P_MPV = Get_Landau_y(corrected_mpv, FWHM, this_dEdx_theory); // == corrected MPV for TMath::Landau
+	//double P_dEdx_measured = Get_Landau_y(corrected_mpv, FWHM, dEdx_measured); // == corrected MPV for TMath::Landau
+	//cout << "SB debug, P_MPV : " << P_MPV << ", P_dEdx_measured : " << P_dEdx_measured << endl;
+	// == For area Likelihood
 	if(dEdx_measured > this_dEdx_theory){
 	  P_dEdx_measured = 1 - P_dEdx_measured;
 	  P_MPV = 1 - P_MPV;
 	}
-	*/
+	
 	this_likelihood = TMath::Log(P_dEdx_measured / P_MPV);
       }
       this_KE_likelihood = this_KE_likelihood + this_likelihood;

@@ -1,7 +1,12 @@
 {
-    "mcfile" : "root://fndca1.fnal.gov:1094/pnfs/fnal.gov/usr/dune/archive/sam_managed_users/tjyang/data/e/1/4/6/f52abbdc-f3f1-4b1e-9b05-0e25fd4bd232-whole_mc.root",
-    "mcoutfile" : "effval.root",
+    //"mcfile" : "root://fndca1.fnal.gov:1094/pnfs/fnal.gov/usr/dune/archive/sam_managed_users/tjyang/data/e/1/4/6/f52abbdc-f3f1-4b1e-9b05-0e25fd4bd232-whole_mc.root",
+    //"mcfile" : "/dune/data/users/sungbino/ProtoDUNE/pion_energy/PDSPProd4a_MC_0.3GeV_reco1_sce_datadriven_v1_ntuple_v09_41_00_03.root",
+    //"mcoutfile" : "effval_0p3.root",
+    //"mcfile" : "/dune/data/users/sungbino/ProtoDUNE/pion_energy/PDSPProd4a_MC_0.5GeV_reco1_sce_datadriven_v1_ntuple_v09_41_00_04.root",
+    //"mcoutfile" : "effval_0p5_nofit.root",
+    "mcfile" : "/dune/data/users/sungbino/ProtoDUNE/pion_energy/PDSPProd4a_MC_1GeV_reco1_sce_datadriven_v1_ntuple_v09_41_00_03.root",
+    "mcoutfile" : "effval_1p0.root",
     "nevents" : -1
-    //"nevents" : 100000
+    //"nevents" : 1
 
 }
