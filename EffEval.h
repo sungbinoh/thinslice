@@ -40,7 +40,11 @@ class EffEval {
   TH1D *h_true_Ppi_all;
   TH1D *h_true_Ppi_sel;
   TH2D *h_reco_true_Ppi_sel;
+  TH2D *h_fit_range_true_Ppi_michel;
+  TH2D *h_fit_range_range_Ppi_michel;
   TH1D *h_res_Ppi_sel;
+  TH1D *h_res_fit_range_true_michel;
+  TH1D *h_res_fit_range_range_michel;
   TH2D *h_res_Ppi_michelscore;
   TH1D *h_true_Ppi_michel;
   TH2D *h_reco_true_Ppi_michel;

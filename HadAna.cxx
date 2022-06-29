@@ -292,6 +292,36 @@ double HadAna::dEdx_Bethe_Bloch(double KE, double mass){
 
   return this_dEdx;
 }
+double HadAna::ResLength_to_KE_BB(double ResLength, double mass){
+  // == KE to ResLength using Bethe-Bloch (BB) 
+  double KE_BB = 0.1; // [MeV], starting with non-zero energy
+  double this_length = 0.;
+  double step = 0.01; // [cm]
+  bool first = true;
+  while(this_length < ResLength){
+    double this_dEdx = dEdx_Bethe_Bloch(KE_BB, mass);
+    KE_BB += this_dEdx * step;
+    this_length += step;
+  }
+
+  return KE_BB;
+}
+
+double HadAna::ResLength_to_mom_BB(double ResLength, double mass){
+  // == KE to ResLength using Bethe-Bloch (BB)
+  double KE_BB = 0.1; // [MeV], starting with non-zero energy
+  double this_length = 0.;
+  double step = 0.01; // [cm]
+  bool first = true;
+  while(this_length < ResLength){
+    double this_dEdx = dEdx_Bethe_Bloch(KE_BB, mass);
+    KE_BB += this_dEdx * step;
+    this_length += step;
+  }
+
+  return sqrt(pow(KE_BB, 2) + 2.0 * KE_BB * mass);
+}
+
 double HadAna::Get_Landau_xi(double KE, double dx, double mass){
   double gamma = (KE/mass)+1.0;
   double beta = TMath::Sqrt(1-(1.0/(gamma*gamma)));
@@ -404,6 +434,7 @@ double HadAna::Fit_Beam_Hit_dEdx_Bethe_Bloch(const anavar& evt, int PID){
   double final_KE = 1500.0; // [MeV], 1.5 GeV
   double KE_step = 5.0; // [MeV]
   int N_KE_trial = (final_KE - initial_KE) / KE_step;
+  int i_bestfit = -1;
   int this_N_calo = evt.reco_beam_calo_Z->size();
   int this_N_hits = TMath::Min(this_N_calo, N_max);
   vector<double> likelihood_vector;
@@ -462,6 +493,7 @@ double HadAna::Fit_Beam_Hit_dEdx_Bethe_Bloch(const anavar& evt, int PID){
     if(this_KE_likelihood < best_likelihood){
       best_likelihood = this_KE_likelihood;
       best_KE = initial_KE + KE_step * (i + 0.);
+      i_bestfit = i;
     }
     likelihood_vector.push_back(this_KE_likelihood);
     KE_vector.push_back(initial_KE + KE_step * (i + 0.));
@@ -483,7 +515,230 @@ double HadAna::Fit_Beam_Hit_dEdx_Bethe_Bloch(const anavar& evt, int PID){
 
   delete likelihood_gr;
 
+  // == Fit failed
+  if(i_bestfit == N_KE_trial - 1){
+    return -9999.;
+  }
+
   return best_mom;
+}
+
+void HadAna::Open_dEdx_res_Profile(){
+  TString input_dir = getenv("LARSOFT_DATA_DIR");
+  TString input_root = input_dir + "/ParticleIdentification/dEdxrestemplates.root";
+  TFile *this_file = new TFile((input_root));
+  dedx_range_proton = (TProfile*)this_file->Get("dedx_range_pro");
+  dedx_range_kaon  = (TProfile*)this_file->Get("dedx_range_ka");
+  dedx_range_pion  = (TProfile*)this_file->Get("dedx_range_pi");
+  dedx_range_muon  = (TProfile*)this_file->Get("dedx_range_mu");
+  dedx_range_proton -> SetDirectory(0);
+  dedx_range_kaon -> SetDirectory(0);
+  dedx_range_pion -> SetDirectory(0);
+  dedx_range_muon -> SetDirectory(0);
+  TProfile::AddDirectory(kFALSE);
+  this_file -> Close();
+  delete this_file;
+}
+
+
+double HadAna::Fit_dEdx_Residual_Length(const anavar& evt, const vector<double> & dEdx, const vector<double> & ResRange, int PID){
+  double this_KE = 0.; // == default KE value : 0 MeV
+  int N_max = 20; // == Maximum number of hits used for the Bethe-Bloch fitting
+
+  // == PID input : mass hypothesis
+  double this_mass = 105.658;
+  if(PID == 2212) this_mass = 938.272;
+  else if(abs(PID) == 211) this_mass = 139.57;
+  else best_fit_KE = this_KE;
+
+  double best_additional_res_length = -0.1; // == [cm]
+  double best_chi2 = 99999.;
+  double min_additional_res_length = 0.; // == [cm]
+  double max_additional_res_length = 60.; // == [cm]
+  double res_length_step = 0.1; // == [cm]
+  int res_length_trial = (max_additional_res_length - min_additional_res_length) / res_length_step;
+  int this_N_calo = dEdx.size();
+  int this_N_hits = TMath::Min(this_N_calo, N_max); // == Use how many hits
+  int i_bestfit = -1;
+  vector<double> chi2_vector;
+  vector<double> additional_res_legnth_vector;
+  for(int i = 0; i < res_length_trial; i++){
+    double this_additional_res_length = min_additional_res_length + (i + 0.) * res_length_step;
+    double this_chi2 = 0.;
+    //for(int j = 5; j < this_N_hits - 5; j++){
+    for(int j = 5; j < this_N_hits - 5; j++){
+      int this_index = this_N_calo - 1 - j;
+      double this_res_length = ResRange.at(this_index) - ResRange.at(this_N_calo - this_N_hits) + this_additional_res_length;
+      double this_KE = ResLength_to_KE_BB(this_res_length, this_mass);
+      double dEdx_theory = dEdx_Bethe_Bloch(this_KE, this_mass);
+
+      double dEdx_measured = dEdx.at(this_index);
+      if(dEdx_measured < 0.5 || dEdx_measured > 5.0) continue;
+      
+      // == Gaussian approx.
+      double dEdx_theory_err = dEdx_theory * 0.02;
+      this_chi2 += pow(dEdx_measured - dEdx_theory, 2);
+
+    }
+    this_chi2 = this_chi2 / (this_N_hits + 0.);
+    if(this_chi2 < best_chi2){
+      best_chi2 = this_chi2;
+      best_additional_res_length = this_additional_res_length;
+      i_bestfit = i;
+    }
+    chi2_vector.push_back(this_chi2);
+    additional_res_legnth_vector.push_back(this_additional_res_length);
+  }
+
+  vector<double> range_original;
+  vector<double> range_bestfit;
+  vector<double> range_reco;
+  vector<double> dEdx_ordered;
+  for(int i = 5; i < this_N_hits - 5; i++){
+    int this_index = this_N_calo - 1 - i;
+    range_original.push_back(ResRange.at(this_index) - ResRange.at(this_N_calo - this_N_hits));
+    range_bestfit.push_back(ResRange.at(this_index) - ResRange.at(this_N_calo - this_N_hits) + best_additional_res_length);
+    range_reco.push_back(ResRange.at(this_index));
+    dEdx_ordered.push_back(dEdx.at(this_index));
+  }
+
+  TGraph *dEdx_gr = new TGraph(this_N_hits - 10, &range_original[0], &dEdx_ordered[0]);
+  dEdx_gr -> SetName(Form("dEdx_Run%d_Evt%d_Nhit%d", evt.run, evt.event, this_N_hits));
+  dEdx_gr -> Write();
+  delete dEdx_gr;
+
+  TGraph *dEdx_bestfit_gr = new TGraph(this_N_hits - 10,&range_bestfit[0], &dEdx_ordered[0]);
+  dEdx_bestfit_gr -> SetName(Form("dEdx_bestfit_Run%d_Evt%d_Nhit%d", evt.run, evt.event, this_N_hits));
+  dEdx_bestfit_gr -> Write();
+  delete dEdx_bestfit_gr;
+
+  TGraph *dEdx_reco_gr = new TGraph(this_N_hits - 10,&range_reco[0], &dEdx_ordered[0]);
+  dEdx_reco_gr -> SetName(Form("dEdx_reco_Run%d_Evt%d_Nhit%d", evt.run, evt.event, this_N_hits));
+  dEdx_reco_gr -> Write();
+  delete dEdx_reco_gr;
+
+  TGraph *chi2_gr = new TGraph(additional_res_legnth_vector.size(), &additional_res_legnth_vector[0], &chi2_vector[0]);
+  chi2_gr -> SetName(Form("Chi2_Run%d_Evt%d_Nhit%d", evt.run, evt.event, this_N_hits));
+  chi2_gr -> Write();
+  chi2_vector.clear();
+  additional_res_legnth_vector.clear();
+  delete chi2_gr;
+
+  double original_res_length = ResRange.at(this_N_calo - 1) - ResRange.at(this_N_calo - this_N_hits); // == [cm]
+  double best_total_res_length = best_additional_res_length + original_res_length;
+  double best_KE = ResLength_to_KE_BB(best_total_res_length, this_mass);
+  double best_mom = sqrt(pow(best_KE, 2) + 2.0 * best_KE * this_mass);
+
+  if(i_bestfit == res_length_trial - 1){
+    cout << "[HadAna::Fit_Beam_Hit_dEdx_Residual_Length] Fit failed : no mimumum" << endl;
+    return -9999.;
+  }
+  else if(best_chi2 > 99990.){
+    cout << "[HadAna::Fit_Beam_Hit_dEdx_Residual_Length] Fit failed : best_chi2 > 99990." << endl;
+    return -9999.;
+  }
+  else if(best_chi2 < 1.0e-11){
+    cout << "[HadAna::Fit_Beam_Hit_dEdx_Residual_Length] Fit failed : best_chi2 < 1.0e-11" << endl;
+    return -9999.;
+  }
+
+  return best_mom;
+}
+
+
+
+double HadAna::Fit_Beam_Hit_dEdx_Residual_Length(const anavar& evt, int PID){
+
+  double this_KE = 0.; // == default KE value : 0 MeV
+  int N_max = 60; // == Maximum number of hits used for the Bethe-Bloch fitting
+  
+  // == PID input : mass hypothesis
+  double this_mass = 105.658; // == default : muon mass, https://pdg.lbl.gov/2022/listings/rpp2022-list-muon.pdf 
+  if(PID == 2212) this_mass = 938.272; // == https://pdg.lbl.gov/2022/listings/rpp2022-list-p.pdf
+  else if(abs(PID) == 211) this_mass = 139.57; // == https://pdg.lbl.gov/2022/listings/rpp2022-list-pi-plus-minus.pdf
+  else best_fit_KE = this_KE;
+
+  double best_additional_res_length = -1.;
+  double best_chi2 = 99999.;
+  double min_additional_res_length = 0.; // == [cm]
+  double max_additional_res_length = 150.; // == [cm]
+  double res_length_step = 1.0; // == [cm]
+  int res_length_trial = (max_additional_res_length - min_additional_res_length) / res_length_step;
+  int this_N_calo = evt.reco_beam_calo_Z->size();
+  int this_N_hits = TMath::Min(this_N_calo, N_max);
+  int i_bestfit = -1;
+  vector<double> chi2_vector;
+  vector<double> additional_res_legnth_vector;
+  for(int i = 0; i < res_length_trial; i++){
+    double this_additional_res_length = min_additional_res_length + (i + 0.) * res_length_step;
+    double this_chi2 = 0.;
+    for(int j = 1; j < this_N_hits - 1; j++){
+
+      double this_res_length = (*evt.reco_beam_resRange_SCE)[j] + this_additional_res_length - (*evt.reco_beam_resRange_SCE)[this_N_hits - 1];
+      //cout << "(*evt.reco_beam_resRange_SCE)[j] : " << (*evt.reco_beam_resRange_SCE)[j] << endl;
+      
+      //double dEdx_theory = this_dEdx_res_profile -> GetBinContent(this_bin);
+      double this_KE = ResLength_to_KE_BB(this_res_length, this_mass);
+      double dEdx_theory = dEdx_Bethe_Bloch(this_KE, this_mass);
+      //cout << "this_res_length\t" << this_res_length << "\tthis_KE\t" << this_KE << "\tdEdx_theor\t" << dEdx_theory << endl;
+
+      double dEdx_measured = (*evt.reco_beam_calibrated_dEdX_SCE)[j];
+      if(dEdx_measured < 0.5 || dEdx_measured > 5.0) continue;
+
+      // == Gaussian approx.
+      double dEdx_theory_err = dEdx_theory * 0.02;
+      //double dEdx_measured_err = 0.04231+0.0001783*dEdx_measured*dEdx_measured;
+      //this_chi2 += pow(dEdx_measured - dEdx_theory, 2) / pow(dEdx_theory_err, 2);
+      this_chi2 += pow(dEdx_measured - dEdx_theory, 2);
+    }
+    if(this_chi2 < best_chi2){
+      best_chi2 = this_chi2;
+      best_additional_res_length = this_additional_res_length;
+      i_bestfit = i;
+    }
+    
+    //cout << "SB debug, [HadAna::Fit_Beam_Hit_dEdx_Residual_Length] this_chi2 : " << this_chi2 << endl;
+    chi2_vector.push_back(this_chi2);
+    additional_res_legnth_vector.push_back(this_additional_res_length);
+  }
+
+  vector<double> range_original;
+  vector<double> range_bestfit;
+  for(int i = 1; i < this_N_hits - 1; i++){
+    range_original.push_back((*evt.reco_beam_resRange_SCE)[i] - (*evt.reco_beam_resRange_SCE)[this_N_hits - 1]);
+    range_bestfit.push_back((*evt.reco_beam_resRange_SCE)[i] + best_additional_res_length - (*evt.reco_beam_resRange_SCE)[this_N_hits - 1]);
+  }
+
+  TGraph *dEdx_gr = new TGraph(this_N_hits - 2, &range_original[0], &(*evt.reco_beam_calibrated_dEdX_SCE)[1]);
+  dEdx_gr -> SetName(Form("dEdx_Run%d_Evt%d_PID%d", evt.run, evt.event, PID));
+  dEdx_gr -> Write();
+  delete dEdx_gr;
+
+  TGraph *dEdx_bestfit_gr = new TGraph(this_N_hits - 2,&range_bestfit[0], &(*evt.reco_beam_calibrated_dEdX_SCE)[1]);
+  dEdx_bestfit_gr -> SetName(Form("dEdx_bestfit_Run%d_Evt%d_PID%d", evt.run, evt.event, PID));
+  dEdx_bestfit_gr -> Write();
+  delete dEdx_bestfit_gr;
+
+  TGraph *chi2_gr = new TGraph(additional_res_legnth_vector.size(), &additional_res_legnth_vector[0], &chi2_vector[0]);
+  chi2_gr -> SetName(Form("Chi2_Run%d_Evt%d_PID%d", evt.run, evt.event, PID));
+  chi2_gr -> Write();
+  chi2_vector.clear();
+  additional_res_legnth_vector.clear();
+  delete chi2_gr;
+
+  double best_total_res_length = best_additional_res_length + (*evt.reco_beam_resRange_SCE)[0] - (*evt.reco_beam_resRange_SCE)[this_N_hits - 1];
+  double best_KE = ResLength_to_KE_BB(best_total_res_length, this_mass);
+  double best_mom = sqrt(pow(best_KE, 2) + 2.0 * best_KE * this_mass);
+  cout << Form("Chi2_Run%d_Evt%d_PID%d", evt.run, evt.event, PID) << ", (*evt.reco_beam_resRange_SCE)[1] : "
+       << (*evt.reco_beam_resRange_SCE)[1] << ", (*evt.reco_beam_resRange_SCE)[this_N_hits - 1] : " << (*evt.reco_beam_resRange_SCE)[this_N_hits - 1] << 
+    endl;
+
+  if(i_bestfit == res_length_trial - 1){
+    cout << "[HadAna::Fit_Beam_Hit_dEdx_Residual_Length] Fit failed" << endl;
+    return -9999.;
+  }
+  return best_mom;
+
 }
 
 void HadAna::Draw_Landau(double KE, double mass, TString suffix){

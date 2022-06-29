@@ -5,6 +5,7 @@
 #include "EventSelection.h"
 #include "SliceParams.h"
 #include "TGraph.h"
+#include "TProfile.h"
 
 class anavar;
 
@@ -68,6 +69,8 @@ class HadAna{
   // == Energy measurement using beam pion and its track's part
   double Density_Correction(double beta, double gamma);
   double dEdx_Bethe_Bloch(double KE, double mass);
+  double ResLength_to_KE_BB(double ResLength, double mass);
+  double ResLength_to_mom_BB(double ResLength, double mass);
   double Get_Landau_xi(double KE, double dx, double mass);
   double dpdx_Bethe_Bloch(double KE, double dx, double mass);
   double best_fit_KE;
@@ -76,6 +79,13 @@ class HadAna{
   double Get_Landau_P(double MPV, double FWHM, double x);
   double Get_Landau_y(double MPV, double FWHM, double x);
   double Fit_Beam_Hit_dEdx_Bethe_Bloch(const anavar& evt, int PID);
+  TProfile *dedx_range_proton;
+  TProfile *dedx_range_kaon;
+  TProfile *dedx_range_pion;
+  TProfile *dedx_range_muon;  
+  void Open_dEdx_res_Profile();
+  double Fit_dEdx_Residual_Length(const anavar& evt, const vector<double> & dEdx, const vector<double> & ResRange, int PID);
+  double Fit_Beam_Hit_dEdx_Residual_Length(const anavar& evt, int PID);
 
   double trklen_csda_proton;
   double beam_score;
