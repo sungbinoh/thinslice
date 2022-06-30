@@ -209,6 +209,10 @@ double BetheBloch::KEAtLength(double KE0, double tracklength){
 
 }
 
+double BetheBloch::KEtoMomentum(double KE){
+  return sqrt(pow(KE, 2) + 2.0 * KE * mass);
+}
+
 void BetheBloch::CreateSplineAtKE(int iKE){
 
   double KE0 = iKE;

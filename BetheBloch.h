@@ -32,6 +32,8 @@ class BetheBloch {
 
   double KEAtLength(double KE0, double tracklength);
 
+  double KEtoMomentum(double KE);
+
   void CreateSplineAtKE(int iKE);
 
   

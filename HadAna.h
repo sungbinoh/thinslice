@@ -1,17 +1,22 @@
 #ifndef HADANA_H
 #define HADANA_H
 
+#include <map>
 #include "EventType.h"
 #include "EventSelection.h"
 #include "SliceParams.h"
+#include "BetheBloch.h"
 #include "TGraph.h"
 
 class anavar;
+class BetheBloch;
 
 class HadAna{
  public: 
 
   HadAna();
+
+  std::map< int, BetheBloch* > map_BB;
 
   void InitPi();
 
@@ -66,10 +71,6 @@ class HadAna{
   double true_ffKE;
 
   // == Momentum measurement using dE/dx and hit for a short track segment
-  double Density_Correction(double beta, double gamma);
-  double dEdx_Bethe_Bloch(double KE, double mass);
-  double ResLength_to_KE_BB(double ResLength, double mass);
-  double ResLength_to_mom_BB(double ResLength, double mass);
   double Fit_dEdx_Residual_Length(const anavar& evt, const vector<double> & dEdx, const vector<double> & ResRange, int PID, bool save_graph);
   
   double trklen_csda_proton;
