@@ -199,7 +199,7 @@ void EffEval::FillHistograms(const anavar & evt){
 		  double this_range = (*evt.reco_daughter_allTrack_resRange_SCE).at(j).at(N_ranges-1);
 		  double this_range_mom = hadana.ResLength_to_mom_BB(this_range, 139.57);
 		  double this_fitted_mom = hadana.Fit_dEdx_Residual_Length(evt, (*evt.reco_daughter_allTrack_calibrated_dEdX_SCE)[j],
-									   (*evt.reco_daughter_allTrack_resRange_SCE)[j], 211);
+									   (*evt.reco_daughter_allTrack_resRange_SCE)[j], 211, true);
 		  
 		  //double this_mom_res = (this_fitted_mom - true_mom) / true_mom;
 		  double this_mom_res_true = (this_fitted_mom - true_mom) / true_mom;

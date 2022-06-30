@@ -541,7 +541,7 @@ void HadAna::Open_dEdx_res_Profile(){
 }
 
 
-double HadAna::Fit_dEdx_Residual_Length(const anavar& evt, const vector<double> & dEdx, const vector<double> & ResRange, int PID){
+double HadAna::Fit_dEdx_Residual_Length(const anavar& evt, const vector<double> & dEdx, const vector<double> & ResRange, int PID, bool save_graph){
   double this_KE = 0.; // == default KE value : 0 MeV
   int N_max = 20; // == Maximum number of hits used for the Bethe-Bloch fitting
 
@@ -602,28 +602,29 @@ double HadAna::Fit_dEdx_Residual_Length(const anavar& evt, const vector<double> 
     dEdx_ordered.push_back(dEdx.at(this_index));
   }
 
-  TGraph *dEdx_gr = new TGraph(this_N_hits - 10, &range_original[0], &dEdx_ordered[0]);
-  dEdx_gr -> SetName(Form("dEdx_Run%d_Evt%d_Nhit%d", evt.run, evt.event, this_N_hits));
-  dEdx_gr -> Write();
-  delete dEdx_gr;
-
-  TGraph *dEdx_bestfit_gr = new TGraph(this_N_hits - 10,&range_bestfit[0], &dEdx_ordered[0]);
-  dEdx_bestfit_gr -> SetName(Form("dEdx_bestfit_Run%d_Evt%d_Nhit%d", evt.run, evt.event, this_N_hits));
-  dEdx_bestfit_gr -> Write();
-  delete dEdx_bestfit_gr;
-
-  TGraph *dEdx_reco_gr = new TGraph(this_N_hits - 10,&range_reco[0], &dEdx_ordered[0]);
-  dEdx_reco_gr -> SetName(Form("dEdx_reco_Run%d_Evt%d_Nhit%d", evt.run, evt.event, this_N_hits));
-  dEdx_reco_gr -> Write();
-  delete dEdx_reco_gr;
-
-  TGraph *chi2_gr = new TGraph(additional_res_legnth_vector.size(), &additional_res_legnth_vector[0], &chi2_vector[0]);
-  chi2_gr -> SetName(Form("Chi2_Run%d_Evt%d_Nhit%d", evt.run, evt.event, this_N_hits));
-  chi2_gr -> Write();
-  chi2_vector.clear();
-  additional_res_legnth_vector.clear();
-  delete chi2_gr;
-
+  if(save_graph){
+    TGraph *dEdx_gr = new TGraph(this_N_hits - 10, &range_original[0], &dEdx_ordered[0]);
+    dEdx_gr -> SetName(Form("dEdx_Run%d_Evt%d_Nhit%d", evt.run, evt.event, this_N_hits));
+    dEdx_gr -> Write();
+    delete dEdx_gr;
+    
+    TGraph *dEdx_bestfit_gr = new TGraph(this_N_hits - 10,&range_bestfit[0], &dEdx_ordered[0]);
+    dEdx_bestfit_gr -> SetName(Form("dEdx_bestfit_Run%d_Evt%d_Nhit%d", evt.run, evt.event, this_N_hits));
+    dEdx_bestfit_gr -> Write();
+    delete dEdx_bestfit_gr;
+    
+    TGraph *dEdx_reco_gr = new TGraph(this_N_hits - 10,&range_reco[0], &dEdx_ordered[0]);
+    dEdx_reco_gr -> SetName(Form("dEdx_reco_Run%d_Evt%d_Nhit%d", evt.run, evt.event, this_N_hits));
+    dEdx_reco_gr -> Write();
+    delete dEdx_reco_gr;
+    
+    TGraph *chi2_gr = new TGraph(additional_res_legnth_vector.size(), &additional_res_legnth_vector[0], &chi2_vector[0]);
+    chi2_gr -> SetName(Form("Chi2_Run%d_Evt%d_Nhit%d", evt.run, evt.event, this_N_hits));
+    chi2_gr -> Write();
+    chi2_vector.clear();
+    additional_res_legnth_vector.clear();
+    delete chi2_gr;
+  }
   double original_res_length = ResRange.at(this_N_calo - 1) - ResRange.at(this_N_calo - this_N_hits); // == [cm]
   double best_total_res_length = best_additional_res_length + original_res_length;
   double best_KE = ResLength_to_KE_BB(best_total_res_length, this_mass);

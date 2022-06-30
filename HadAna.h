@@ -84,7 +84,7 @@ class HadAna{
   TProfile *dedx_range_pion;
   TProfile *dedx_range_muon;  
   void Open_dEdx_res_Profile();
-  double Fit_dEdx_Residual_Length(const anavar& evt, const vector<double> & dEdx, const vector<double> & ResRange, int PID);
+  double Fit_dEdx_Residual_Length(const anavar& evt, const vector<double> & dEdx, const vector<double> & ResRange, int PID, bool save_graph);
   double Fit_Beam_Hit_dEdx_Residual_Length(const anavar& evt, int PID);
 
   double trklen_csda_proton;
