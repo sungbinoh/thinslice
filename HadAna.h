@@ -64,6 +64,13 @@ class HadAna{
   std::vector<double> true_trklen_accum;
   std::vector<double> reco_trklen_accum;
   double true_ffKE;
+
+  // == Momentum measurement using dE/dx and hit for a short track segment
+  double Density_Correction(double beta, double gamma);
+  double dEdx_Bethe_Bloch(double KE, double mass);
+  double ResLength_to_KE_BB(double ResLength, double mass);
+  double ResLength_to_mom_BB(double ResLength, double mass);
+  double Fit_dEdx_Residual_Length(const anavar& evt, const vector<double> & dEdx, const vector<double> & ResRange, int PID, bool save_graph);
   
   double trklen_csda_proton;
   double beam_score;
