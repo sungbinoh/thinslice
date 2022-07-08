@@ -55,8 +55,7 @@ int main(int argc, char ** argv){
   ProtonEnergy datape;
   datape.SetOutputFileName(root["dataoutfile"].asString());
   datape.Run(dataevt, root["nevents"].asInt());
-
-
+ 
   return 0;
 
 }

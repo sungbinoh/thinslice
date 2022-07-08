@@ -215,6 +215,30 @@ bool HadAna::PassBeamQualityCut(bool has_angle_cut) const{ // cut on beam entran
   return true;
 }
 
+bool HadAna::PassBeamScraperCut(const anavar& evt) const{
+
+  bool this_decision = false;
+
+  if(!evt.MC){
+    // == Cut for Data
+    double this_beam_dx = evt.beam_inst_X - meanX_data;
+    double this_beam_dy = evt.beam_inst_Y - meanY_data;
+    double this_beam_dx_err = rmsX_data * 1.5;
+    double this_beam_dy_err = rmsY_data * 1.5;
+    this_decision = ( pow(this_beam_dx / this_beam_dx_err, 2.) + pow(this_beam_dy / this_beam_dy_err, 2.0) ) <= 1.;
+  }
+  else{
+    // == Cut for MC
+    double this_beam_dx = evt.beam_inst_X - meanX_mc;
+    double this_beam_dy= evt.beam_inst_Y - meanY_mc;
+    double this_beam_dx_err = rmsX_mc * 1.5;
+    double this_beam_dy_err = rmsY_mc * 1.5;
+    this_decision = ( pow(this_beam_dx / this_beam_dx_err, 2.) + pow(this_beam_dy / this_beam_dy_err, 2.0) ) <= 1.;
+  }
+
+  return this_decision;
+}
+
 bool HadAna::PassAPA3Cut(const anavar& evt) const{ // only use track in the first TPC
   return true;
   double cutAPA3_Z = 220.;
@@ -256,7 +280,8 @@ bool HadAna::PassPCuts(const anavar& evt) const{
 
 double HadAna::Fit_dEdx_Residual_Length(const anavar& evt, const vector<double> & dEdx, const vector<double> & ResRange, int PID, bool save_graph){
 
-  int N_max = 20; // == Maximum number of hits used for the Bethe-Bloch fitting
+  bool this_is_beam = true;
+  int N_max = 200; // == Maximum number of hits used for the Bethe-Bloch fitting
 
   // == PID input : mass hypothesis, valid only for muons, charged pions, and protons
   int abs_PID = abs(PID);
@@ -268,8 +293,8 @@ double HadAna::Fit_dEdx_Residual_Length(const anavar& evt, const vector<double> 
   double best_additional_res_length = -0.1;
   double best_chi2 = 99999.;
   double min_additional_res_length = 0.; // == [cm]
-  double max_additional_res_length = 60.; // == [cm]
-  double res_length_step = 0.1; // == [cm]
+  double max_additional_res_length = 200.; // == [cm]
+  double res_length_step = 0.5; // == [cm]
   int res_length_trial = (max_additional_res_length - min_additional_res_length) / res_length_step;
   int this_N_calo = dEdx.size();
   if(this_N_calo <= 15){
@@ -285,13 +310,18 @@ double HadAna::Fit_dEdx_Residual_Length(const anavar& evt, const vector<double> 
     double this_chi2 = 0.;
     for(int j = 5; j < this_N_hits - 5; j++){ // == Do not use first and last 5 hits
       int this_index = this_N_calo - 1 - j;
+      if(this_is_beam) this_index = j;
       double this_res_length = ResRange.at(this_index) - ResRange.at(this_N_calo - this_N_hits) + this_additional_res_length;
+      if(this_is_beam) this_res_length = ResRange.at(this_index) - ResRange.at(this_N_hits - 1) + this_additional_res_length;
+      
+      //cout << Form("[HadAna::Fit_dEdx_Residual_Length] ResRange.at(%d) = %f, dEdx.at(%d) = %f", j, ResRange.at(j), j, dEdx.at(j)) << endl;
+
       //double this_KE = ResLength_to_KE_BB(this_res_length, this_mass);
       double this_KE = map_BB[abs_PID]->KEFromRangeSpline(this_res_length);
       //double dEdx_theory = dEdx_Bethe_Bloch(this_KE, this_mass);
       double dEdx_theory = map_BB[abs_PID]->meandEdx(this_KE);
       double dEdx_measured = dEdx.at(this_index);
-      if(dEdx_measured < 0.5 || dEdx_measured > 5.0) continue; // == Truncate, it should be modified to consider protons
+      if(dEdx_measured < 0.5 || dEdx_measured > 20.0) continue; // == Truncate, it should be modified to consider protons
 
       // == Gaussian approx.
       //double dEdx_theory_err = dEdx_theory * 0.02;
@@ -318,13 +348,19 @@ double HadAna::Fit_dEdx_Residual_Length(const anavar& evt, const vector<double> 
     vector<double> dEdx_ordered;
     for(int i = 5; i < this_N_hits - 5; i++){
       int this_index = this_N_calo - 1 - i;
-      range_original.push_back(ResRange.at(this_index) - ResRange.at(this_N_calo - this_N_hits));
-      range_bestfit.push_back(ResRange.at(this_index) - ResRange.at(this_N_calo - this_N_hits) + best_additional_res_length);
+      if(this_is_beam) this_index = i;
+      double this_range_original = ResRange.at(this_index) - ResRange.at(this_N_calo - this_N_hits);
+      if(this_is_beam) this_range_original = ResRange.at(this_index) - ResRange.at(this_N_hits - 1);
+      range_original.push_back(this_range_original);
+
+      double this_range_bestfit = ResRange.at(this_index) - ResRange.at(this_N_calo - this_N_hits) + best_additional_res_length;
+      if(this_is_beam) this_range_bestfit = ResRange.at(this_index) - ResRange.at(this_N_hits - 1) + best_additional_res_length;
+      range_bestfit.push_back(this_range_bestfit);
       range_reco.push_back(ResRange.at(this_index));
       dEdx_ordered.push_back(dEdx.at(this_index));
     }
     TGraph *dEdx_gr = new TGraph(this_N_hits - 10, &range_original[0], &dEdx_ordered[0]);
-    dEdx_gr -> SetName(Form("dEdx_Run%d_Evt%d_Nhit%d", evt.run, evt.event, this_N_hits));
+    dEdx_gr -> SetName(Form("dEdx_Run%d_Evt%d_Nhit%d", evt.run, evt.event, this_N_hits - 1));
     dEdx_gr -> Write();
     delete dEdx_gr;
 
@@ -347,6 +383,7 @@ double HadAna::Fit_dEdx_Residual_Length(const anavar& evt, const vector<double> 
   }
 
   double original_res_length = ResRange.at(this_N_calo - 1) - ResRange.at(this_N_calo - this_N_hits); // == [cm]
+  if(this_is_beam) original_res_length = ResRange.at(0) - ResRange.at(this_N_hits - 1); // == [cm]
   double best_total_res_length = best_additional_res_length + original_res_length;
   double best_KE = map_BB[abs_PID]->KEFromRangeSpline(best_total_res_length);
   double best_mom = map_BB[abs_PID]->KEtoMomentum(best_KE);
@@ -365,7 +402,18 @@ double HadAna::Fit_dEdx_Residual_Length(const anavar& evt, const vector<double> 
     return -9999.;
   }
 
-  return best_mom;
+  //return best_mom;
+  return best_total_res_length;
+}
+
+double HadAna::Integrate_dEdx(const vector<double> & dEdx, const vector<double> & pitch){
+  double integrated_KE = 0.;
+  for(int i = 0; i < dEdx.size(); i++){
+    double this_deltaE = dEdx.at(i) * pitch.at(i);
+    integrated_KE += this_deltaE;
+  }
+
+  return integrated_KE;
 }
 
 void HadAna::ProcessEvent(const anavar& evt){
