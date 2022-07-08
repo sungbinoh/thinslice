@@ -264,7 +264,8 @@ bool HadAna::PassPiCuts(const anavar& evt) const{
 bool HadAna::PassPCuts(const anavar& evt) const{
   return PassPandoraSliceCut(evt)&&
     PassCaloSizeCut(evt)&&
-    PassBeamQualityCut();
+    PassBeamQualityCut()&&
+    PassBeamXYCut(evt);
 }
 
 double HadAna::Fit_dEdx_Residual_Length(const anavar& evt, const vector<double> & dEdx, const vector<double> & ResRange, int PID, bool save_graph){
