@@ -215,6 +215,19 @@ bool HadAna::PassBeamQualityCut(bool has_angle_cut) const{ // cut on beam entran
   return true;
 }
 
+bool HadAna::PassBeamXYCut(const anavar& evt) const{
+
+  //ref: https://indico.fnal.gov/event/55048/contributions/244291/attachments/156262/203827/20220616_hy.pdf
+  if (!evt.MC){//data
+    if ((pow(((evt.beam_inst_X-meanX_data)/(1.5*rmsX_data)),2)+pow(((evt.beam_inst_Y-meanY_data)/(1.5*rmsY_data)),2))<=1.) return true;
+    else return false;
+  }
+  else{//mc
+    if ((pow(((evt.beam_inst_X-meanX_mc)/(1.5*rmsX_mc)),2)+pow(((evt.beam_inst_Y-meanY_mc)/(1.5*rmsY_mc)),2))<=1.) return true;
+    else return false;
+  }
+}
+
 bool HadAna::PassAPA3Cut(const anavar& evt) const{ // only use track in the first TPC
   return true;
   double cutAPA3_Z = 220.;
