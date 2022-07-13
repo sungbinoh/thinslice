@@ -46,7 +46,7 @@ class HadAna{
 
   bool PassPandoraSliceCut(const anavar& evt) const;
   bool PassBeamQualityCut(bool has_angle_cut = true) const;
-  bool PassBeamScraperCut(const anavar& evt) const;
+  bool PassBeamXYCut(const anavar& evt) const;
   bool PassAPA3Cut(const anavar& evt) const;
   bool PassCaloSizeCut(const anavar& evt) const;
   bool PassMichelScoreCut() const;
@@ -64,12 +64,14 @@ class HadAna{
   double daughter_michel_score;
   double dEdx_5cm;
   double beam_dx, beam_dy, beam_dz, beam_dxy, beam_costh;
-  
+
+  // == True beam information
   double true_trklen;
   double reco_trklen;
   std::vector<double> true_trklen_accum;
   std::vector<double> reco_trklen_accum;
   double true_ffKE;
+  double Get_true_ffKE(const anavar& evt, double KE_in_TPC, double length_to_ff);
 
   // == Momentum measurement using dE/dx and hit for a short track segment
   double Fit_dEdx_Residual_Length(const anavar& evt, const vector<double> & dEdx, const vector<double> & ResRange, int PID, bool save_graph);

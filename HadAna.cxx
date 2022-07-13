@@ -215,28 +215,17 @@ bool HadAna::PassBeamQualityCut(bool has_angle_cut) const{ // cut on beam entran
   return true;
 }
 
-bool HadAna::PassBeamScraperCut(const anavar& evt) const{
+bool HadAna::PassBeamXYCut(const anavar& evt) const{
 
-  bool this_decision = false;
-
-  if(!evt.MC){
-    // == Cut for Data
-    double this_beam_dx = evt.beam_inst_X - meanX_data;
-    double this_beam_dy = evt.beam_inst_Y - meanY_data;
-    double this_beam_dx_err = rmsX_data * 1.5;
-    double this_beam_dy_err = rmsY_data * 1.5;
-    this_decision = ( pow(this_beam_dx / this_beam_dx_err, 2.) + pow(this_beam_dy / this_beam_dy_err, 2.0) ) <= 1.;
+  //ref: https://indico.fnal.gov/event/55048/contributions/244291/attachments/156262/203827/20220616_hy.pdf
+  if (!evt.MC){//data
+    if ((pow(((evt.beam_inst_X-meanX_data)/(1.5*rmsX_data)),2)+pow(((evt.beam_inst_Y-meanY_data)/(1.5*rmsY_data)),2))<=1.) return true;
+    else return false;
   }
-  else{
-    // == Cut for MC
-    double this_beam_dx = evt.beam_inst_X - meanX_mc;
-    double this_beam_dy= evt.beam_inst_Y - meanY_mc;
-    double this_beam_dx_err = rmsX_mc * 1.5;
-    double this_beam_dy_err = rmsY_mc * 1.5;
-    this_decision = ( pow(this_beam_dx / this_beam_dx_err, 2.) + pow(this_beam_dy / this_beam_dy_err, 2.0) ) <= 1.;
+  else{//mc
+    if ((pow(((evt.beam_inst_X-meanX_mc)/(1.5*rmsX_mc)),2)+pow(((evt.beam_inst_Y-meanY_mc)/(1.5*rmsY_mc)),2))<=1.) return true;
+    else return false;
   }
-
-  return this_decision;
 }
 
 bool HadAna::PassAPA3Cut(const anavar& evt) const{ // only use track in the first TPC
@@ -275,7 +264,13 @@ bool HadAna::PassPiCuts(const anavar& evt) const{
 bool HadAna::PassPCuts(const anavar& evt) const{
   return PassPandoraSliceCut(evt)&&
     PassCaloSizeCut(evt)&&
-    PassBeamQualityCut();
+    PassBeamQualityCut()&&
+    PassBeamXYCut(evt);
+}
+
+double HadAna::Get_true_ffKE(const anavar& evt, double KE_in_TPC, double length_to_ff){
+  double this_dEdx = map_BB[abs(evt.true_beam_PDG)] -> meandEdx(KE_in_TPC);
+  return KE_in_TPC + this_dEdx * length_to_ff;
 }
 
 double HadAna::Fit_dEdx_Residual_Length(const anavar& evt, const vector<double> & dEdx, const vector<double> & ResRange, int PID, bool save_graph){
@@ -588,7 +583,19 @@ void HadAna::ProcessEvent(const anavar& evt){
     }
     // front-face energy
     true_ffKE = 999999.;
-    if (start_idx >= 0) true_ffKE = (*evt.true_beam_traj_KE)[start_idx+1] + 2.18*(true_trklen_accum)[start_idx+1];
+    if (start_idx >= 0){
+      //double ff_dEdx = Get_true_ffKE(evt, (*evt.true_beam_traj_KE)[start_idx+1], (true_trklen_accum)[start_idx+1]);
+      true_ffKE = Get_true_ffKE(evt, (*evt.true_beam_traj_KE)[start_idx+1], (true_trklen_accum)[start_idx+1]);
+    }
+    // == Check order of small additional length
+    /*
+    if (start_idx >= 0){
+      cout << "==============" << endl;
+      cout << "SB debug, (*evt.true_beam_traj_KE)[start_idx+1] : " << (*evt.true_beam_traj_KE)[start_idx+1] << endl;
+      cout << "SB debug, (true_trklen_accum)[start_idx+1] : " << (true_trklen_accum)[start_idx+1] << endl;
+      cout << "SB debug, Get_true_ffKE(evt, ..) : " << Get_true_ffKE(evt, (*evt.true_beam_traj_KE)[start_idx+1], (true_trklen_accum)[start_idx+1]) << endl;
+    }
+    */
   }
   
   energy_calorimetry_SCE = 0; //MeV

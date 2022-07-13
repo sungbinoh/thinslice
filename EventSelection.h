@@ -64,12 +64,11 @@ const double beam_angleX_mc = 101.579;
 const double beam_angleY_mc = 101.212;
 const double beam_angleZ_mc = 16.5822;
 
-// == Based on Heng-Ye's study for beam scraper veto
+//beam XY parameters
 const double meanX_data=-31.3139;
 const double rmsX_data=3.79366;
 const double meanY_data=422.116;
 const double rmsY_data=3.48005;
-
 const double meanX_mc=-29.1637;
 const double rmsX_mc=4.50311;
 const double meanY_mc=421.76;

@@ -72,6 +72,8 @@ void ProtonEnergy::FillHistograms(const anavar & evt){
     double dKE_calo_vs_fitted = KE_calo - fitted_KE;
     double fitted_P = hadana.map_BB[2212]->KEtoMomentum(fitted_KE);
     double fitted_dP = evt.beam_inst_P*1000. - fitted_P;
+    double true_KE_ff = hadana.true_ffKE;
+    double dKE_true_KE_ff_vs_fitted = true_KE_ff - fitted_KE;
     //cout << "[ProtonEnergy::FillHistograms] fitted_KE : " << fitted_KE << ", KE_calo : " << KE_calo << endl;
 
     FillHistVec1D(htrack_length_fitted,fitted_length, hadana.ptype);
@@ -81,7 +83,9 @@ void ProtonEnergy::FillHistograms(const anavar & evt){
     FillHistVec1D(htrack_fittedKE, fitted_KE, hadana.ptype);
     FillHistVec1D(htrack_fitted_dKE, fitted_dKE, hadana.ptype);
     FillHistVec1D(htrack_dKE_fitted_vs_KECalo, dKE_calo_vs_fitted, hadana.ptype);
-    /*
+    FillHistVec1D(htrack_KETruth, true_KE_ff, hadana.ptype);    
+    FillHistVec1D(htrack_dKE_fitted_vs_Truth, dKE_true_KE_ff_vs_fitted, hadana.ptype);; 
+   /*
     cout << "[ProtonEnergy::FillHistograms] fitted_length : " << fitted_length << endl;
     cout << "[ProtonEnergy::FillHistograms] reco length : " << evt.reco_beam_alt_len << endl;
     cout << "[ProtonEnergy::FillHistograms] hypoth_length : " << hypoth_length << endl;
@@ -149,7 +153,6 @@ void ProtonEnergy::Run(anavar & evt, Long64_t nentries=-1){
     if (!hadana.isSelectedPart(evt)) continue;
     ProcessEvent(evt);
     if (!hadana.PassPCuts(evt)) continue;
-    if (!hadana.PassBeamScraperCut(evt)) continue;
     FillHistograms(evt);
     
   }
