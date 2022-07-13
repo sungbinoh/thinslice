@@ -70,6 +70,7 @@ class HadAna{
   std::vector<double> true_trklen_accum;
   std::vector<double> reco_trklen_accum;
   double true_ffKE;
+  double Get_true_ffKE(const anavar& evt, double KE_in_TPC, double length_to_ff);
 
   // == Momentum measurement using dE/dx and hit for a short track segment
   double Fit_dEdx_Residual_Length(const anavar& evt, const vector<double> & dEdx, const vector<double> & ResRange, int PID, bool save_graph);

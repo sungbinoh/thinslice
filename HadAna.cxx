@@ -268,6 +268,11 @@ bool HadAna::PassPCuts(const anavar& evt) const{
     PassBeamXYCut(evt);
 }
 
+double HadAna::Get_true_ffKE(const anavar& evt, double KE_in_TPC, double length_to_ff){
+  double this_dEdx = map_BB[abs(evt.true_beam_PDG)] -> meandEdx(KE_in_TPC);
+  return KE_in_TPC + this_dEdx * length_to_ff;
+}
+
 double HadAna::Fit_dEdx_Residual_Length(const anavar& evt, const vector<double> & dEdx, const vector<double> & ResRange, int PID, bool save_graph){
 
   int N_max = 20; // == Maximum number of hits used for the Bethe-Bloch fitting
@@ -554,7 +559,9 @@ void HadAna::ProcessEvent(const anavar& evt){
     }
     // front-face energy
     true_ffKE = 999999.;
-    if (start_idx >= 0) true_ffKE = (*evt.true_beam_traj_KE)[start_idx+1] + 2.18*(true_trklen_accum)[start_idx+1];
+    if (start_idx >= 0){
+      true_ffKE = Get_true_ffKE(evt, (*evt.true_beam_traj_KE)[start_idx+1], (true_trklen_accum)[start_idx+1]);
+    }
   }
   
   energy_calorimetry_SCE = 0; //MeV
