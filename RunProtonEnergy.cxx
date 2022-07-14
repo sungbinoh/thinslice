@@ -47,6 +47,7 @@ int main(int argc, char ** argv){
   mcpe.SetOutputFileName(root["mcoutfile"].asString());
   mcpe.Run(mcevt, root["nevents"].asInt());
 
+  /*
   TChain *datachain = new TChain();
   datachain->Add(Form("%s/pduneana/beamana", root["datafile"].asString().c_str()));
 
@@ -55,7 +56,7 @@ int main(int argc, char ** argv){
   ProtonEnergy datape;
   datape.SetOutputFileName(root["dataoutfile"].asString());
   datape.Run(dataevt, root["nevents"].asInt());
- 
+  */
   return 0;
 
 }

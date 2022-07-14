@@ -30,9 +30,12 @@ void ProtonEnergy::BookHistograms(){
     htrack_dKE_fitted_vs_KECalo[i] = new TH1D(Form("htrack_dKE_fitted_vs_KECalo_%d",i),Form("%s;track_dKE_fitted_vs_KECalo", p::intTypeName[i]), 2000, -1000, 1000);
     htrack_KETruth[i] = new TH1D(Form("htrack_KETruth_%d",i),Form("%s;track_KETruth", p::intTypeName[i]), 500, 0, 2000);
     htrack_dKE_fitted_vs_Truth[i] = new TH1D(Form("htrack_dKE_fitted_vs_Truth_%d",i),Form("%s;track_dKE_fitted_vs_Truth", p::intTypeName[i]), 2000, -1000, 1000);
+    htrack_dKE_KECalo_vs_Truth[i] = new TH1D(Form("htrack_dKE_KECalo_vs_Truth_%d",i),Form("%s;track_dKE_KECalo_vs_Truth", p::intTypeName[i]), 2000, -1000, 1000);
     htrack_length_ratio_fitted[i] = new TH1D(Form("htrack_length_ratio_fitted_%d",i),Form("%s;track_length_ratio_fitted", p::intTypeName[i]), 1000, 0, 2);
     htrack_length_ratio_eloss46[i] = new TH1D(Form("htrack_length_ratio_eloss46_%d",i),Form("E_{loss} = 46 MeV, %s;track_length_ratio", p::intTypeName[i]), 100, 0, 2);
     hend_energy[i] = new TH1D(Form("hend_energy_%d",i),Form("%s;End point energy", p::intTypeName[i]), 100, -500, 500);
+
+    htrack_dKE_fitted_vs_Truth_2D[i] = new TH2D(Form("htrack_dKE_fitted_vs_Truth_2D_%d",i),Form("%s;track_dKE_fitted_vs_Truth", p::intTypeName[i]),600, 200., 800.,  2000, -1000, 1000);
   }
 
   // == Scanning Eloss
@@ -84,7 +87,11 @@ void ProtonEnergy::FillHistograms(const anavar & evt){
     FillHistVec1D(htrack_fitted_dKE, fitted_dKE, hadana.ptype);
     FillHistVec1D(htrack_dKE_fitted_vs_KECalo, dKE_calo_vs_fitted, hadana.ptype);
     FillHistVec1D(htrack_KETruth, true_KE_ff, hadana.ptype);    
-    FillHistVec1D(htrack_dKE_fitted_vs_Truth, dKE_true_KE_ff_vs_fitted, hadana.ptype);; 
+    FillHistVec1D(htrack_dKE_fitted_vs_Truth, dKE_true_KE_ff_vs_fitted, hadana.ptype);
+    FillHistVec1D(htrack_dKE_KECalo_vs_Truth, true_KE_ff - KE_calo, hadana.ptype);
+
+    FillHistVec2D(htrack_dKE_fitted_vs_Truth_2D, true_KE_ff, dKE_true_KE_ff_vs_fitted, hadana.ptype);
+
    /*
     cout << "[ProtonEnergy::FillHistograms] fitted_length : " << fitted_length << endl;
     cout << "[ProtonEnergy::FillHistograms] reco length : " << evt.reco_beam_alt_len << endl;

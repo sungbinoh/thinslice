@@ -48,9 +48,11 @@ class ProtonEnergy {
   TH1D *htrack_dKE_fitted_vs_KECalo[p::nIntTypes+1];
   TH1D *htrack_KETruth[p::nIntTypes+1];
   TH1D *htrack_dKE_fitted_vs_Truth[p::nIntTypes+1];
+  TH1D *htrack_dKE_KECalo_vs_Truth[p::nIntTypes+1];
   TH1D *htrack_length_fitted[p::nIntTypes+1];
   TH1D *htrack_length_reco[p::nIntTypes+1];
   TH1D *htrack_length_BeamKEtoRange[p::nIntTypes+1];
+  TH2D *htrack_dKE_fitted_vs_Truth_2D[p::nIntTypes+1];
   // Scan Eloss for Elastic scattering
   TH1D *htrack_length_ratio_elss_scan[50];
   // Proton energy at the track end point based on the beam momentum and track length
