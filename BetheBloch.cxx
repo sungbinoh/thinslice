@@ -1,9 +1,10 @@
 #include "BetheBloch.h"
-#include "TF1.h"
 #include "TSpline.h"
 #include <iostream>
 #include <cmath>
 #include <algorithm>
+
+ROOT::Math::VavilovAccurate vav;
 
 using namespace std;
 
@@ -54,19 +55,21 @@ void BetheBloch::SetPdgCode(int pdg){
 }
 
 double BetheBloch::densityEffect(double beta, double gamma){
-
-  double lar_C = 5.215, lar_x0 = 0.201, lar_x1 = 3, lar_a = 0.196, lar_k = 3;
-  double x = log10(beta * gamma);
-  
-  if( x >= lar_x1 ){
-    return 2*log(10)*x - lar_C;
+  // == Estimate the density correction
+  double density_y = TMath::Log10(beta * gamma);
+  double ln10 = TMath::Log(10);
+  double this_delta = 0.;
+  if(density_y > density_y1){
+    this_delta = 2.0 * ln10 * density_y - density_C;
   }
-  else if ( lar_x0 <= x && x < lar_x1){
-    return 2*log(10)*x - lar_C + lar_a * pow(( lar_x1 - x ) , lar_k );
+  else if (density_y < density_y0){
+    this_delta = 0.;
   }
   else{
-    return 0; //if x < lar_x0
+    this_delta = 2.0 * ln10 * density_y - density_C + density_a * pow(density_y1 - density_y, density_k);
   }
+
+  return this_delta;
 }
 
 double BetheBloch::betaGamma(double KE){
@@ -79,21 +82,28 @@ double BetheBloch::betaGamma(double KE){
 
 }
 
+double BetheBloch::Landau_xi(double KE, double pitch){
+  double gamma = (KE/mass)+1.0;
+  double beta = TMath::Sqrt(1-(1.0/(gamma*gamma)));
+  double xi = rho * pitch * 0.5 * K * (Z / A) * pow(1. / beta, 2);
+  return xi;
+}
+
+double BetheBloch::Get_Wmax(double KE){
+  double gamma = (KE/mass)+1.0;
+  double beta = TMath::Sqrt(1-(1.0/(gamma*gamma)));
+  double Wmax = (2.0 * me * pow(beta * gamma, 2)) / (1.0 + 2.0 * me * (gamma / mass) + pow((me / mass),2));
+
+  return Wmax;
+}
+
 double BetheBloch::meandEdx(double KE){
 
   //KE is kinetic energy in MeV
-  
-  double K = 0.307;
-  double rho = 1.396;
-  double Z = 18;
-  double A = 39.948;
-  double I = pow(10,-6)*10.5*18; //MeV
-  double me = 0.511; //MeV me*c^2
-  
   double gamma = (KE + mass) / mass;
   double beta = sqrt( 1 - 1/pow(gamma,2));
   
-  double wmax = 2*me*pow(beta,2)*pow(gamma,2)/(1+2*gamma*me/mass + pow(me,2)/pow(mass,2));
+  double wmax = Get_Wmax(KE);
 
   //cout<<wmax<<" "<<rho*K*Z*pow(charge,2)<<" "<<A*pow(beta,2)<<" "<<0.5*log(2*me*pow(gamma,2)*pow(beta,2)*wmax/pow(I,2))<<" "<<pow(beta,2)<<" "<<densityEffect( beta, gamma )/2<<endl;
   double dEdX = (rho*K*Z*pow(charge,2))/(A*pow(beta,2))*(0.5*log(2*me*pow(gamma,2)*pow(beta,2)*wmax/pow(I,2)) - pow(beta,2) - densityEffect( beta, gamma )/2 );
@@ -105,18 +115,10 @@ double BetheBloch::MPVdEdx(double KE, double pitch){
 
   //KE is kinetic energy in MeV
   //pitch is in cm
-
-  double K = 0.307;
-  double rho = 1.396;
-  double Z = 18;
-  double A = 39.948;
-  double I = pow(10,-6)*10.5*18; //MeV
-  double  me = 0.511; //MeV me*c^2
-
   double gamma = (KE + mass) / mass;
   double beta = sqrt( 1 - 1/pow(gamma,2));
 
-  double xi = ( K/2 )*( Z/A )* ( pitch * rho / pow(beta,2));
+  double xi = Landau_xi(KE, pitch);
   
   double eloss_mpv = xi*(log( 2*me*pow(gamma,2)*pow(beta,2) / I ) + log( xi / I ) + 0.2 - pow(beta,2) - densityEffect( beta, gamma ) )/pitch;
 
@@ -246,4 +248,45 @@ void BetheBloch::CreateSplineAtKE(int iKE){
   delete[] trklength;
   delete[] deltaE;
 
+}
+double dEdx_PDF_fuction(double *x, double *par){
+  // == par[5] = {kappa, beta^2, xi, <dE/dx>BB, width}
+  double a = par[2] / par[4];
+  double b = (0.422784 + par[1] + log(par[0])) * par[2] / par[4] + par[3];
+  double y = (x[0] - b) / a;
+
+  double this_vav = 0.;
+
+  if(par[0] < 0.01){ // == Landau
+    this_vav = TMath::Landau(y);
+    this_vav =  this_vav / a;
+  }
+  else if(par[0] > 10.){ // == Gaussian
+    double mu = vav.Mean(par[0], par[1]);
+    double sigma = sqrt(vav.Variance(par[0], par[1]));
+    this_vav =  TMath::Gaus(y, mu, sigma);
+  }
+  else{ // == Vavilov
+    this_vav =  vav.Pdf(y, par[0], par[1]);
+    this_vav =  this_vav / a;
+  }
+
+  return this_vav;
+}
+
+
+TF1 *BetheBloch::dEdx_PDF(double KE, double pitch){
+
+  double gamma = (KE/mass)+1.0;
+  double beta = TMath::Sqrt(1-(1.0/(gamma*gamma)));
+  double this_xi = Landau_xi(KE, pitch);
+  double this_Wmax = Get_Wmax(KE);
+  double this_kappa = this_xi / this_Wmax;
+  double this_dEdx_BB = meandEdx(KE);
+  double par[5] = {this_kappa, beta * beta, this_xi, this_dEdx_BB, pitch};
+  
+  TF1 *out = new TF1("", dEdx_PDF_fuction, -100., 1000., 5);
+  out -> SetParameters(par[0], par[1], par[2], par[3], par[4]);
+
+  return out;
 }

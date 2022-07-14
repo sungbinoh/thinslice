@@ -584,18 +584,8 @@ void HadAna::ProcessEvent(const anavar& evt){
     // front-face energy
     true_ffKE = 999999.;
     if (start_idx >= 0){
-      //double ff_dEdx = Get_true_ffKE(evt, (*evt.true_beam_traj_KE)[start_idx+1], (true_trklen_accum)[start_idx+1]);
       true_ffKE = Get_true_ffKE(evt, (*evt.true_beam_traj_KE)[start_idx+1], (true_trklen_accum)[start_idx+1]);
     }
-    // == Check order of small additional length
-    /*
-    if (start_idx >= 0){
-      cout << "==============" << endl;
-      cout << "SB debug, (*evt.true_beam_traj_KE)[start_idx+1] : " << (*evt.true_beam_traj_KE)[start_idx+1] << endl;
-      cout << "SB debug, (true_trklen_accum)[start_idx+1] : " << (true_trklen_accum)[start_idx+1] << endl;
-      cout << "SB debug, Get_true_ffKE(evt, ..) : " << Get_true_ffKE(evt, (*evt.true_beam_traj_KE)[start_idx+1], (true_trklen_accum)[start_idx+1]) << endl;
-    }
-    */
   }
   
   energy_calorimetry_SCE = 0; //MeV

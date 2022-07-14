@@ -8,7 +8,7 @@
   project(thinslice)
 
 # Locate the ROOT package and define a number of useful targets and variables.
-  find_package(ROOT REQUIRED COMPONENTS RIO)
+  find_package(ROOT REQUIRED COMPONENTS RIO MathMore)
   if(NOT ROOT_FOUND)
          message(STATUS "ROOT package not found.")
          return()
