@@ -8,39 +8,27 @@
 using namespace std;
 
 PionXsec::PionXsec(){
-  hadana.InitP();
+  hadana.InitPi();
 }
 
 void PionXsec::BookHistograms(){
-
+  //cout << "[PionXsec::BookHistograms] Start" << endl;
   outputFile = TFile::Open(fOutputFileName.c_str(), "recreate");
 
-  for (int i = 0; i < p::nIntTypes+1; ++i){
-    htrack_length_ratio[i] = new TH1D(Form("htrack_length_ratio_%d",i),Form("%s;track_length_ratio", p::intTypeName[i]), 100, 0, 2);
-    htrack_length_reco[i] = new TH1D(Form("htrack_length_reco_%d",i),Form("%s;track_length", p::intTypeName[i]), 100, 0, 1000);
-    htrack_length_BeamKEtoRange[i] = new TH1D(Form("htrack_length_BeamKEtoRange_%d",i),Form("%s;track_length", p::intTypeName[i]), 100, 0, 1000);
-    htrack_length_fitted[i] = new TH1D(Form("htrack_length_fitted_%d",i),Form("%s;track_length_fitted", p::intTypeName[i]), 100, 0, 1000);
-    htrack_BeamKE[i] = new TH1D(Form("htrack_BeamKE_%d",i),Form("%s;track_BeamKE", p::intTypeName[i]), 100, 0, 1000);
-    htrack_BeamP[i] = new TH1D(Form("htrack_BeamP_%d",i),Form("%s;track_BeamP", p::intTypeName[i]), 500, 0, 2000);
-    htrack_fittedP[i] = new TH1D(Form("htrack_fittedP_%d",i),Form("%s;track_fittedP", p::intTypeName[i]), 500, 0, 2000);
-    htrack_fitted_dP[i] = new TH1D(Form("htrack_fitted_dP_%d",i),Form("%s;track_fitted_dP", p::intTypeName[i]), 2000, -1000, 1000);
-    htrack_fittedKE[i] = new TH1D(Form("htrack_fittedKE_%d",i),Form("%s;track_fittedKE", p::intTypeName[i]), 500, 0, 2000);
-    htrack_fitted_dKE[i] = new TH1D(Form("htrack_fitted_dKE_%d",i),Form("%s;track_fitted_dKE", p::intTypeName[i]), 2000, -1000, 1000);
-    htrack_KECalo[i] = new TH1D(Form("htrack_KECalo_%d",i),Form("%s;track_KECalo", p::intTypeName[i]), 500, 0, 2000);
-    htrack_dKE_fitted_vs_KECalo[i] = new TH1D(Form("htrack_dKE_fitted_vs_KECalo_%d",i),Form("%s;track_dKE_fitted_vs_KECalo", p::intTypeName[i]), 2000, -1000, 1000);
-    htrack_KETruth[i] = new TH1D(Form("htrack_KETruth_%d",i),Form("%s;track_KETruth", p::intTypeName[i]), 500, 0, 2000);
-    htrack_dKE_fitted_vs_Truth[i] = new TH1D(Form("htrack_dKE_fitted_vs_Truth_%d",i),Form("%s;track_dKE_fitted_vs_Truth", p::intTypeName[i]), 2000, -1000, 1000);
-    htrack_dKE_KECalo_vs_Truth[i] = new TH1D(Form("htrack_dKE_KECalo_vs_Truth_%d",i),Form("%s;track_dKE_KECalo_vs_Truth", p::intTypeName[i]), 2000, -1000, 1000);
-    htrack_length_ratio_fitted[i] = new TH1D(Form("htrack_length_ratio_fitted_%d",i),Form("%s;track_length_ratio_fitted", p::intTypeName[i]), 1000, 0, 2);
-    htrack_length_ratio_eloss46[i] = new TH1D(Form("htrack_length_ratio_eloss46_%d",i),Form("E_{loss} = 46 MeV, %s;track_length_ratio", p::intTypeName[i]), 100, 0, 2);
-    hend_energy[i] = new TH1D(Form("hend_energy_%d",i),Form("%s;End point energy", p::intTypeName[i]), 100, -500, 500);
+  for (int i = 0; i < pi::nIntTypes+1; ++i){
+    htrack_BeamKE[i] = new TH1D(Form("htrack_BeamKE_%d",i),Form("%s;track_BeamKE", pi::intTypeName[i]), 2000, 0, 2000);
+    htrack_BeamP[i] = new TH1D(Form("htrack_BeamP_%d",i),Form("%s;track_BeamP", pi::intTypeName[i]), 2000, 0, 2000);
+    htrack_fittedP[i] = new TH1D(Form("htrack_fittedP_%d",i),Form("%s;track_fittedP", pi::intTypeName[i]), 2000, 0, 2000);
+    htrack_fitted_dP[i] = new TH1D(Form("htrack_fitted_dP_%d",i),Form("%s;track_fitted_dP", pi::intTypeName[i]), 2000, -1000, 2000);
+    htrack_fittedKE[i] = new TH1D(Form("htrack_fittedKE_%d",i),Form("%s;track_fittedKE", pi::intTypeName[i]), 500, 0, 2000);
+    htrack_fitted_dKE[i] = new TH1D(Form("htrack_fitted_dKE_%d",i),Form("%s;track_fitted_dKE", pi::intTypeName[i]), 2000, -1000, 1000);
+    htrack_KECalo[i] = new TH1D(Form("htrack_KECalo_%d",i),Form("%s;track_KECalo", pi::intTypeName[i]), 500, 0, 2000);
+    htrack_dKE_fitted_vs_KECalo[i] = new TH1D(Form("htrack_dKE_fitted_vs_KECalo_%d",i),Form("%s;track_dKE_fitted_vs_KECalo", pi::intTypeName[i]), 2000, -1000, 1000);
+    htrack_KETruth[i] = new TH1D(Form("htrack_KETruth_%d",i),Form("%s;track_KETruth", pi::intTypeName[i]), 500, 0, 2000);
+    htrack_dKE_fitted_vs_Truth[i] = new TH1D(Form("htrack_dKE_fitted_vs_Truth_%d",i),Form("%s;track_dKE_fitted_vs_Truth", pi::intTypeName[i]), 2000, -1000, 1000);
+    hend_energy[i] = new TH1D(Form("hend_energy_%d",i),Form("%s;End point energy", pi::intTypeName[i]), 100, -500, 500);
 
-    htrack_dKE_fitted_vs_Truth_2D[i] = new TH2D(Form("htrack_dKE_fitted_vs_Truth_2D_%d",i),Form("%s;track_dKE_fitted_vs_Truth", p::intTypeName[i]),600, 200., 800.,  2000, -1000, 1000);
-  }
-
-  // == Scanning Eloss
-  for (int i = 0; i < 50; i++){
-    htrack_length_ratio_elss_scan[i] = new TH1D(Form("htrack_length_ratio_eloss%dMeV", i), Form("E_{loss} = %d MeV;track_length_ratio", i), 100, 0, 2);
+    htrack_dKE_fitted_vs_Truth_2D[i] = new TH2D(Form("htrack_dKE_fitted_vs_Truth_2D_%d",i),Form("%s;track_dKE_fitted_vs_Truth", pi::intTypeName[i]),600, 200., 800.,  2000, -1000, 1000);
   }
 
 }
@@ -50,66 +38,36 @@ void PionXsec::ProcessEvent(const anavar & evt){
 }
 
 void PionXsec::FillHistograms(const anavar & evt){
+  //cout << "[PionXsec::FillHistograms] Start" <<endl;
 
-  double beamKE = sqrt(pow(evt.beam_inst_P*1000, 2) + pow(938.272, 2)) - 938.272;
-  double hypoth_length = hadana.map_BB[2212]->RangeFromKESpline(beamKE);
-  double hypoth_length_eloss46 = hadana.map_BB[2212]->RangeFromKESpline(beamKE-46);
-  double end_energy = hadana.map_BB[2212]->KEAtLength(beamKE, evt.reco_beam_alt_len);
+  double beamP = evt.beam_inst_P*1000.;
+  double beamKE = sqrt(pow(beamP, 2) + pow(139.57, 2)) - 139.57;
   double KE_calo = hadana.Integrate_dEdx(*evt.reco_beam_dEdX_SCE, *evt.reco_beam_TrkPitch_SCE);
-  //double KE_truth = ;
-  //cout<<evt.beam_inst_P<<" "<<beamKE<<" "<<hypoth_length<<" "<<evt.reco_beam_alt_len<<endl;
-  FillHistVec1D(htrack_length_ratio, evt.reco_beam_alt_len/hypoth_length, hadana.ptype);
-  FillHistVec1D(htrack_length_ratio_eloss46, evt.reco_beam_alt_len/hypoth_length_eloss46, hadana.ptype);
-  FillHistVec1D(htrack_length_reco, evt.reco_beam_alt_len, hadana.ptype);
-  FillHistVec1D(htrack_length_BeamKEtoRange, hypoth_length, hadana.ptype);
-  FillHistVec1D(htrack_BeamKE, beamKE, hadana.ptype);
-  FillHistVec1D(htrack_BeamP, evt.beam_inst_P*1000., hadana.ptype);
-  FillHistVec1D(htrack_KECalo, KE_calo, hadana.ptype);
-  FillHistVec1D(hend_energy, end_energy, hadana.ptype);
+  double end_energy = hadana.map_BB[211]->KEAtLength(beamKE, evt.reco_beam_alt_len);
+  FillHistVec1D(htrack_BeamKE, beamKE, hadana.pitype);
+  FillHistVec1D(htrack_BeamP, evt.beam_inst_P*1000., hadana.pitype);
+  FillHistVec1D(htrack_KECalo, KE_calo, hadana.pitype);
+  FillHistVec1D(hend_energy, end_energy, hadana.pitype);
 
-  // == Fit hypothetical residual range
-  if((*evt.reco_beam_dEdX_SCE).size() > 50){
-    double fitted_length = hadana.Fit_dEdx_Residual_Length(evt, *evt.reco_beam_dEdX_SCE, *evt.reco_beam_resRange_SCE, 2212, false);
-    double fitted_KE = hadana.map_BB[2212]->KEFromRangeSpline(fitted_length);
+  if((*evt.reco_beam_dEdX_SCE).size() > 20){
+    //cout << "[PionXsec::FillHistograms] fitting" << endl;
+    double fitted_length = hadana.Fit_dEdx_Residual_Length(evt, *evt.reco_beam_dEdX_SCE, *evt.reco_beam_resRange_SCE, 211, false);
+    double fitted_KE = hadana.map_BB[211]->KEFromRangeSpline(fitted_length);
     double fitted_dKE = beamKE - fitted_KE;
     double dKE_calo_vs_fitted = KE_calo - fitted_KE;
-    double fitted_P = hadana.map_BB[2212]->KEtoMomentum(fitted_KE);
+    double fitted_P = hadana.map_BB[211]->KEtoMomentum(fitted_KE);
     double fitted_dP = evt.beam_inst_P*1000. - fitted_P;
     double true_KE_ff = hadana.true_ffKE;
     double dKE_true_KE_ff_vs_fitted = true_KE_ff - fitted_KE;
-    //cout << "[PionXsec::FillHistograms] fitted_KE : " << fitted_KE << ", KE_calo : " << KE_calo << endl;
-
-    FillHistVec1D(htrack_length_fitted,fitted_length, hadana.ptype);
-    FillHistVec1D(htrack_length_ratio_fitted, evt.reco_beam_alt_len/fitted_length, hadana.ptype);
-    FillHistVec1D(htrack_fittedP, fitted_P, hadana.ptype);
-    FillHistVec1D(htrack_fitted_dP, fitted_dP, hadana.ptype);
-    FillHistVec1D(htrack_fittedKE, fitted_KE, hadana.ptype);
-    FillHistVec1D(htrack_fitted_dKE, fitted_dKE, hadana.ptype);
-    FillHistVec1D(htrack_dKE_fitted_vs_KECalo, dKE_calo_vs_fitted, hadana.ptype);
-    FillHistVec1D(htrack_KETruth, true_KE_ff, hadana.ptype);    
-    FillHistVec1D(htrack_dKE_fitted_vs_Truth, dKE_true_KE_ff_vs_fitted, hadana.ptype);
-    FillHistVec1D(htrack_dKE_KECalo_vs_Truth, true_KE_ff - KE_calo, hadana.ptype);
-
-    FillHistVec2D(htrack_dKE_fitted_vs_Truth_2D, true_KE_ff, dKE_true_KE_ff_vs_fitted, hadana.ptype);
-
-   /*
-    cout << "[PionXsec::FillHistograms] fitted_length : " << fitted_length << endl;
-    cout << "[PionXsec::FillHistograms] reco length : " << evt.reco_beam_alt_len << endl;
-    cout << "[PionXsec::FillHistograms] hypoth_length : " << hypoth_length << endl;
-    cout << "[PionXsec::FillHistograms] hypoth_length_eloss46 : " << hypoth_length_eloss46 << endl;
-    */
+    FillHistVec1D(htrack_fittedP, fitted_P, hadana.pitype);
+    FillHistVec1D(htrack_fitted_dP, fitted_dP, hadana.pitype);
+    FillHistVec1D(htrack_fittedKE, fitted_KE, hadana.pitype);
+    FillHistVec1D(htrack_fitted_dKE, fitted_dKE, hadana.pitype);
+    FillHistVec1D(htrack_dKE_fitted_vs_KECalo, dKE_calo_vs_fitted, hadana.pitype);
+    FillHistVec1D(htrack_KETruth, true_KE_ff, hadana.pitype);    
+    FillHistVec1D(htrack_dKE_fitted_vs_Truth, dKE_true_KE_ff_vs_fitted, hadana.pitype);
+    FillHistVec2D(htrack_dKE_fitted_vs_Truth_2D, true_KE_ff, dKE_true_KE_ff_vs_fitted, hadana.pitype);
   }
-
-  // == Scanning Eloss
-  //if(hadana.ptype == p::kPElas){
-  if(hadana.ptype == p::kData){
-    for(int i = 0; i < 50; i++){
-      double this_eloss = i + 0.;
-      double hypoth_length_eloss = hadana.map_BB[2212]->RangeFromKESpline(beamKE - this_eloss);
-      htrack_length_ratio_elss_scan[i] -> Fill(evt.reco_beam_alt_len/hypoth_length_eloss);
-    }
-  }
-
 }
 
 void PionXsec::SaveHistograms(){
@@ -137,7 +95,6 @@ void PionXsec::Run(anavar & evt, Long64_t nentries=-1){
     ProcessEvent(evt);
     if (!hadana.PassPCuts(evt)) continue;
     FillHistograms(evt);
-    
   }
   SaveHistograms();
   //Make_dEdx_Range_Profile();

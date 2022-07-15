@@ -201,7 +201,6 @@ double BetheBloch::KEAtLength(double KE0, double tracklength){
   if (spmap.find(iKE)==spmap.end()){
     CreateSplineAtKE(iKE);
   }
-
   double deltaE = spmap[iKE]->Eval(tracklength);
 
   if (deltaE < 0) return 0;//cout<<"Negative delta E: "<<deltaE<<endl;
