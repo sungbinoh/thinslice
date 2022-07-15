@@ -1,4 +1,4 @@
-#include "ProtonEnergy.h"
+#include "PionXsec.h"
 #include "EventType.h"
 #include "EventSelection.h"
 #include "TChain.h"
@@ -21,7 +21,7 @@ int main(int argc, char ** argv){
      found_config = true;
     }
     if (!strcasecmp(argv[iArg],"-h")) {
-      std::cout << "Usage: RunProtonEnergy " <<
+      std::cout << "Usage: RunPionXsec " <<
                    "-c config.json " << std::endl;
       return 1;
     }
@@ -43,7 +43,7 @@ int main(int argc, char ** argv){
 
   anavar mcevt(mcchain);
 
-  ProtonEnergy mcpe;
+  PionXsec mcpe;
   mcpe.SetOutputFileName(root["mcoutfile"].asString());
   mcpe.Run(mcevt, root["nevents"].asInt());
 
@@ -52,7 +52,7 @@ int main(int argc, char ** argv){
 
   anavar dataevt(datachain);
 
-  ProtonEnergy datape;
+  PionXsec datape;
   datape.SetOutputFileName(root["dataoutfile"].asString());
   datape.Run(dataevt, root["nevents"].asInt());
 
