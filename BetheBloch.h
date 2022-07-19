@@ -39,6 +39,8 @@ class BetheBloch {
 
   double KEtoMomentum(double KE);
 
+  double MomentumtoKE(double momentum);
+
   void CreateSplineAtKE(int iKE);
 
   TF1 *dEdx_PDF(double KE, double pitch);

@@ -214,6 +214,11 @@ double BetheBloch::KEtoMomentum(double KE){
   return sqrt(pow(KE, 2) + 2.0 * KE * mass);
 }
 
+double BetheBloch::MomentumtoKE(double momentum){
+  return sqrt(pow(momentum, 2) + pow(mass, 2)) - mass;
+}
+
+
 void BetheBloch::CreateSplineAtKE(int iKE){
 
   double KE0 = iKE;

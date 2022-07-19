@@ -275,7 +275,8 @@ double HadAna::Get_true_ffKE(const anavar& evt, double KE_in_TPC, double length_
 }
 
 double HadAna::Fit_dEdx_Residual_Length(const anavar& evt, const vector<double> & dEdx, const vector<double> & ResRange, int PID, bool save_graph){
-
+  
+  //cout << "[HadAna::Fit_dEdx_Residual_Length] Start" << endl;
   bool this_is_beam = true;
   int N_max = 200; // == Maximum number of hits used for the Bethe-Bloch fitting
 
@@ -289,8 +290,8 @@ double HadAna::Fit_dEdx_Residual_Length(const anavar& evt, const vector<double> 
   double best_additional_res_length = -0.1;
   double best_chi2 = 99999.;
   double min_additional_res_length = 0.; // == [cm]
-  double max_additional_res_length = 200.; // == [cm]
-  double res_length_step = 0.5; // == [cm]
+  double max_additional_res_length = 300.; // == [cm]
+  double res_length_step = 1.0; // == [cm]
   int res_length_trial = (max_additional_res_length - min_additional_res_length) / res_length_step;
   int this_N_calo = dEdx.size();
   if(this_N_calo <= 15){
@@ -299,6 +300,8 @@ double HadAna::Fit_dEdx_Residual_Length(const anavar& evt, const vector<double> 
   }
   int this_N_hits = TMath::Min(this_N_calo, N_max); // == Use how many hits
   int i_bestfit = -1;
+  double dEdx_truncate_upper = 5.;
+  double dEdx_truncate_bellow = 0.5;
   vector<double> chi2_vector;
   vector<double> additional_res_legnth_vector;
   for(int i = 0; i < res_length_trial; i++){
@@ -317,7 +320,7 @@ double HadAna::Fit_dEdx_Residual_Length(const anavar& evt, const vector<double> 
       //double dEdx_theory = dEdx_Bethe_Bloch(this_KE, this_mass);
       double dEdx_theory = map_BB[abs_PID]->meandEdx(this_KE);
       double dEdx_measured = dEdx.at(this_index);
-      if(dEdx_measured < 0.5 || dEdx_measured > 20.0) continue; // == Truncate, it should be modified to consider protons
+      if(dEdx_measured < dEdx_truncate_bellow || dEdx_measured > dEdx_truncate_upper) continue; // == Truncate, it should be modified to consider protons
 
       // == Gaussian approx.
       //double dEdx_theory_err = dEdx_theory * 0.02;
