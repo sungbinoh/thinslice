@@ -33,6 +33,8 @@ void PionXsec::BookHistograms(){
     htrack_beam_costh_precut[i] = new TH1D(Form("htrack_beam_costh_precut_%d",i),Form("%s;beam_dxy", pi::intTypeName[i]), 200., -1., 1.);
     htrack_daughter_michel_score_precut[i] = new TH1D(Form("htrack_daughter_michel_score_precut_%d",i),Form("%s;daughter_michel_score", pi::intTypeName[i]), 100., 0., 1.);
     htrack_chi2_proton_precut[i] = new TH1D(Form("htrack_chi2_proton_precut_%d",i),Form("%s;chi2_proton", pi::intTypeName[i]), 1000., 0., 100.);
+    htrack_KEffTruth_precut[i] = new TH1D(Form("htrack_KEffTruth_precut_%d",i),Form("%s;track_KEffTruth_precut", pi::intTypeName[i]), 5000, 0, 5000);
+    htrack_PffTruth_precut[i] = new TH1D(Form("htrack_PffTruth_precut_%d",i),Form("%s;track_PffTruth_precut", pi::intTypeName[i]), 5000, 0, 5000);
     htrack_beam_inst_XY_precut[i] = new TH2D(Form("htrack_beam_inst_XY_precut_%d",i),Form("%s;beam_inst_XY", pi::intTypeName[i]), 400., -50., -10., 400., 400., 440.);
 
     // == Histograms for beam after PiCuts
@@ -47,8 +49,12 @@ void PionXsec::BookHistograms(){
     htrack_beam_costh[i] = new TH1D(Form("htrack_beam_costh_%d",i),Form("%s;beam_dxy", pi::intTypeName[i]), 200., -1., 1.);
     htrack_daughter_michel_score[i] = new TH1D(Form("htrack_daughter_michel_score_%d",i),Form("%s;daughter_michel_score", pi::intTypeName[i]), 100., 0., 1.);
     htrack_chi2_proton[i] = new TH1D(Form("htrack_chi2_proton_%d",i),Form("%s;chi2_proton", pi::intTypeName[i]), 1000., 0., 100.);
+    htrack_KEffTruth[i] = new TH1D(Form("htrack_KEffTruth_%d",i),Form("%s;track_KEffTruth", pi::intTypeName[i]), 5000, 0, 5000);
+    htrack_PffTruth[i] = new TH1D(Form("htrack_PffTruth_%d",i),Form("%s;track_PffTruth", pi::intTypeName[i]), 5000, 0, 5000);
     htrack_beam_inst_XY[i] = new TH2D(Form("htrack_beam_inst_XY_%d",i),Form("%s;beam_inst_XY", pi::intTypeName[i]), 400., -50., -10., 400., 400., 440.);
 
+    // == More plots
+    htrack_BeamP_true[i] = new TH1D(Form("htrack_BeamP_true_%d",i),Form("%s;track_BeamP_true", pi::intTypeName[i]), 5000, 0, 5000);
     htrack_BeamKE_loss[i] = new TH1D(Form("htrack_BeamKE_loss_%d",i),Form("%s;track_BeamKE_loss", pi::intTypeName[i]), 1000, -500, 500);
     htrack_BeamKE_loss_true_mass[i] = new TH1D(Form("htrack_BeamKE_loss_true_mass_%d",i),Form("%s;track_BeamKE_loss_true_mass", pi::intTypeName[i]), 1000, -500, 500);
     htrack_Beam_alt_length[i] = new TH1D(Form("htrack_Beam_alt_length_%d",i),Form("%s;track_Beam_Length", pi::intTypeName[i]), 1000, 0, 1000);
@@ -58,7 +64,6 @@ void PionXsec::BookHistograms(){
     htrack_fitted_dKE[i] = new TH1D(Form("htrack_fitted_dKE_%d",i),Form("%s;track_fitted_dKE", pi::intTypeName[i]), 2000, -1000, 1000);
     htrack_KECalo[i] = new TH1D(Form("htrack_KECalo_%d",i),Form("%s;track_KECalo", pi::intTypeName[i]), 500, 0, 2000);
     htrack_dKE_fitted_vs_KECalo[i] = new TH1D(Form("htrack_dKE_fitted_vs_KECalo_%d",i),Form("%s;track_dKE_fitted_vs_KECalo", pi::intTypeName[i]), 2000, -1000, 1000);
-    htrack_KETruth[i] = new TH1D(Form("htrack_KETruth_%d",i),Form("%s;track_KETruth", pi::intTypeName[i]), 500, 0, 2000);
     htrack_dKE_fitted_vs_Truth[i] = new TH1D(Form("htrack_dKE_fitted_vs_Truth_%d",i),Form("%s;track_dKE_fitted_vs_Truth", pi::intTypeName[i]), 2000, -1000, 1000);
   
     hend_energy[i] = new TH1D(Form("hend_energy_%d",i),Form("%s;End point energy", pi::intTypeName[i]), 400, -2000, 2000);
@@ -84,7 +89,7 @@ void PionXsec::ProcessEvent(const anavar & evt){
 
 void PionXsec::FillHistograms_precut(const anavar & evt){
   double beamP_scale = 1.0;
-  if(evt.MC) beamP_scale = 2.0;
+  if(evt.MC) beamP_scale = 0.5;
   double beamP = evt.beam_inst_P*1000. * beamP_scale;
   double beamKE = sqrt(pow(beamP, 2) + pow(139.57, 2)) - 139.57;
   FillHistVec1D(htrack_BeamKE_precut, beamKE, hadana.pitype);
@@ -99,12 +104,20 @@ void PionXsec::FillHistograms_precut(const anavar & evt){
   FillHistVec1D(htrack_daughter_michel_score_precut, hadana.daughter_michel_score, hadana.pitype);
   FillHistVec1D(htrack_chi2_proton_precut, hadana.chi2_proton, hadana.pitype);
   FillHistVec2D(htrack_beam_inst_XY_precut, evt.beam_inst_X, evt.beam_inst_Y, hadana.pitype);
+
+  // == True Beam info
+  double beamP_true = evt.true_beam_startP * 1000.;
+  double true_KE_ff = hadana.true_ffKE;
+  double true_P_ff = hadana.map_BB[abs(evt.true_beam_PDG)] -> KEtoMomentum(true_KE_ff);
+  FillHistVec1D(htrack_BeamP_true, beamP_true, hadana.pitype);
+  FillHistVec1D(htrack_KEffTruth_precut, true_KE_ff, hadana.pitype);
+  FillHistVec1D(htrack_PffTruth_precut, true_P_ff, hadana.pitype);
 }
 
 void PionXsec::FillHistograms(const anavar & evt){
   //cout << "[PionXsec::FillHistograms] Start" <<endl;
   double beamP_scale = 1.0;
-  if(evt.MC) beamP_scale = 2.0;
+  if(evt.MC) beamP_scale = 0.5;
   double beamP = evt.beam_inst_P*1000. * beamP_scale;
   double beamKE = sqrt(pow(beamP, 2) + pow(139.57, 2)) - 139.57;
   double beamKE_true_mass = beamKE;
@@ -147,7 +160,7 @@ void PionXsec::FillHistograms(const anavar & evt){
     FillHistVec1D(htrack_fittedKE, fitted_KE, hadana.pitype);
     FillHistVec1D(htrack_fitted_dKE, fitted_dKE, hadana.pitype);
     FillHistVec1D(htrack_dKE_fitted_vs_KECalo, dKE_calo_vs_fitted, hadana.pitype);
-    FillHistVec1D(htrack_KETruth, true_KE_ff, hadana.pitype);    
+    FillHistVec1D(htrack_KEffTruth, true_KE_ff, hadana.pitype);    
     FillHistVec1D(htrack_dKE_fitted_vs_Truth, dKE_true_KE_ff_vs_fitted, hadana.pitype);
     FillHistVec2D(htrack_dKE_fitted_vs_Truth_2D, true_KE_ff, dKE_true_KE_ff_vs_fitted, hadana.pitype);
   }

@@ -1,4 +1,4 @@
-#include "PionXsec.h"
+#include "BeamSampleAna.h"
 #include "EventType.h"
 #include "EventSelection.h"
 #include "TChain.h"
@@ -21,7 +21,7 @@ int main(int argc, char ** argv){
      found_config = true;
     }
     if (!strcasecmp(argv[iArg],"-h")) {
-      std::cout << "Usage: RunPionXsec " <<
+      std::cout << "Usage: RunBeamSampleAna " <<
                    "-c config.json " << std::endl;
       return 1;
     }
@@ -39,20 +39,20 @@ int main(int argc, char ** argv){
   //cout<<root["mcfile"].asString()<<endl;
 
   TChain *mcchain = new TChain();
-  mcchain->Add(Form("%s/pduneana/beamana", root["mcfile"].asString().c_str()));
+  mcchain->Add(Form("%s/NTuples/GoodParticle", root["mcfile"].asString().c_str()));
   
-  anavar mcevt(mcchain);
+  BeamNtuple mcevt(mcchain);
 
-  PionXsec mcpe;
+  BeamSampleAna mcpe;
   mcpe.SetOutputFileName(root["mcoutfile"].asString());
   mcpe.Run(mcevt, root["nevents"].asInt());
   /*
   TChain *datachain = new TChain();
   datachain->Add(Form("%s/pduneana/beamana", root["datafile"].asString().c_str()));
 
-  anavar dataevt(datachain);
+  BeamNtuple dataevt(datachain);
 
-  PionXsec datape;
+  BeamSampleAna datape;
   datape.SetOutputFileName(root["dataoutfile"].asString());
   datape.Run(dataevt, root["nevents"].asInt());
   */

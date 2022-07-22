@@ -47,6 +47,9 @@ class PionXsec {
   TH2D *htrack_beam_inst_XY_precut[pi::nIntTypes+1]; // beam Inst XY
   TH1D *htrack_daughter_michel_score_precut[pi::nIntTypes+1];
   TH1D *htrack_chi2_proton_precut[pi::nIntTypes+1];
+  TH1D *htrack_KEffTruth_precut[pi::nIntTypes+1];
+  TH1D *htrack_PffTruth_precut[pi::nIntTypes+1];
+
 
   // == After PiCuts
   TH1D *htrack_BeamKE[pi::nIntTypes+1];
@@ -61,7 +64,12 @@ class PionXsec {
   TH2D *htrack_beam_inst_XY[pi::nIntTypes+1]; // beam Inst XY
   TH1D *htrack_daughter_michel_score[pi::nIntTypes+1];
   TH1D *htrack_chi2_proton[pi::nIntTypes+1];
+  TH1D *htrack_KEffTruth[pi::nIntTypes+1];
+  TH1D *htrack_PffTruth[pi::nIntTypes+1];
 
+ 
+  // == More plots
+  TH1D *htrack_BeamP_true[pi::nIntTypes+1];
   TH1D *htrack_BeamKE_loss[pi::nIntTypes+1];
   TH1D *htrack_BeamKE_loss_true_mass[pi::nIntTypes+1];
   TH1D *htrack_Beam_alt_length[pi::nIntTypes+1];
@@ -71,8 +79,10 @@ class PionXsec {
   TH1D *htrack_fitted_dKE[pi::nIntTypes+1];
   TH1D *htrack_KECalo[pi::nIntTypes+1];
   TH1D *htrack_dKE_fitted_vs_KECalo[pi::nIntTypes+1];
-  TH1D *htrack_KETruth[pi::nIntTypes+1];
   TH1D *htrack_dKE_fitted_vs_Truth[pi::nIntTypes+1];
+  TH1D *htrack_BeamX_true[pi::nIntTypes+1];
+  TH1D *htrack_BeamY_true[pi::nIntTypes+1];
+  TH1D *htrack_BeamZ_true[pi::nIntTypes+1];
 
   TH2D *htrack_dKE_fitted_vs_Truth_2D[pi::nIntTypes+1];
   // Proton energy at the track end point based on the beam momentum and track length

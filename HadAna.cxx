@@ -256,7 +256,7 @@ bool HadAna::PassPiCuts(const anavar& evt) const{
   return PassPandoraSliceCut(evt)&&
     PassCaloSizeCut(evt)&&
     PassBeamQualityCut()&&
-    PassBeamXYCut(evt) &&
+    //PassBeamXYCut(evt) &&
     PassAPA3Cut(evt)&&
     PassMichelScoreCut()&&
     PassProtonCut();
