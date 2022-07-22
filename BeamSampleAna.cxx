@@ -1,9 +1,5 @@
 #include "BeamSampleAna.h"
-//#include "HadAna.h"
 #include "BeamNtuple.h"
-#include "TH1D.h"
-#include "util.h"
-#include <iostream>
 
 using namespace std;
 
@@ -13,7 +9,7 @@ BeamSampleAna::BeamSampleAna(){
 
 void BeamSampleAna::BookHistograms(){
   //cout << "[BeamSampleAna::BookHistograms] Start" << endl;
-  outputFile = TFile::Open(fOutputFileName.c_str(), "recreate");
+  Hist.outfile = TFile::Open(fOutputFileName.c_str(), "recreate");
 
   // == Histograms for normalization
   h_cutflow = new TH1D("Cutflow", "Cutflow", 20, 0., 20.);
@@ -26,13 +22,16 @@ void BeamSampleAna::ProcessEvent(const BeamNtuple & evt){
 void BeamSampleAna::FillHistograms(const BeamNtuple & evt){
   cout << "[BeamSampleAna::FillHistograms] Start" <<endl;
   cout << "AfterTarget_Pz : " << evt.AfterTarget_Pz << endl;
+  double P_AfterTarget = sqrt(pow(evt.AfterTarget_Px, 2) + pow(evt.AfterTarget_Py, 2) + pow(evt.AfterTarget_Pz, 2));
+  Hist.FillHist("P_AfterTarget", P_AfterTarget, 1., 5000., 0., 5000.); 
   double beamP_scale = 1.0;
   //if(evt.MC) beamP_scale = 0.5;
 }
 
 void BeamSampleAna::SaveHistograms(){
-  outputFile->cd();
-  outputFile->Write();
+  Hist.WriteHist();
+  //Hist.outfile->cd();
+  //outputFile->Write();
 }
 
 void BeamSampleAna::Run(BeamNtuple & evt, Long64_t nentries=-1){

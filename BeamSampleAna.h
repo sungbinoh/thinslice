@@ -1,11 +1,14 @@
 #ifndef BEAMSAMPLEANA_H
 #define BEAMSAMPLEANA_H
 
+#include "TH1D.h"
+#include "util.h"
 #include "TFile.h"
 #include "BeamNtuple.h"
-//#include "HadAna.h"
+#include "FillHist_Helper.h"
 
 class BeamNtuple;
+class FillHist_Helper;
 //class HadAna;
 class TH1D;
 class TH2D;
@@ -16,6 +19,7 @@ class BeamSampleAna {
 
   BeamSampleAna();
 
+  FillHist_Helper Hist;
   //HadAna hadana;
   
   std::string fOutputFileName;
