@@ -245,6 +245,7 @@ bool HadAna::PassCaloSizeCut(const anavar& evt) const{ // Require hits informati
 bool HadAna::PassMichelScoreCut() const{ // further veto muon tracks according to Michel score
   
   return daughter_michel_score < 0.55;
+  //return daughter_michel_score > 0.55; // FIXME, inverted temp for TJ's request
 }
 
 bool HadAna::PassProtonCut() const{ // to remove proton background
@@ -405,15 +406,135 @@ double HadAna::Fit_dEdx_Residual_Length(const anavar& evt, const vector<double> 
   return best_total_res_length;
 }
 
+double HadAna::Fit_Pion_Residual_Length_Likelihood(const anavar& evt, const vector<double> & dEdx, const vector<double> & ResRange, int PID, bool save_graph){
+  // == only for charged pions
+  bool this_is_beam = true;
+  int N_max = 200;  
+  int abs_PID = abs(PID);
+  if(!abs(PID) == 211){
+    return -9999.;
+  }
+  double best_additional_res_length = -0.1;
+  double best_m2lnL = 99999.;
+  double min_additional_res_length = 0.; // == [cm]
+  double max_additional_res_length = 300.; // == [cm]
+  double res_length_step = 0.1; // == [cm]
+  int res_length_trial = (max_additional_res_length - min_additional_res_length) / res_length_step;
+  int this_N_calo = dEdx.size();
+  if(this_N_calo <= 15){
+    return -9999.; // == Too small number of hits 
+  }
+  int this_N_hits = TMath::Min(this_N_calo, N_max); // == Use how many hits
+  int i_bestfit = -1;
+  double dEdx_truncate_upper = 5.;
+  double dEdx_truncate_bellow = 0.5;
+  vector<double> m2lnL_vector;
+  vector<double> additional_res_legnth_vector;
+  for(int i = 0; i < res_length_trial; i++){
+
+    double this_additional_res_length = min_additional_res_length + (i + 0.) * res_length_step;
+    double this_m2lnL = 0.;
+    for(int j = 5; j < this_N_hits - 5; j++){ // == Do not use first and last 5 hits 
+      int this_index = this_N_calo - 1 - j;
+      if(this_is_beam) this_index = j;
+      double this_res_length = ResRange.at(this_index) - ResRange.at(this_N_calo - this_N_hits) + this_additional_res_length;
+      if(this_is_beam) this_res_length = ResRange.at(this_index) - ResRange.at(this_N_hits - 1) + this_additional_res_length;
+      double this_KE = map_BB[abs_PID]->KEFromRangeSpline(this_res_length);
+      double dEdx_theory = map_BB[abs_PID]->meandEdx(this_KE);
+      double dEdx_measured = dEdx.at(this_index);
+      if(dEdx_measured < dEdx_truncate_bellow || dEdx_measured > dEdx_truncate_upper) continue; // == Truncate
+
+      // == Likelihood
+      double this_pitch = fabs(ResRange.at(this_index) - ResRange.at(this_index + 1));
+      this_m2lnL += (-2.0) * log(map_BB[abs_PID] -> dEdx_PDF(this_KE, this_pitch) -> Eval(dEdx_measured));
+    }
+    //this_chi2 = this_chi2 / (this_N_hits + 0.); // == chi2 / n.d.f                                                                                                                                       
+    if(this_m2lnL < best_m2lnL){
+      best_m2lnL = this_m2lnL;
+      best_additional_res_length = this_additional_res_length;
+      i_bestfit = i;
+    }
+    if(save_graph){
+      // == Save vectors for graphes
+      m2lnL_vector.push_back(this_m2lnL);
+      additional_res_legnth_vector.push_back(this_additional_res_length);
+    }
+  }
+
+  if(save_graph){
+    vector<double> range_original;
+    vector<double> range_bestfit;
+    vector<double> range_reco;
+    vector<double> dEdx_ordered;
+    for(int i = 5; i < this_N_hits - 5; i++){
+      int this_index = this_N_calo - 1 - i;
+      if(this_is_beam) this_index = i;
+      double this_range_original = ResRange.at(this_index) - ResRange.at(this_N_calo - this_N_hits);
+      if(this_is_beam) this_range_original = ResRange.at(this_index) - ResRange.at(this_N_hits - 1);
+      range_original.push_back(this_range_original);
+
+      double this_range_bestfit = ResRange.at(this_index) - ResRange.at(this_N_calo - this_N_hits) + best_additional_res_length;
+      if(this_is_beam) this_range_bestfit = ResRange.at(this_index) - ResRange.at(this_N_hits - 1) + best_additional_res_length;
+      range_bestfit.push_back(this_range_bestfit);
+      range_reco.push_back(ResRange.at(this_index));
+      dEdx_ordered.push_back(dEdx.at(this_index));
+    }
+    TGraph *dEdx_gr = new TGraph(this_N_hits - 10, &range_original[0], &dEdx_ordered[0]);
+    dEdx_gr -> SetName(Form("dEdx_Run%d_Evt%d_Nhit%d", evt.run, evt.event, this_N_hits - 1));
+    dEdx_gr -> Write();
+    delete dEdx_gr;
+
+    TGraph *dEdx_bestfit_gr = new TGraph(this_N_hits - 10,&range_bestfit[0], &dEdx_ordered[0]);
+    dEdx_bestfit_gr -> SetName(Form("dEdx_bestfit_Run%d_Evt%d_Nhit%d", evt.run, evt.event, this_N_hits));
+    dEdx_bestfit_gr -> Write();
+    delete dEdx_bestfit_gr;
+
+    TGraph *dEdx_reco_gr = new TGraph(this_N_hits - 10,&range_reco[0], &dEdx_ordered[0]);
+    dEdx_reco_gr -> SetName(Form("dEdx_reco_Run%d_Evt%d_Nhit%d", evt.run, evt.event, this_N_hits));
+    dEdx_reco_gr -> Write();
+    delete dEdx_reco_gr;
+
+    TGraph *chi2_gr = new TGraph(additional_res_legnth_vector.size(), &additional_res_legnth_vector[0], &m2lnL_vector[0]);
+    chi2_gr -> SetName(Form("Chi2_Run%d_Evt%d_Nhit%d", evt.run, evt.event, this_N_hits));
+    chi2_gr -> Write();
+    m2lnL_vector.clear();
+    additional_res_legnth_vector.clear();
+    delete chi2_gr;
+  }
+
+  double original_res_length = ResRange.at(this_N_calo - 1) - ResRange.at(this_N_calo - this_N_hits); // == [cm]
+  if(this_is_beam) original_res_length = ResRange.at(0) - ResRange.at(this_N_hits - 1); // == [cm]
+  double best_total_res_length = best_additional_res_length + original_res_length;
+  double best_KE = map_BB[abs_PID]->KEFromRangeSpline(best_total_res_length);
+  double best_mom = map_BB[abs_PID]->KEtoMomentum(best_KE);
+
+  // == Define fitting failed cases
+  if(i_bestfit == res_length_trial - 1){
+    //cout << "[HadAna::Fit_Beam_Hit_dEdx_Residual_Length] Fit failed : no mimumum" << endl; 
+    return -9999.;
+  }
+  else if(best_m2lnL > 99990.){
+    //cout << "[HadAna::Fit_Beam_Hit_dEdx_Residual_Length] Fit failed : best_chi2 > 99990." << endl;
+    return -9999.;
+  }
+  else if(best_m2lnL < 1.0e-11){
+    //cout << "[HadAna::Fit_Beam_Hit_dEdx_Residual_Length] Fit failed : best_chi2 < 1.0e-11" << endl;
+    return -9999.;
+  }
+
+  return best_total_res_length;
+}
+
 double HadAna::Integrate_dEdx(const vector<double> & dEdx, const vector<double> & pitch){
   double integrated_KE = 0.;
   for(int i = 0; i < dEdx.size(); i++){
     double this_deltaE = dEdx.at(i) * pitch.at(i);
     integrated_KE += this_deltaE;
   }
-
+  
   return integrated_KE;
 }
+
 
 void HadAna::ProcessEvent(const anavar& evt){
 

@@ -152,6 +152,96 @@ void FillHist_Helper::FillHist(TString histname,
 
 }
 
+TH1D* FillHist_Helper::JSGetHist1D(TString suffix, TString histname){
+
+  TH1D *h = NULL;
+
+  std::map< TString, std::map<TString, TH1D*> >::iterator mapit = JSmaphist_TH1D.find(suffix);
+  if(mapit==JSmaphist_TH1D.end()){
+    return h;
+  }
+  else{
+
+    std::map<TString, TH1D*> this_maphist = mapit->second;
+    std::map<TString, TH1D*>::iterator mapitit = this_maphist.find(histname);
+    if(mapitit != this_maphist.end()) return mapitit->second;
+
+  }
+
+  return h;
+
+}
+
+void FillHist_Helper::JSFillHist(TString suffix, TString histname, double value, double weight, int n_bin, double x_min, double x_max){
+
+  TH1D *this_hist = JSGetHist1D(suffix, histname);
+  if( !this_hist ){
+
+    this_hist = new TH1D(histname, "", n_bin, x_min, x_max);
+    (JSmaphist_TH1D[suffix])[histname] = this_hist;
+
+  }
+
+  this_hist->Fill(value, weight);
+
+}
+
+TH2D* FillHist_Helper::JSGetHist2D(TString suffix, TString histname){
+
+  TH2D *h = NULL;
+
+  std::map< TString, std::map<TString, TH2D*> >::iterator mapit = JSmaphist_TH2D.find(suffix);
+  if(mapit==JSmaphist_TH2D.end()){
+    return h;
+  }
+  else{
+
+    std::map<TString, TH2D*> this_maphist = mapit->second;
+    std::map<TString, TH2D*>::iterator mapitit = this_maphist.find(histname);
+    if(mapitit != this_maphist.end()) return mapitit->second;
+
+  }
+
+  return h;
+
+}
+
+void FillHist_Helper::JSFillHist(TString suffix, TString histname,
+                              double value_x, double value_y,
+                              double weight,
+                              int n_binx, double x_min, double x_max,
+                              int n_biny, double y_min, double y_max){
+
+  TH2D *this_hist = JSGetHist2D(suffix, histname);
+  if( !this_hist ){
+
+    this_hist = new TH2D(histname, "", n_binx, x_min, x_max, n_biny, y_min, y_max);
+    (JSmaphist_TH2D[suffix])[histname] = this_hist;
+
+  }
+
+  this_hist->Fill(value_x, value_y, weight);
+
+}
+
+void FillHist_Helper::JSFillHist(TString suffix, TString histname,
+                              double value_x, double value_y,
+                              double weight,
+                              int n_binx, double *xbins,
+                              int n_biny, double *ybins){
+
+  TH2D *this_hist = JSGetHist2D(suffix, histname);
+  if( !this_hist ){
+
+    this_hist = new TH2D(histname, "", n_binx, xbins, n_biny, ybins);
+    (JSmaphist_TH2D[suffix])[histname] = this_hist;
+
+  }
+
+  this_hist->Fill(value_x, value_y, weight);
+
+}
+
 void FillHist_Helper::WriteHist(){
 
   outfile->cd();
@@ -191,4 +281,45 @@ void FillHist_Helper::WriteHist(){
     mapit->second->Write(this_name);
     outfile->cd();
   }
+
+  outfile->cd();
+  for(std::map< TString, std::map<TString, TH1D*> >::iterator mapit=JSmaphist_TH1D.begin(); mapit!=JSmaphist_TH1D.end(); mapit++){
+
+    TString this_suffix = mapit->first;
+    std::map< TString, TH1D* > this_maphist = mapit->second;
+
+
+    TDirectory *dir = outfile->GetDirectory(this_suffix);
+    if(!dir){
+      outfile->mkdir(this_suffix);
+    }
+    outfile->cd(this_suffix);
+
+    for(std::map< TString, TH1D* >::iterator mapit = this_maphist.begin(); mapit!=this_maphist.end(); mapit++){
+      mapit->second->Write();
+    }
+
+    outfile->cd();
+
+  }
+
+  for(std::map< TString, std::map<TString, TH2D*> >::iterator mapit=JSmaphist_TH2D.begin(); mapit!=JSmaphist_TH2D.end(); mapit++){
+
+    TString this_suffix = mapit->first;
+    std::map< TString, TH2D* > this_maphist = mapit->second;
+
+    TDirectory *dir = outfile->GetDirectory(this_suffix);
+    if(!dir){
+      outfile->mkdir(this_suffix);
+    }
+    outfile->cd(this_suffix);
+
+    for(std::map< TString, TH2D* >::iterator mapit = this_maphist.begin(); mapit!=this_maphist.end(); mapit++){
+      mapit->second->Write();
+    }
+
+    outfile->cd();
+
+  }
+
 }

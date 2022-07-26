@@ -65,6 +65,23 @@ class FillHist_Helper {
                 int n_binx, double *xbins,
                 int n_biny, double *ybins,
                 int n_binz, double *zbins);
+  //==== JSFillHist : 1D
+  std::map< TString, std::map<TString, TH1D*> > JSmaphist_TH1D;
+  TH1D* JSGetHist1D(TString suffix, TString histname);
+  void JSFillHist(TString suffix, TString histname, double value, double weight, int n_bin, double x_min, double x_max);
+  //==== JSFillHist : 2D
+  std::map< TString, std::map<TString, TH2D*> > JSmaphist_TH2D;
+  TH2D* JSGetHist2D(TString suffix, TString histname);
+  void JSFillHist(TString suffix, TString histname,
+                  double value_x, double value_y,
+                  double weight,
+                  int n_binx, double x_min, double x_max,
+                  int n_biny, double y_min, double y_max);
+  void JSFillHist(TString suffix, TString histname,
+                  double value_x, double value_y,
+                  double weight,
+                  int n_binx, double *xbins,
+                  int n_biny, double *ybins);
 
   //==== Output rootfile;
   TFile *outfile;

@@ -1,0 +1,6 @@
+{
+    //"mcfile" : "xroot://fndca1.fnal.gov:1094/pnfs/fnal.gov/usr/dune/persistent/dunepro/beam_data/simulation/G4beamlineVersion3.06/v34b_0.5GeV_G4beamlineVersion3.06/*.root",
+    "mcfile" : "/pnfs/dune/persistent/dunepro/beam_data/simulation/G4beamlineVersion3.06/v34b_0.5GeV_G4beamlineVersion3.06/*.root",
+    "mcoutfile" : "mc_BeamSampleAna_0.5GeV.root",
+    "nevents" : -1
+}
