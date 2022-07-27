@@ -24,10 +24,22 @@ class PionXsec {
   
   std::string fOutputFileName;
   void SetOutputFileName(std::string name){fOutputFileName = name;};
+
+  // == Call Daughter Collections
+  vector<RecoDaughter> GetAllRecoDaughters(const anavar & evt);
+  vector<RecoDaughter> GetPions(const vector<RecoDaughter> in);
+  vector<RecoDaughter> GetProtons(const vector<RecoDaughter> in);
+  vector<RecoDaughter> GetTruePions(const vector<RecoDaughter> in);
+  vector<RecoDaughter> GetTrueProtons(const vector<RecoDaughter> in);
+
+  // == Draw Histograms
   void BookHistograms();
   void FillHistBeam(const anavar & evt, double weight, TString suffix);
+  void FillHistDaughterTrue(const vector<RecoDaughter> daughters);
   void FillHistDaughters(const anavar & evt, double weight, TString suffix);
   void SaveHistograms();
+
+  // == Run
   void ProcessEvent(const anavar & evt);
   void Run(anavar & evt, Long64_t nentries);
 

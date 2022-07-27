@@ -31,6 +31,152 @@ double PionXsec::Gaussian_Reweight(double mu1, double sigma1, double mu2, double
   return y1/y2;
 }
 
+vector<RecoDaughter> PionXsec::GetAllRecoDaughters(const anavar & evt){
+
+  vector<RecoDaughter> out;
+
+  //cout << "[PionXsec::GetAllRecoDaughters] evt.reco_daughter_allTrack_ID->size() : " << evt.reco_daughter_allTrack_ID->size() << endl;
+  for (size_t i = 0; i < evt.reco_daughter_allTrack_ID->size(); i++){
+    if((*evt.reco_daughter_allTrack_dQdX_SCE)[i].empty()) continue;
+
+    RecoDaughter this_RecoDaughter;
+    //cout << "[PionXsec::GetAllRecoDaughters] i : " << i << endl;
+    this_RecoDaughter.SetIsEmpty(false);
+    if(evt.MC){
+      this_RecoDaughter.Set_PFP_true_byHits_PDG((*evt.reco_daughter_PFP_true_byHits_PDG).at(i));
+      this_RecoDaughter.Set_PFP_true_byHits_ID((*evt.reco_daughter_PFP_true_byHits_ID).at(i));
+      this_RecoDaughter.Set_PFP_true_byHits_origin((*evt.reco_daughter_PFP_true_byHits_origin).at(i));
+      this_RecoDaughter.Set_PFP_true_byHits_parID((*evt.reco_daughter_PFP_true_byHits_parID).at(i));
+      this_RecoDaughter.Set_PFP_true_byHits_parPDG((*evt.reco_daughter_PFP_true_byHits_parPDG).at(i));
+      this_RecoDaughter.Set_PFP_true_byHits_process((*evt.reco_daughter_PFP_true_byHits_process).at(i));
+      this_RecoDaughter.Set_PFP_true_byHits_sharedHits((*evt.reco_daughter_PFP_true_byHits_sharedHits).at(i));
+      this_RecoDaughter.Set_PFP_true_byHits_emHits((*evt.reco_daughter_PFP_true_byHits_emHits).at(i));
+      this_RecoDaughter.Set_PFP_true_byHits_len((*evt.reco_daughter_PFP_true_byHits_len).at(i));
+      this_RecoDaughter.Set_PFP_true_byHits_startX((*evt.reco_daughter_PFP_true_byHits_startX).at(i));
+      this_RecoDaughter.Set_PFP_true_byHits_startY((*evt.reco_daughter_PFP_true_byHits_startY).at(i));
+      this_RecoDaughter.Set_PFP_true_byHits_startZ((*evt.reco_daughter_PFP_true_byHits_startZ).at(i));
+      this_RecoDaughter.Set_PFP_true_byHits_endX((*evt.reco_daughter_PFP_true_byHits_endX).at(i));
+      this_RecoDaughter.Set_PFP_true_byHits_endY((*evt.reco_daughter_PFP_true_byHits_endY).at(i));
+      this_RecoDaughter.Set_PFP_true_byHits_endZ((*evt.reco_daughter_PFP_true_byHits_endZ).at(i));
+      this_RecoDaughter.Set_PFP_true_byHits_startPx((*evt.reco_daughter_PFP_true_byHits_startPx).at(i));
+      this_RecoDaughter.Set_PFP_true_byHits_startPy((*evt.reco_daughter_PFP_true_byHits_startPy).at(i));
+      this_RecoDaughter.Set_PFP_true_byHits_startPz((*evt.reco_daughter_PFP_true_byHits_startPz).at(i));
+      this_RecoDaughter.Set_PFP_true_byHits_startP((*evt.reco_daughter_PFP_true_byHits_startP).at(i));
+      this_RecoDaughter.Set_PFP_true_byHits_startE((*evt.reco_daughter_PFP_true_byHits_startE).at(i));
+      this_RecoDaughter.Set_PFP_true_byHits_endProcess((*evt.reco_daughter_PFP_true_byHits_endProcess).at(i));
+      this_RecoDaughter.Set_PFP_true_byHits_purity((*evt.reco_daughter_PFP_true_byHits_purity).at(i));
+      this_RecoDaughter.Set_PFP_true_byHits_completeness((*evt.reco_daughter_PFP_true_byHits_completeness).at(i));
+      this_RecoDaughter.Set_PFP_true_byE_PDG((*evt.reco_daughter_PFP_true_byE_PDG).at(i));
+      this_RecoDaughter.Set_PFP_true_byE_len((*evt.reco_daughter_PFP_true_byE_len).at(i));
+    }
+
+    this_RecoDaughter.Set_PFP_ID((*evt.reco_daughter_PFP_ID).at(i));
+    this_RecoDaughter.Set_PFP_nHits((*evt.reco_daughter_PFP_nHits).at(i));
+    this_RecoDaughter.Set_PFP_nHits_collection((*evt.reco_daughter_PFP_nHits_collection).at(i));
+    this_RecoDaughter.Set_PFP_trackScore((*evt.reco_daughter_PFP_trackScore).at(i));
+    this_RecoDaughter.Set_PFP_emScore((*evt.reco_daughter_PFP_emScore).at(i));
+    this_RecoDaughter.Set_PFP_michelScore((*evt.reco_daughter_PFP_michelScore).at(i));
+    this_RecoDaughter.Set_PFP_trackScore_collection((*evt.reco_daughter_PFP_trackScore_collection).at(i));
+    this_RecoDaughter.Set_PFP_emScore_collection((*evt.reco_daughter_PFP_emScore_collection).at(i));
+    this_RecoDaughter.Set_PFP_michelScore_collection((*evt.reco_daughter_PFP_michelScore_collection).at(i));
+    this_RecoDaughter.Set_allTrack_ID((*evt.reco_daughter_allTrack_ID).at(i));
+    this_RecoDaughter.Set_allTrack_EField_SCE((*evt.reco_daughter_allTrack_EField_SCE).at(i));
+    this_RecoDaughter.Set_allTrack_resRange_SCE((*evt.reco_daughter_allTrack_resRange_SCE).at(i));
+    this_RecoDaughter.Set_allTrack_calibrated_dEdX_SCE((*evt.reco_daughter_allTrack_calibrated_dEdX_SCE).at(i));
+    this_RecoDaughter.Set_allTrack_Chi2_proton((*evt.reco_daughter_allTrack_Chi2_proton).at(i));
+    this_RecoDaughter.Set_allTrack_Chi2_pion((*evt.reco_daughter_allTrack_Chi2_pion).at(i));
+    this_RecoDaughter.Set_allTrack_Chi2_muon((*evt.reco_daughter_allTrack_Chi2_muon).at(i));
+    this_RecoDaughter.Set_allTrack_Chi2_ndof((*evt.reco_daughter_allTrack_Chi2_ndof).at(i));
+    this_RecoDaughter.Set_allTrack_Chi2_ndof_pion((*evt.reco_daughter_allTrack_Chi2_ndof_pion).at(i));
+    this_RecoDaughter.Set_allTrack_Chi2_ndof_muon((*evt.reco_daughter_allTrack_Chi2_ndof_muon).at(i));
+    this_RecoDaughter.Set_allTrack_Theta((*evt.reco_daughter_allTrack_Theta).at(i));
+    this_RecoDaughter.Set_allTrack_Phi((*evt.reco_daughter_allTrack_Phi).at(i));
+    //this_RecoDaughter.Set_allTrack_startDirX((*evt.reco_daughter_allTrack_startDirX).at(i));
+    //this_RecoDaughter.Set_allTrack_startDirY((*evt.reco_daughter_allTrack_startDirY).at(i));
+    //this_RecoDaughter.Set_allTrack_startDirZ((*evt.reco_daughter_allTrack_startDirZ).at(i));
+    this_RecoDaughter.Set_allTrack_alt_len((*evt.reco_daughter_allTrack_alt_len).at(i));
+    this_RecoDaughter.Set_allTrack_startX((*evt.reco_daughter_allTrack_startX).at(i));
+    this_RecoDaughter.Set_allTrack_startY((*evt.reco_daughter_allTrack_startY).at(i));
+    this_RecoDaughter.Set_allTrack_startZ((*evt.reco_daughter_allTrack_startZ).at(i));
+    this_RecoDaughter.Set_allTrack_endX((*evt.reco_daughter_allTrack_endX).at(i));
+    this_RecoDaughter.Set_allTrack_endY((*evt.reco_daughter_allTrack_endY).at(i));
+    this_RecoDaughter.Set_allTrack_endZ((*evt.reco_daughter_allTrack_endZ).at(i));
+    this_RecoDaughter.Set_allTrack_vertex_michel_score((*evt.reco_daughter_allTrack_vertex_michel_score).at(i));
+    this_RecoDaughter.Set_allTrack_vertex_nHits((*evt.reco_daughter_allTrack_vertex_nHits).at(i));
+    this_RecoDaughter.Set_pandora_type((*evt.reco_daughter_pandora_type).at(i));
+  
+    out.push_back(this_RecoDaughter);
+  }
+
+  return out;
+}
+
+vector<RecoDaughter> PionXsec::GetPions(const vector<RecoDaughter> in){
+
+  vector<RecoDaughter> out;
+
+  double cut_trackScore = 0.5;
+  double cut_emScore = 0.5;
+  double cut_chi2_proton = 60.;
+  for(unsigned int i = 0; i < in.size(); i++){
+    RecoDaughter this_in = in.at(i);
+    double this_chi2 = this_in.allTrack_Chi2_proton() / this_in.allTrack_Chi2_ndof();
+    if(this_in.PFP_trackScore() > cut_trackScore && this_in.PFP_emScore() < cut_emScore && this_chi2 > cut_chi2_proton){
+      out.push_back(this_in);
+    }
+  }
+  
+  return out;
+}
+
+vector<RecoDaughter> PionXsec::GetProtons(const vector<RecoDaughter> in){
+
+  vector<RecoDaughter> out;
+
+  double cut_trackScore = 0.5;
+  double cut_emScore = 0.5;
+  double cut_chi2_proton = 50.;
+  for(unsigned int i = 0; i < in.size(); i++){
+    RecoDaughter this_in = in.at(i);
+    double this_chi2 = this_in.allTrack_Chi2_proton() /this_in.allTrack_Chi2_ndof();
+    if(this_in.PFP_trackScore() > cut_trackScore && this_in.PFP_emScore() < cut_emScore && this_chi2 < cut_chi2_proton){
+      out.push_back(this_in);
+    }
+  }
+
+  return out;
+}
+
+vector<RecoDaughter> PionXsec::GetTruePions(const vector<RecoDaughter> in){
+
+  vector<RecoDaughter> out;
+
+  for(unsigned int i = 0; i < in.size(); i++){
+    RecoDaughter this_in = in.at(i);
+    int this_true_PID = this_in.PFP_true_byHits_PDG();
+    if(abs(this_true_PID) == 211){
+      out.push_back(this_in);
+    }
+  }
+
+  return out;
+}
+
+vector<RecoDaughter> PionXsec::GetTrueProtons(const vector<RecoDaughter> in){
+
+  vector<RecoDaughter> out;
+
+  for(unsigned int i = 0; i < in.size(); i++){
+    RecoDaughter this_in = in.at(i);
+    int this_true_PID = this_in.PFP_true_byHits_PDG();
+    if(this_true_PID == 2212){
+      out.push_back(this_in);
+    }
+  }
+
+  return out;
+}
+
 void PionXsec::BookHistograms(){
   //cout << "[PionXsec::BookHistograms] Start" << endl;
   Hist.outfile = TFile::Open(fOutputFileName.c_str(), "recreate");
@@ -71,6 +217,13 @@ void PionXsec::FillHistBeam(const anavar & evt, double weight, TString suffix){
     Hist.JSFillHist(suffix, "htrack_KEffTruth_" + suffix + "_" + pitype_str, true_KE_ff, weight, 5000, 0, 5000);
     Hist.JSFillHist(suffix, "htrack_PffTruth_" + suffix + "_" + pitype_str, true_P_ff, weight, 5000, 0, 5000);
   }
+}
+
+void PionXsec::FillHistDaughterTrue(const vector<RecoDaughter> daughters){
+
+  vector<RecoDaughter> true_pions = GetTruePions(daughters);
+  vector<RecoDaughter> true_protons = GetTrueProtons(daughters);
+  
 }
 
 void PionXsec::FillHistDaughters(const anavar & evt, double weight, TString suffix){
@@ -210,6 +363,24 @@ void PionXsec::Run(anavar & evt, Long64_t nentries=-1){
     FillHistBeam(evt, 1., "noweight");
     FillHistBeam(evt, weight, "Preweight");
     FillHistBeam(evt, weight_piOnly, "Preweight_piOnly");
+
+    //cout << evt.run << ":" << evt.event << endl;
+    vector<RecoDaughter> RecoDaughters_all = GetAllRecoDaughters(evt);
+    //cout << "Before continue" << endl;
+    if(RecoDaughters_all.size() < 1) continue;
+
+    vector<RecoDaughter> pions = GetPions(RecoDaughters_all);
+    vector<RecoDaughter> protons = GetProtons(RecoDaughters_all);
+
+    if(evt.MC){
+      vector<RecoDaughter> true_pions = GetTruePions(RecoDaughters_all);
+      vector<RecoDaughter> true_protons = GetTrueProtons(RecoDaughters_all);
+
+      FillHistDaughterTrue(RecoDaughters_all);
+    }
+    
+
+
     FillHistDaughters(evt, 1., "noweight");
     FillHistDaughters(evt, weight, "Preweight");
     FillHistDaughters(evt, weight_piOnly, "Preweight_piOnly");
