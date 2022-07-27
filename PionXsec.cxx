@@ -83,24 +83,24 @@ void PionXsec::FillHistDaughters(const anavar & evt, double weight, TString suff
     if(!evt.MC) continue;
     // == proton
     if((*evt.reco_daughter_PFP_true_byHits_PDG).at(i) == 2212){
-      Hist.JSFillHist(suffix, "hdaughter_proton_trackScore", (*evt.reco_daughter_PFP_trackScore).at(i), weight, 100., 0., 1.);
-      Hist.JSFillHist(suffix, "hdaughter_proton_emScore", (*evt.reco_daughter_PFP_emScore).at(i), weight, 100., 0., 1.);
+      Hist.JSFillHist(suffix, "hdaughter_proton_trackScore_" + suffix, (*evt.reco_daughter_PFP_trackScore).at(i), weight, 100., 0., 1.);
+      Hist.JSFillHist(suffix, "hdaughter_proton_emScore_" + suffix, (*evt.reco_daughter_PFP_emScore).at(i), weight, 100., 0., 1.);
       double this_chi2 = (*evt.reco_daughter_allTrack_Chi2_proton).at(i) / (*evt.reco_daughter_allTrack_Chi2_ndof).at(i);
-      Hist.JSFillHist(suffix, "hdaughter_proton_chi2_proton", this_chi2, weight, 1000., 0., 100.); 
+      Hist.JSFillHist(suffix, "hdaughter_proton_chi2_proton_" + suffix, this_chi2, weight, 1000., 0., 100.); 
       //cout << "proton this_chi2 : " << this_chi2 << endl;
     }
     // == pion
     else if(abs((*evt.reco_daughter_PFP_true_byHits_PDG).at(i)) == 211){
-      Hist.JSFillHist(suffix, "hdaughter_pion_trackScore", (*evt.reco_daughter_PFP_trackScore).at(i), weight, 100., 0., 1.);
-      Hist.JSFillHist(suffix, "hdaughter_pion_emScore", (*evt.reco_daughter_PFP_emScore).at(i), weight, 100., 0., 1.);
+      Hist.JSFillHist(suffix, "hdaughter_pion_trackScore_" + suffix, (*evt.reco_daughter_PFP_trackScore).at(i), weight, 100., 0., 1.);
+      Hist.JSFillHist(suffix, "hdaughter_pion_emScore_" + suffix, (*evt.reco_daughter_PFP_emScore).at(i), weight, 100., 0., 1.);
       double this_chi2 = (*evt.reco_daughter_allTrack_Chi2_proton).at(i) / (*evt.reco_daughter_allTrack_Chi2_ndof).at(i);
-      Hist.JSFillHist(suffix, "hdaughter_pion_chi2_proton", this_chi2, weight, 1000., 0., 100.);
+      Hist.JSFillHist(suffix, "hdaughter_pion_chi2_proton_" + suffix, this_chi2, weight, 1000., 0., 100.);
     }
     else{
-      Hist.JSFillHist(suffix, "hdaughter_other_trackScore", (*evt.reco_daughter_PFP_trackScore).at(i), weight, 100., 0., 1.);
-      Hist.JSFillHist(suffix, "hdaughter_other_emScore", (*evt.reco_daughter_PFP_emScore).at(i), weight, 100., 0., 1.);
+      Hist.JSFillHist(suffix, "hdaughter_other_trackScore_" + suffix, (*evt.reco_daughter_PFP_trackScore).at(i), weight, 100., 0., 1.);
+      Hist.JSFillHist(suffix, "hdaughter_other_emScore_" + suffix, (*evt.reco_daughter_PFP_emScore).at(i), weight, 100., 0., 1.);
       double this_chi2 = (*evt.reco_daughter_allTrack_Chi2_proton).at(i) / (*evt.reco_daughter_allTrack_Chi2_ndof).at(i);
-      Hist.JSFillHist(suffix, "hdaughter_other_chi2_proton", this_chi2, weight, 1000., 0., 100.);
+      Hist.JSFillHist(suffix, "hdaughter_other_chi2_proton_" + suffix, this_chi2, weight, 1000., 0., 100.);
     }
 
     // == Truth matched
@@ -138,8 +138,8 @@ void PionXsec::FillHistDaughters(const anavar & evt, double weight, TString suff
 
 void PionXsec::SaveHistograms(){
   
-  outputFile->cd();
-  outputFile->Write();
+  //outputFile->cd();
+  //outputFile->Write();
   Hist.WriteHist();
 }
 
@@ -150,9 +150,6 @@ void PionXsec::Run(anavar & evt, Long64_t nentries=-1){
   //Long64_t nentries = evt.fChain->GetEntriesFast();
   if (nentries == -1) nentries = evt.fChain->GetEntries();
 
-  // == Beam P scale
-  if(evt.MC) beamP_scale = 1.0;
-  
   Long64_t nbytes = 0, nb = 0;
   for (Long64_t jentry=0; jentry<nentries;jentry++) {
     //if (jentry%100000==0) std::cout<<jentry<<"/"<<nentries<<std::endl;
@@ -160,6 +157,7 @@ void PionXsec::Run(anavar & evt, Long64_t nentries=-1){
     Long64_t ientry = evt.LoadTree(jentry);
     if (ientry < 0) break;
     nb = evt.fChain->GetEntry(jentry);   nbytes += nb;
+
     // if (Cut(ientry) < 0) continue;
     //std::cout<<evt.run<<" "<<evt.event<<" "<<evt.MC<<" "<<evt.reco_beam_true_byE_matched<<" "<<evt.true_beam_PDG<<" "<<(*evt.true_beam_endProcess)<<std::endl;
     //std::cout<<GetParType(ana)<<std::endl;
@@ -170,11 +168,34 @@ void PionXsec::Run(anavar & evt, Long64_t nentries=-1){
     double weight = 1.;
     double weight_piOnly = 1.;
     if(evt.MC){
+      // == Beam P scale
+      beamP_scale = 0.5;
+
       double beamP_true = evt.true_beam_startP * 1000.;
+
+      // == 0.5 GeV
+    
+      double data_mu = 508.9;
+      double data_sigma = 36.66;
+      double true_mu = 504.7;
+      double true_sigma = 28.3;
+    
+      // == 1.0 GeV
+      /*
       double data_mu = 1007.;
       double data_sigma = 68.17;
       double true_mu = 1007.;
       double true_sigma = 57.7;
+      */
+
+      // == 2.0 GeV
+      /*
+      double data_mu = 2013.;
+      double data_sigma = 141.02;
+      double true_mu = 2013.;
+      double true_sigma = 113.4;
+      */
+      
       double P_reweight = Gaussian_Reweight(data_mu, data_sigma, true_mu, true_sigma, 0., 2000., beamP_true);
       weight = P_reweight;
       if(evt.true_beam_PDG == 211){

@@ -4,10 +4,12 @@
 #include "TFile.h"
 #include "HadAna.h"
 #include "FillHist_Helper.h"
+#include "RecoDaughter.h"
 
 class anavar;
 class HadAna;
 class FillHist_Helper;
+//class RecoDaughter;
 class TH1D;
 class TH2D;
 
