@@ -35,8 +35,9 @@ class PionXsec {
   // == Draw Histograms
   void BookHistograms();
   void FillHistBeam(const anavar & evt, double weight, TString suffix);
-  void FillHistDaughterTrue(const vector<RecoDaughter> daughters);
-  void FillHistDaughters(const anavar & evt, double weight, TString suffix);
+  void FillHistDaughterTrue(const vector<RecoDaughter> daughters, const anavar & evt, double weight, TString suffix);
+  void FillHistDaughterPurity(const vector<RecoDaughter> daughters, const anavar & evt, double weight, TString suffix);
+  void FillHistQE_MCstudy(const vector<RecoDaughter> daughters, const anavar & evt, double weight, TString suffix);
   void SaveHistograms();
 
   // == Run
@@ -47,15 +48,14 @@ class PionXsec {
   
   TFile *outputFile;
 
-  // == event selection
-  vector<int> pion_index_vec;
-  vector<int> p_index_vec;
-
   // == Beam P scale
   double beamP_scale = 1.0;
 
   // == Beam P_{true} reweight
   double Gaussian_Reweight(double mu1, double sigma1, double mu2, double sigma2, double x_min, double x_max, double x);
+
+  // == Event Topology
+  double Get_EQE(double P_pion, double cos_theta);
 
 };
 
