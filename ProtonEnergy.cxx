@@ -69,7 +69,7 @@ void ProtonEnergy::FillHistograms(const anavar & evt){
 
   // == Fit hypothetical residual range
   if((*evt.reco_beam_dEdX_SCE).size() > 50){
-    double fitted_length = hadana.Fit_dEdx_Residual_Length(evt, *evt.reco_beam_dEdX_SCE, *evt.reco_beam_resRange_SCE, 2212, false);
+    double fitted_length = hadana.Fit_dEdx_Residual_Length(evt, *evt.reco_beam_dEdX_SCE, *evt.reco_beam_resRange_SCE, 2212, false, true);
     double fitted_KE = hadana.map_BB[2212]->KEFromRangeSpline(fitted_length);
     double fitted_dKE = beamKE - fitted_KE;
     double dKE_calo_vs_fitted = KE_calo - fitted_KE;

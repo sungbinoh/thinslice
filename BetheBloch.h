@@ -44,7 +44,7 @@ class BetheBloch {
   void CreateSplineAtKE(int iKE);
 
   TF1 *dEdx_PDF(double KE, double pitch);
-
+  double dEdx_Gaus_Sigma(double KE, double pitch);
   
  private:
 

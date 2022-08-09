@@ -294,3 +294,16 @@ TF1 *BetheBloch::dEdx_PDF(double KE, double pitch){
 
   return out;
 }
+
+double BetheBloch::dEdx_Gaus_Sigma(double KE, double pitch){
+
+  double gamma = (KE/mass)+1.0;
+  double beta = TMath::Sqrt(1-(1.0/(gamma*gamma)));
+  double this_xi = Landau_xi(KE, pitch);
+  double this_Wmax = Get_Wmax(KE);
+  double this_kappa = this_xi / this_Wmax;
+
+  double sigma = sqrt(vav.Variance(this_kappa, beta * beta));
+
+  return sigma;
+}

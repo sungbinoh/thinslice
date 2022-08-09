@@ -7,6 +7,7 @@
 #include "SliceParams.h"
 #include "BetheBloch.h"
 #include "TGraph.h"
+#include "TProfile.h"
 
 class anavar;
 class BetheBloch;
@@ -73,8 +74,14 @@ class HadAna{
   double true_ffKE;
   double Get_true_ffKE(const anavar& evt, double KE_in_TPC, double length_to_ff);
 
+  // == Functions for PID
+  double Truncatd_Mean_dEdx(const vector<double> & dEdx, const vector<double> & ResRange);
+  double Particle_chi2(const vector<double> & dEdx, const vector<double> & ResRange, bool this_is_beam, int PID);
+  double Particle_chi2_with_offset(const vector<double> & dEdx, const vector<double> & ResRange, bool this_is_beam, int PID);
+
   // == Momentum measurement using dE/dx and hit for a short track segment
-  double Fit_dEdx_Residual_Length(const anavar& evt, const vector<double> & dEdx, const vector<double> & ResRange, int PID, bool save_graph);
+  double Fit_particle_chi2(const vector<double> & dEdx, const vector<double> & ResRange, bool this_is_beam, int PID);
+  double Fit_dEdx_Residual_Length(const anavar& evt, const vector<double> & dEdx, const vector<double> & ResRange, int PID, bool save_graph, bool this_is_beam);
   double Fit_Pion_Residual_Length_Likelihood(const anavar& evt, const vector<double> & dEdx, const vector<double> & ResRange, int PID, bool save_graph);
   double Integrate_dEdx(const vector<double> & dEdx, const vector<double> & pitch);
   double trklen_csda_proton;
@@ -95,6 +102,7 @@ class HadAna{
   
   bool fProtonCSDACheck = true;
   TGraph *csda_range_vs_mom_sm;
+  std::map< int, TProfile* > map_profile;  
 };
 
 #endif

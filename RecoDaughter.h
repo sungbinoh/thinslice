@@ -57,7 +57,11 @@ public:
   void Set_allTrack_ID(int i_allTrack_ID);
   void Set_allTrack_EField_SCE(vector<double> i_allTrack_EField_SCE);
   void Set_allTrack_resRange_SCE(vector<double> i_allTrack_resRange_SCE);
+  void Set_allTrack_resRange_SCE_plane0(vector<double> i_allTrack_resRange_SCE_plane0);
+  void Set_allTrack_resRange_SCE_plane1(vector<double> i_allTrack_resRange_SCE_plane1);
   void Set_allTrack_calibrated_dEdX_SCE(vector<double> i_allTrack_calibrated_dEdX_SCE);
+  void Set_allTrack_calibrated_dEdX_SCE_plane0(vector<double> i_allTrack_calibrated_dEdX_SCE_plane0);
+  void Set_allTrack_calibrated_dEdX_SCE_plane1(vector<double> i_allTrack_calibrated_dEdX_SCE_plane1);
   void Set_allTrack_Chi2_proton(double i_allTrack_Chi2_proton);
   void Set_allTrack_Chi2_pion(double i_allTrack_Chi2_pion);
   void Set_allTrack_Chi2_muon(double i_allTrack_Chi2_muon);
@@ -79,6 +83,8 @@ public:
   void Set_allTrack_vertex_michel_score(double i_allTrack_vertex_michel_score);
   void Set_allTrack_vertex_nHits(int i_allTrack_vertex_nHits);
   void Set_pandora_type(int i_pandora_type);
+  void Set_Beam_Cos(double j_Beam_Cos);
+  void Set_Beam_Dist(double j_Beam_Dist);
 
   inline int PFP_true_byHits_PDG() const { return j_PFP_true_byHits_PDG; }
   inline int PFP_true_byHits_ID() const { return j_PFP_true_byHits_ID; }
@@ -117,7 +123,11 @@ public:
   inline int allTrack_ID() const { return j_allTrack_ID; }
   inline vector<double> allTrack_EField_SCE() const { return j_allTrack_EField_SCE; }
   inline vector<double> allTrack_resRange_SCE() const { return j_allTrack_resRange_SCE; }
+  inline vector<double> allTrack_resRange_SCE_plane0() const { return j_allTrack_resRange_SCE_plane0; }
+  inline vector<double> allTrack_resRange_SCE_plane1() const { return j_allTrack_resRange_SCE_plane1; }
   inline vector<double> allTrack_calibrated_dEdX_SCE() const { return j_allTrack_calibrated_dEdX_SCE; }
+  inline vector<double> allTrack_calibrated_dEdX_SCE_plane0() const { return j_allTrack_calibrated_dEdX_SCE_plane0; }
+  inline vector<double> allTrack_calibrated_dEdX_SCE_plane1() const { return j_allTrack_calibrated_dEdX_SCE_plane1; }
   inline double allTrack_Chi2_proton() const { return j_allTrack_Chi2_proton; }
   inline double allTrack_Chi2_pion() const { return j_allTrack_Chi2_pion; }
   inline double allTrack_Chi2_muon() const { return j_allTrack_Chi2_muon; }
@@ -139,6 +149,8 @@ public:
   inline double allTrack_vertex_michel_score() const { return j_allTrack_vertex_michel_score; }
   inline int allTrack_vertex_nHits() const { return j_allTrack_vertex_nHits; }
   inline int pandora_type() const { return j_pandora_type; }
+  inline double Beam_Cos() const { return j_Beam_Cos; }
+  inline double Beam_Dist() const { return j_Beam_Dist; }
 
 private:
   bool j_IsEmpty;
@@ -181,7 +193,11 @@ private:
   int j_allTrack_ID;
   vector<double> j_allTrack_EField_SCE;
   vector<double> j_allTrack_resRange_SCE;
+  vector<double> j_allTrack_resRange_SCE_plane0;
+  vector<double> j_allTrack_resRange_SCE_plane1;
   vector<double> j_allTrack_calibrated_dEdX_SCE;
+  vector<double> j_allTrack_calibrated_dEdX_SCE_plane0;
+  vector<double> j_allTrack_calibrated_dEdX_SCE_plane1;
   double j_allTrack_Chi2_proton;
   double j_allTrack_Chi2_pion;
   double j_allTrack_Chi2_muon;
@@ -204,7 +220,8 @@ private:
   int j_allTrack_vertex_nHits;
 
   int j_pandora_type;
-
+  double j_Beam_Cos;
+  double j_Beam_Dist;
 };
 
 #endif

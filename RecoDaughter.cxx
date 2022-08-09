@@ -40,7 +40,11 @@ RecoDaughter::RecoDaughter(){
   j_allTrack_ID = -1;
   j_allTrack_EField_SCE.clear();
   j_allTrack_resRange_SCE.clear();
+  j_allTrack_resRange_SCE_plane0.clear();
+  j_allTrack_resRange_SCE_plane1.clear();
   j_allTrack_calibrated_dEdX_SCE.clear();
+  j_allTrack_calibrated_dEdX_SCE_plane0.clear();
+  j_allTrack_calibrated_dEdX_SCE_plane1.clear();
   j_allTrack_Chi2_proton = -9999.;
   j_allTrack_Chi2_pion = -9999.;
   j_allTrack_Chi2_muon = -9999.;
@@ -62,6 +66,7 @@ RecoDaughter::RecoDaughter(){
   j_allTrack_vertex_michel_score = -9999.;
   j_allTrack_vertex_nHits = -1;
   j_pandora_type = -1;
+  j_Beam_Cos = -9999.;
 }
 
 RecoDaughter::~RecoDaughter(){}
@@ -105,7 +110,11 @@ void RecoDaughter::Set_PFP_michelScore_collection(double i_PFP_michelScore_colle
 void RecoDaughter::Set_allTrack_ID(int i_allTrack_ID){ j_allTrack_ID = i_allTrack_ID; }
 void RecoDaughter::Set_allTrack_EField_SCE(vector<double> i_allTrack_EField_SCE){ j_allTrack_EField_SCE = i_allTrack_EField_SCE; }
 void RecoDaughter::Set_allTrack_resRange_SCE(vector<double> i_allTrack_resRange_SCE){ j_allTrack_resRange_SCE = i_allTrack_resRange_SCE; }
+void RecoDaughter::Set_allTrack_resRange_SCE_plane0(vector<double> i_allTrack_resRange_SCE_plane0){ j_allTrack_resRange_SCE_plane0 = i_allTrack_resRange_SCE_plane0; }
+void RecoDaughter::Set_allTrack_resRange_SCE_plane1(vector<double> i_allTrack_resRange_SCE_plane1){ j_allTrack_resRange_SCE_plane1 = i_allTrack_resRange_SCE_plane1; }
 void RecoDaughter::Set_allTrack_calibrated_dEdX_SCE(vector<double> i_allTrack_calibrated_dEdX_SCE){ j_allTrack_calibrated_dEdX_SCE = i_allTrack_calibrated_dEdX_SCE; }
+void RecoDaughter::Set_allTrack_calibrated_dEdX_SCE_plane0(vector<double> i_allTrack_calibrated_dEdX_SCE_plane0){ j_allTrack_calibrated_dEdX_SCE_plane0 = i_allTrack_calibrated_dEdX_SCE_plane0; }
+void RecoDaughter::Set_allTrack_calibrated_dEdX_SCE_plane1(vector<double> i_allTrack_calibrated_dEdX_SCE_plane1){ j_allTrack_calibrated_dEdX_SCE_plane1 = i_allTrack_calibrated_dEdX_SCE_plane1; }
 void RecoDaughter::Set_allTrack_Chi2_proton(double i_allTrack_Chi2_proton){ j_allTrack_Chi2_proton = i_allTrack_Chi2_proton; }
 void RecoDaughter::Set_allTrack_Chi2_pion(double i_allTrack_Chi2_pion){ j_allTrack_Chi2_pion = i_allTrack_Chi2_pion; }
 void RecoDaughter::Set_allTrack_Chi2_muon(double i_allTrack_Chi2_muon){ j_allTrack_Chi2_muon = i_allTrack_Chi2_muon; }
@@ -127,3 +136,5 @@ void RecoDaughter::Set_allTrack_endZ(double i_allTrack_endZ){ j_allTrack_endZ = 
 void RecoDaughter::Set_allTrack_vertex_michel_score(double i_allTrack_vertex_michel_score){ j_allTrack_vertex_michel_score = i_allTrack_vertex_michel_score; }
 void RecoDaughter::Set_allTrack_vertex_nHits(int i_allTrack_vertex_nHits){ j_allTrack_vertex_nHits = i_allTrack_vertex_nHits; }
 void RecoDaughter::Set_pandora_type(int i_pandora_type){ j_pandora_type = i_pandora_type; }
+void RecoDaughter::Set_Beam_Cos(double i_Beam_Cos) { j_Beam_Cos = i_Beam_Cos; }
+void RecoDaughter::Set_Beam_Dist(double i_Beam_Dist) { j_Beam_Dist = i_Beam_Dist; }
