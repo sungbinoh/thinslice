@@ -38,6 +38,7 @@ int main(int argc, char ** argv){
   cout<<root<<endl;
   //cout<<root["mcfile"].asString()<<endl;
 
+  /*
   TChain *mcchain = new TChain();
   mcchain->Add(Form("%s/pduneana/beamana", root["mcfile"].asString().c_str()));
   
@@ -46,7 +47,8 @@ int main(int argc, char ** argv){
   PionXsec mcpe;
   mcpe.SetOutputFileName(root["mcoutfile"].asString());
   mcpe.Run(mcevt, root["nevents"].asInt());
-  /*
+  */
+
   TChain *datachain = new TChain();
   datachain->Add(Form("%s/pduneana/beamana", root["datafile"].asString().c_str()));
 
@@ -55,7 +57,7 @@ int main(int argc, char ** argv){
   PionXsec datape;
   datape.SetOutputFileName(root["dataoutfile"].asString());
   datape.Run(dataevt, root["nevents"].asInt());
-  */
+  
   return 0;
 
 }
