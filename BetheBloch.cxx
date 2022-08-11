@@ -279,7 +279,7 @@ double dEdx_PDF_fuction(double *x, double *par){
 }
 
 
-TF1 *BetheBloch::dEdx_PDF(double KE, double pitch){
+double BetheBloch::dEdx_PDF(double KE, double pitch, double dEdx){
 
   double gamma = (KE/mass)+1.0;
   double beta = TMath::Sqrt(1-(1.0/(gamma*gamma)));
@@ -289,9 +289,11 @@ TF1 *BetheBloch::dEdx_PDF(double KE, double pitch){
   double this_dEdx_BB = meandEdx(KE);
   double par[5] = {this_kappa, beta * beta, this_xi, this_dEdx_BB, pitch};
   
-  TF1 *out = new TF1("", dEdx_PDF_fuction, -100., 1000., 5);
-  out -> SetParameters(par[0], par[1], par[2], par[3], par[4]);
+  TF1 *PDF = new TF1("", dEdx_PDF_fuction, -100., 1000., 5);
+  PDF -> SetParameters(par[0], par[1], par[2], par[3], par[4]);
 
+  double out = PDF -> Eval(dEdx);
+  delete PDF;
   return out;
 }
 

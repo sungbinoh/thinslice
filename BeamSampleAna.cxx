@@ -36,7 +36,7 @@ void BeamSampleAna::FillHistograms(const BeamNtuple & evt){
   int PID_NP04front = evt.NP04front_PDGid;
   int PID_NP04FieldCage = evt.NP04FieldCage_PDGid;
 
-  if(abs(PID_AfterTarget) != 13 && PID_AfterTarget != 211) return; // == Select only pion and muon beam
+  //if(abs(PID_AfterTarget) != 13 && PID_AfterTarget != 211) return; // == Select only pion and muon beam
   if(PID_AfterTarget != PID_NP04front){
     //cout << "PID_AfterTarget : " << PID_AfterTarget << ", PID_NP04front: " << PID_NP04front << endl;
   }
