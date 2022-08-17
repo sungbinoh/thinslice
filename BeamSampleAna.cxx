@@ -1,5 +1,6 @@
 #include "BeamSampleAna.h"
 #include "BeamNtuple.h"
+#include "BeamVirtualDetector.h"
 
 using namespace std;
 
@@ -60,7 +61,7 @@ void BeamSampleAna::FillHistograms(const BeamNtuple & evt){
   // == After Target
   Hist.FillHist("P_AfterTarget", P_AfterTarget, 1., 5000., 0., 5000.); 
   Hist.FillHist("P_AfterTarget_PID" + PID_AfterTarget_str, P_AfterTarget, 1., 5000., 0., 5000.);
-
+  /*
   cout << "===========" << endl;
   cout << "AfterTarget_x : " << evt.AfterTarget_x << endl;
   cout << "AfterTarget_y : " << evt.AfterTarget_y << endl;
@@ -74,7 +75,7 @@ void BeamSampleAna::FillHistograms(const BeamNtuple & evt){
   cout << "NP04front_x : " << evt.NP04front_x << endl;
   cout << "NP04front_y : " << evt.NP04front_y << endl;
   cout << "NP04front_z : " << evt.NP04front_z << endl;
-
+  */
   // == TOF1
   Hist.FillHist("P_TOF1", P_TOF1, 1., 5000., 0., 5000.);
   Hist.FillHist("P_TOF1_PID" + PID_AfterTarget_str, P_TOF1, 1., 5000., 0., 5000.);
@@ -121,6 +122,19 @@ void BeamSampleAna::FillHistograms(const BeamNtuple & evt){
 
 }
 
+void BeamSampleAna::FillHistograms(const BeamVirtualDetector & evt, TString detector_str){
+
+  int PID = evt.PDGid;
+  TString PID_str = Form("%d", abs(PID));
+
+  double P = sqrt(pow(evt.Px, 2) + pow(evt.Py, 2) + pow(evt.Pz, 2));
+  double InitKE = evt.InitKE;
+
+  Hist.FillHist("VirtualDetector_P_" + detector_str, P, 1., 10000., 0., 100000.);
+  Hist.FillHist("VirtualDetector_P_" + detector_str + "_" + PID_str, P, 1., 10000., 0., 100000.);
+
+}
+
 void BeamSampleAna::SaveHistograms(){
   Hist.WriteHist();
   //Hist.outfile->cd();
@@ -137,7 +151,7 @@ void BeamSampleAna::Run(BeamNtuple & evt, Long64_t nentries=-1){
   Long64_t nbytes = 0, nb = 0;
   for (Long64_t jentry=0; jentry<nentries;jentry++) {
     //if (jentry%100000==0) std::cout<<jentry<<"/"<<nentries<<std::endl;
-    if (jentry%1000==0) std::cout<<jentry<<"/"<<nentries<<std::endl;
+    if (jentry%1000==0) std::cout<<"[GoodParticle] " <<jentry<<"/"<<nentries<<std::endl;
     Long64_t ientry = evt.LoadTree(jentry);
     if (ientry < 0) break;
     nb = evt.fChain->GetEntry(jentry);   nbytes += nb;
@@ -148,3 +162,19 @@ void BeamSampleAna::Run(BeamNtuple & evt, Long64_t nentries=-1){
   SaveHistograms();
 }
 
+void BeamSampleAna::Run(BeamVirtualDetector & evt, Long64_t nentries=-1, TString detector_str = ""){
+
+  BookHistograms();
+  if (nentries == -1) nentries = evt.fChain->GetEntries();
+  Long64_t nbytes = 0, nb = 0;
+  for (Long64_t jentry=0; jentry<nentries;jentry++) {
+    if (jentry%1000==0) std::cout<<"[" << detector_str << "] " << jentry<<"/"<<nentries<<std::endl;
+    Long64_t ientry = evt.LoadTree(jentry);
+    if (ientry < 0) break;
+    nb = evt.fChain->GetEntry(jentry);   nbytes += nb;
+    h_cutflow -> Fill(0.5);
+    FillHistograms(evt, detector_str);
+  }
+
+  SaveHistograms();
+}

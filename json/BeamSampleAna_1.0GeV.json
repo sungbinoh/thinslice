@@ -1,5 +1,5 @@
 {
     "mcfile" : "xroot://fndca1.fnal.gov:1094/pnfs/fnal.gov/usr/dune/persistent/dunepro/beam_data/simulation/G4beamlineVersion3.06/v34b_1GeV_G4beamlineVersion3.06/*.root",
     "mcoutfile" : "mc_BeamSampleAna_1.0GeV_test.root",
-    "nevents" : -1
+    "nevents" : 500000
 }

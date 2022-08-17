@@ -275,6 +275,10 @@ double dEdx_PDF_fuction(double *x, double *par){
     this_vav =  this_vav / a;
   }
 
+  // == Vavilov PDF only - out of range for very low kappa values
+  //this_vav =  vav.Pdf(y, par[0], par[1]);
+  //this_vav =  this_vav / a;
+
   return this_vav;
 }
 

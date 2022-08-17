@@ -37,7 +37,7 @@ int main(int argc, char ** argv){
   file >> root;
   cout<<root<<endl;
   //cout<<root["mcfile"].asString()<<endl;
-
+  
   TChain *mcchain = new TChain();
   mcchain->Add(Form("%s/pduneana/beamana", root["mcfile"].asString().c_str()));
   
