@@ -129,10 +129,34 @@ void BeamSampleAna::FillHistograms(const BeamVirtualDetector & evt, TString dete
 
   double P = sqrt(pow(evt.Px, 2) + pow(evt.Py, 2) + pow(evt.Pz, 2));
   double InitKE = evt.InitKE;
-
+  double z_in_meter = (evt.z - 681526.937500) / 1000.;
+  //cout << "[BeamSampleAna::FillHistograms] " << detector_str << Form(", (x, y, z) =  (%f, %f, %f", evt.x, evt.y, evt.z - 681526.937500) << endl;
+  /*  
+  if(PID = -13){
+    cout << "[BeamSampleAna::FillHistograms] " << endl;
+    cout << "[BeamSampleAna::FillHistograms] " << detector_str << Form(" (PolX, PolY, PolZ) =  (%f, %f, %f", evt.PolX, evt.PolY, evt.PolZ) << endl;
+    cout << "[BeamSampleAna::FillHistograms] " << detector_str << Form(" (Bx, By, Bz) =  (%f, %f, %f", evt.Bx, evt.By, evt.Bz) << endl;
+    cout << "[BeamSampleAna::FillHistograms] " << detector_str << Form(" (Ex, Ey, Ez) =  (%f, %f, %f", evt.Ex, evt.Ey, evt.Ez) << endl;
+    cout << "[BeamSampleAna::FillHistograms] " << detector_str << Form(", (x, y, z) =  (%f, %f, %f", evt.x, evt.y, evt.z) << endl;
+    cout << "[BeamSampleAna::FillHistograms] " << detector_str << Form(" (InitX, InitY, InitZ) =  (%f, %f, %f", evt.InitX, evt.InitY, evt.InitZ) << endl;
+    cout << "[BeamSampleAna::FillHistograms] " << detector_str << "PID : " << PID << ", InitKE : " << evt.InitKE << ", P : " << P << endl;
+  }
+  */
+  double m_muon = 105.658;
+  double m_pion = 139.57;
+  double E_muon_from_P = sqrt(P*P + m_muon * m_muon);
+  double E_pion_from_P = sqrt(P*P + m_pion * m_pion); 
+  double E_muon_from_KE = InitKE + m_muon;
+  double E_pion_from_KE = InitKE + m_pion;
   Hist.FillHist("VirtualDetector_P_" + detector_str, P, 1., 10000., 0., 100000.);
   Hist.FillHist("VirtualDetector_P_" + detector_str + "_" + PID_str, P, 1., 10000., 0., 100000.);
-
+  Hist.FillHist("VirtualDetector_P_vs_InitKE_" + detector_str + "_" + PID_str, P, InitKE, 1., 400., 0., 2000., 1000., 0., 5000.);
+  Hist.FillHist("VirtualDetector_E_muon_from_P_vs_E_muon_from_KE_" + detector_str + "_" + PID_str, E_muon_from_P, E_muon_from_KE, 1., 400., 0., 2000., 1000., 0., 5000.);
+  Hist.FillHist("VirtualDetector_E_muon_from_P_vs_E_pion_from_KE_" + detector_str + "_" + PID_str, E_muon_from_P, E_pion_from_KE, 1., 400., 0., 2000., 1000., 0., 5000.);
+  Hist.FillHist("VirtualDetector_E_pion_from_P_vs_E_pion_from_KE_" + detector_str + "_" + PID_str, E_pion_from_P, E_pion_from_KE, 1., 400., 0., 2000., 1000., 0., 5000.);
+  Hist.FillHist("VirtualDetector_xz_" + detector_str + "_" + PID_str, z_in_meter, evt.x, 1., 400., 0., 40., 400., -200., 200.);
+  Hist.FillHist("VirtualDetector_yz_" + detector_str + "_" + PID_str, z_in_meter, evt.y, 1., 400., 0.,40., 400., -200., 200.);
+  
 }
 
 void BeamSampleAna::SaveHistograms(){
@@ -149,15 +173,17 @@ void BeamSampleAna::Run(BeamNtuple & evt, Long64_t nentries=-1){
   if (nentries == -1) nentries = evt.fChain->GetEntries();
   
   Long64_t nbytes = 0, nb = 0;
-  for (Long64_t jentry=0; jentry<nentries;jentry++) {
-    //if (jentry%100000==0) std::cout<<jentry<<"/"<<nentries<<std::endl;
+  
+  //for (Long64_t jentry=0; jentry<nentries;jentry++) {
+  for (Long64_t jentry=0; jentry<1;jentry++) { 
+   //if (jentry%100000==0) std::cout<<jentry<<"/"<<nentries<<std::endl;
     if (jentry%1000==0) std::cout<<"[GoodParticle] " <<jentry<<"/"<<nentries<<std::endl;
     Long64_t ientry = evt.LoadTree(jentry);
     if (ientry < 0) break;
     nb = evt.fChain->GetEntry(jentry);   nbytes += nb;
     h_cutflow -> Fill(0.5);
     ProcessEvent(evt);
-    FillHistograms(evt);
+    //FillHistograms(evt);
   }
   SaveHistograms();
 }

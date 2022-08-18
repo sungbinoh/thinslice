@@ -278,6 +278,7 @@ void PionXsec::FillHistBeam(const anavar & evt, double weight, TString suffix){
   Hist.JSFillHist(suffix, "htrack_chi2_proton_" + suffix + "_" + pitype_str, hadana.chi2_proton, weight, 1000., 0., 100.);
   Hist.JSFillHist(suffix, "htrack_beam_alt_len_" + suffix + "_" + pitype_str, evt.reco_beam_alt_len, weight, 600., 0., 600.);
   Hist.JSFillHist(suffix, "htrack_beam_inst_XY_" + suffix + "_" + pitype_str, evt.beam_inst_X, evt.beam_inst_Y, weight, 400., -50., -10., 400., 400., 440.); 
+  Hist.JSFillHist(suffix, "htrack_beam_start_XY_" + suffix + "_" + pitype_str, evt.reco_beam_startX, evt.reco_beam_startY, weight, 400., -50., -10., 400., 400., 440.);
 
   // == Truth
   if(evt.MC){
