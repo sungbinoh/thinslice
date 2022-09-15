@@ -48,7 +48,7 @@
 # include directories and C++ standard are propagated to our libraries or executables.
 # Note: To ensure compatibility with Cling, targets *must* be compiled using the
 # same C++ standard as ROOT was compiled with.
-  add_library(Event SHARED anavar.C BeamNtuple.C BeamVirtualDetector.C HadAna.cxx ThinSlice.cxx EffEval.cxx ProtonInel.cxx ProtonEnergy.cxx PionXsec.cxx BeamSampleAna.cxx util.cxx FillHist_Helper.cxx RecoDaughter.cxx Unfold.cxx TemplateFitter.cxx BetheBloch.cxx)
+  add_library(Event SHARED anavar.C BeamNtuple.C BeamVirtualDetector.C HadAna.cxx ThinSlice.cxx EffEval.cxx ProtonInel.cxx ProtonEnergy.cxx PionXsec.cxx HypFit.cxx BeamSampleAna.cxx util.cxx FillHist_Helper.cxx RecoDaughter.cxx Unfold.cxx TemplateFitter.cxx BetheBloch.cxx)
   target_link_libraries(Event PUBLIC ${ROOT_LIBRARIES} ${RooUnfold_LIBRARIES} ${JSONCPP_LIBRARIES})
 #   target_compile_options(Event INTERFACE ${CMAKE_REQUIRED_FLAGS})
 # Create the main program using the library.
@@ -67,6 +67,9 @@
   add_executable(RunPionXsec RunPionXsec.cxx)
   target_link_libraries(RunPionXsec Event)
 
+  add_executable(RunHypFit RunHypFit.cxx)
+  target_link_libraries(RunHypFit Event)
+
   add_executable(RunBeamSampleAna RunBeamSampleAna.cxx)
   target_link_libraries(RunBeamSampleAna Event)
 
@@ -79,5 +82,5 @@
   add_executable(RunBBStudies BBStudies.cxx)
   target_link_libraries(RunBBStudies Event)
 
-  install(TARGETS RunCrossSection BackgroundFit RunProtonInel RunProtonEnergy RunPionXsec RunBeamSampleAna RunEffEval RunCalcXS RunBBStudies  DESTINATION bin)
+  install(TARGETS RunCrossSection BackgroundFit RunProtonInel RunProtonEnergy RunPionXsec RunHypFit RunBeamSampleAna RunEffEval RunCalcXS RunBBStudies  DESTINATION bin)
   install(TARGETS Event DESTINATION lib)

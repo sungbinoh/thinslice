@@ -266,7 +266,7 @@ bool HadAna::PassPiCuts(const anavar& evt) const{
     PassBeamQualityCut()&&
     //PassBeamXYCut(evt) &&
     PassAPA3Cut(evt)&&
-    PassMichelScoreCut()&&
+    //PassMichelScoreCut()&& // == FIXME, commented out for Hypfit study
     PassProtonCut();
 }
 
@@ -498,12 +498,9 @@ double HadAna::Fit_particle_chi2(const vector<double> & dEdx, const vector<doubl
 double HadAna::Fit_dEdx_Residual_Length(const anavar& evt, const vector<double> & dEdx, const vector<double> & ResRange, int PID, bool save_graph, bool this_is_beam){
   
   //cout << "[HadAna::Fit_dEdx_Residual_Length] Start" << endl;
-  int N_max = 200; // == Maximum number of hits used for the Bethe-Bloch fitting
-
   // == PID input : mass hypothesis, valid only for muons, charged pions, and protons
   int abs_PID = abs(PID);
   if(!(abs(PID) == 13 || PID == 2212 || abs(PID) == 211)){
-    //cout << "[HadAna::Fit_dEdx_Residual_Length] Not a valid PID!" << endl;
     return -9999.;
   }
 
@@ -522,11 +519,11 @@ double HadAna::Fit_dEdx_Residual_Length(const anavar& evt, const vector<double> 
   double dEdx_truncate_upper = 5.;
   double dEdx_truncate_bellow = 0.5;
   if(PID == 2212){
-    max_additional_res_length = 50.;
+    max_additional_res_length = 120.;
     dEdx_truncate_upper = 20.;
   }
   int res_length_trial = (max_additional_res_length - min_additional_res_length) / res_length_step;
-  int this_N_hits = TMath::Min(this_N_calo, N_max); // == Use how many hits
+  int this_N_hits = this_N_calo;
   vector<double> chi2_vector;
   vector<double> additional_res_legnth_vector;
   for(int i = 0; i < res_length_trial; i++){
@@ -623,10 +620,10 @@ double HadAna::Fit_dEdx_Residual_Length(const anavar& evt, const vector<double> 
   return best_total_res_length;
 }
 
-double HadAna::Fit_Pion_Residual_Length_Likelihood(const anavar& evt, const vector<double> & dEdx, const vector<double> & ResRange, int PID, bool save_graph){
-  // == only for charged pions
+double HadAna::Fit_Residual_Length_Likelihood(const anavar& evt, const vector<double> & dEdx, const vector<double> & ResRange, int PID, bool save_graph){
+  // == only for charged pions and protons
   int abs_PID = abs(PID);
-  if(!abs(PID) == 211){
+  if(!(abs(PID) == 13 || PID == 2212 || abs(PID) == 211)){
     return -9999.;
   }
   double best_additional_res_length = -0.1;
@@ -644,6 +641,11 @@ double HadAna::Fit_Pion_Residual_Length_Likelihood(const anavar& evt, const vect
   int i_bestfit = -1;
   double dEdx_truncate_upper = 5.;
   double dEdx_truncate_bellow = 0.5;
+  if(PID == 2212){
+    max_additional_res_length = 120.;
+    dEdx_truncate_upper = 20.;
+  }
+  
   vector<double> m2lnL_vector;
   vector<double> additional_res_legnth_vector;
   for(int i = 0; i < res_length_trial; i++){

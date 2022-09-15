@@ -82,7 +82,7 @@ class HadAna{
   // == Momentum measurement using dE/dx and hit for a short track segment
   double Fit_particle_chi2(const vector<double> & dEdx, const vector<double> & ResRange, bool this_is_beam, int PID);
   double Fit_dEdx_Residual_Length(const anavar& evt, const vector<double> & dEdx, const vector<double> & ResRange, int PID, bool save_graph, bool this_is_beam);
-  double Fit_Pion_Residual_Length_Likelihood(const anavar& evt, const vector<double> & dEdx, const vector<double> & ResRange, int PID, bool save_graph);
+  double Fit_Residual_Length_Likelihood(const anavar& evt, const vector<double> & dEdx, const vector<double> & ResRange, int PID, bool save_graph);
   double Integrate_dEdx(const vector<double> & dEdx, const vector<double> & pitch);
   double trklen_csda_proton;
   double beam_score;

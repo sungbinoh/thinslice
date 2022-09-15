@@ -125,7 +125,7 @@ void BeamSampleAna::FillHistograms(const BeamNtuple & evt){
 void BeamSampleAna::FillHistograms(const BeamVirtualDetector & evt, TString detector_str){
 
   int PID = evt.PDGid;
-  TString PID_str = Form("%d", abs(PID));
+  TString PID_str = Form("%d", PID);
 
   double P = sqrt(pow(evt.Px, 2) + pow(evt.Py, 2) + pow(evt.Pz, 2));
   double InitKE = evt.InitKE;
@@ -154,9 +154,11 @@ void BeamSampleAna::FillHistograms(const BeamVirtualDetector & evt, TString dete
   Hist.FillHist("VirtualDetector_E_muon_from_P_vs_E_muon_from_KE_" + detector_str + "_" + PID_str, E_muon_from_P, E_muon_from_KE, 1., 400., 0., 2000., 1000., 0., 5000.);
   Hist.FillHist("VirtualDetector_E_muon_from_P_vs_E_pion_from_KE_" + detector_str + "_" + PID_str, E_muon_from_P, E_pion_from_KE, 1., 400., 0., 2000., 1000., 0., 5000.);
   Hist.FillHist("VirtualDetector_E_pion_from_P_vs_E_pion_from_KE_" + detector_str + "_" + PID_str, E_pion_from_P, E_pion_from_KE, 1., 400., 0., 2000., 1000., 0., 5000.);
+
+  double xy = sqrt(evt.x *evt.x + evt.y * evt.y);
   Hist.FillHist("VirtualDetector_xz_" + detector_str + "_" + PID_str, z_in_meter, evt.x, 1., 400., 0., 40., 400., -200., 200.);
   Hist.FillHist("VirtualDetector_yz_" + detector_str + "_" + PID_str, z_in_meter, evt.y, 1., 400., 0.,40., 400., -200., 200.);
-  
+  Hist.FillHist("VirtualDetector_P_vs_xy_"  + detector_str + "_" + PID_str, P, xy, 1., 1500., 0., 1500., 200., 0., 200.);
 }
 
 void BeamSampleAna::SaveHistograms(){
