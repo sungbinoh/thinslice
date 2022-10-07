@@ -24,8 +24,6 @@ double PionXsec::Get_EQE(double P_pion, double cos_theta){
 
   double EQE = numer / denom;
 
-  //cout << "[PionXsec::Get_EQE]\tEQE\t" << EQE << "\tP_pion\t" << P_pion << "\tcos_theta\t" << cos_theta << endl;
-
   return EQE;
 }
 
@@ -281,6 +279,13 @@ void PionXsec::FillHistBeam(const anavar & evt, double weight, TString suffix){
   Hist.JSFillHist(suffix, "htrack_beam_start_XY_" + suffix + "_" + pitype_str, evt.reco_beam_startX, evt.reco_beam_startY, weight, 400., -50., -10., 400., 400., 440.);
   Hist.JSFillHist(suffix, "htrack_beam_start_Z_" + suffix + "_" + pitype_str, evt.reco_beam_startZ, weight, 1000., -100., 900.);
   Hist.JSFillHist(suffix, "htrack_beam_end_Z_" + suffix + "_" + pitype_str, evt.reco_beam_endZ, weight, 1000., -100., 900.);
+  
+  if(beamKE > 600. && beamKE < 1200.){
+    int hundered_low = beamKE / 100.;
+
+    TString KE_range_str = Form("BeamKE%dto%dMeV_", 100 * hundered_low, 100 * (hundered_low + 1));
+    Hist.JSFillHist(suffix, "htrack_beam_inst_XY_" + KE_range_str + suffix + "_" + pitype_str, evt.beam_inst_X, evt.beam_inst_Y, weight, 400., -50., -10., 400., 400., 440.);
+  }
 
   // == Comaprison between Beam Inst. and TPC track
   TVector3 Beam_Inst_r(evt.beam_inst_X, evt.beam_inst_Y, evt.beam_inst_Z);
@@ -294,12 +299,15 @@ void PionXsec::FillHistBeam(const anavar & evt, double weight, TString suffix){
 
   }
 
-
   // == Truth
   if(evt.MC){
     double beamP_true = evt.true_beam_startP * 1000.;
+    double beamKE_true = sqrt(pow(beamP_true, 2) + pow(139.57, 2)) - 139.57;
     double true_KE_ff = hadana.true_ffKE;
     double true_P_ff = hadana.map_BB[abs(evt.true_beam_PDG)] -> KEtoMomentum(true_KE_ff);
+    double KE_diff = beamKE - true_KE_ff;
+    double KE_diff_true = beamKE_true - true_KE_ff;
+    double KE_diff_beam_true = beamKE - beamKE_true;
     TString true_beam_PDG_str = Form("%d", abs(evt.true_beam_PDG));
     double beamP_res = (beamP_true - beamP) / beamP_true;
     Hist.JSFillHist(suffix, "htrack_BeamP_Res_" + suffix + "_" + pitype_str, beamP_res, weight, 4000, -2, 2);
@@ -308,6 +316,45 @@ void PionXsec::FillHistBeam(const anavar & evt, double weight, TString suffix){
     Hist.JSFillHist(suffix, "htrack_KEffTruth_" + suffix + "_" + pitype_str, true_KE_ff, weight, 5000, 0, 5000);
     Hist.JSFillHist(suffix, "htrack_PffTruth_" + suffix + "_" + pitype_str, true_P_ff, weight, 5000, 0, 5000);
     Hist.JSFillHist(suffix, "htrack_BeamP_true_vs_D_" + suffix + "_PID" + true_beam_PDG_str, beamP_true, distance, weight, 300., 0., 1500., 100., 0., 100.);
+    Hist.JSFillHist(suffix, "htrack_BeamKE_vs_KEffTruth_" + suffix + "_" + pitype_str, beamKE, true_KE_ff, weight, 300., 0., 1500., 300., 0., 1500.);
+    Hist.JSFillHist(suffix, "htrack_BeamKE_vs_KEffTruth_" + suffix + "_PID" + true_beam_PDG_str, beamKE, true_KE_ff, weight, 300., 0., 1500., 300., 0., 1500.);
+    Hist.JSFillHist(suffix, "htrack_BeamKE_vs_KE_diff_" + suffix + "_" + pitype_str, beamKE, KE_diff, weight, 300., 0., 1500., 500., -500., 500.);
+    Hist.JSFillHist(suffix, "htrack_BeamKE_vs_KE_diff_" + suffix + "_PID" + true_beam_PDG_str, beamKE, KE_diff, weight, 300., 0., 1500., 500., -500., 500.);
+    if(beamKE > 600. && beamKE < 1200.){
+      int hundered_low = beamKE / 100.;
+      int beamKE_50bin = beamKE / 50.;
+
+      TString KE_range_str_50MeV = Form("BeamKE%dto%dMeV_", 50 * beamKE_50bin, 50 * (beamKE_50bin  + 1));
+      TString KE_range_str = Form("BeamKE%dto%dMeV_", 100 * hundered_low, 100 * (hundered_low + 1));
+      Hist.JSFillHist(suffix, "htrack_KE_diff_" + KE_range_str + suffix + "_" + pitype_str, KE_diff, weight, 500., -500., 500.);
+      Hist.JSFillHist(suffix, "htrack_KE_diff_" + KE_range_str + suffix + "_PID" + true_beam_PDG_str, KE_diff, weight, 500., -500., 500.);
+      Hist.JSFillHist(suffix, "htrack_KE_diff_true_" + KE_range_str + suffix + "_" + pitype_str, KE_diff_true, weight, 500., -500., 500.);
+      Hist.JSFillHist(suffix, "htrack_KE_diff_true_" + KE_range_str + suffix + "_PID" + true_beam_PDG_str, KE_diff_true, weight, 500., -500., 500.);
+
+      bool is_scraper = false;
+      if(beamKE > 700.  && beamKE < 800.  && KE_diff > 54.5 ) is_scraper = true;
+      if(beamKE > 800.  && beamKE < 900.  && KE_diff > 71.5 ) is_scraper = true;
+      if(beamKE > 900.  && beamKE < 1000. && KE_diff > 88.3 ) is_scraper = true;
+      if(beamKE > 1000. && beamKE < 1100. && KE_diff > 102.3) is_scraper = true;
+
+      Hist.JSFillHist(suffix, "htrack_beam_inst_XY_" + KE_range_str + suffix + "_" + pitype_str, evt.beam_inst_X, evt.beam_inst_Y, weight, 400., -50., -10., 400., 400., 440.);
+      if(is_scraper) Hist.JSFillHist(suffix, "htrack_beam_inst_XY_scraper_" + KE_range_str + suffix + "_" + pitype_str, evt.beam_inst_X, evt.beam_inst_Y, weight, 400., -50., -10., 400., 400., 440.);
+      else{
+	Hist.JSFillHist(suffix, "htrack_beam_inst_XY_nonscraper_" + KE_range_str + suffix + "_" + pitype_str, evt.beam_inst_X, evt.beam_inst_Y, weight, 400., -50., -10., 400., 400., 440.);;
+      }
+
+      bool is_inside_1p5sigma = false;
+      double distance = sqrt( pow(evt.beam_inst_X + 29.6, 2) + pow(evt.beam_inst_Y - 422.0 , 2) );
+      if(distance < 1.5 * 4.8) is_inside_1p5sigma = true;
+      if(is_inside_1p5sigma){
+	Hist.JSFillHist(suffix, "htrack_KE_diff_nonscraper_" + KE_range_str + suffix + "_" + pitype_str, KE_diff, weight, 500., -500., 500.);
+	Hist.JSFillHist(suffix, "htrack_KE_diff_nonscraper_" + KE_range_str_50MeV + suffix + "_" + pitype_str, KE_diff, weight, 500., -500., 500.);
+	Hist.JSFillHist(suffix, "htrack_KE_diff_true_nonscraper_" + KE_range_str + suffix + "_" + pitype_str, KE_diff_true, weight, 500., -500., 500.);
+	Hist.JSFillHist(suffix, "htrack_KE_diff_true_nonscraper_" + KE_range_str_50MeV + suffix + "_" + pitype_str, KE_diff_true, weight, 500., -500., 500.);
+	Hist.JSFillHist(suffix, "htrack_KE_diff_beam_true_nonscraper_" + KE_range_str + suffix + "_" + pitype_str, KE_diff_beam_true, weight, 500., -500., 500.);
+        Hist.JSFillHist(suffix, "htrack_KE_diff_beam_true_nonscraper_" + KE_range_str_50MeV + suffix + "_" + pitype_str, KE_diff_beam_true, weight, 500., -500., 500.);
+      }
+    }
   }
 }
 
@@ -462,6 +509,76 @@ void PionXsec::FillHistDaughterPurity(const vector<RecoDaughter> daughters, cons
 
 }
 
+void PionXsec::Fill_Eslice_Study(const anavar & evt, double weight, TString suffix){
+
+  TString true_beam_PDG_str = Form("%d", abs(evt.true_beam_PDG));
+  TString pitype_str = Form("%d", hadana.pitype);
+  double true_KE_ff = hadana.true_ffKE;
+  double KE_end = -9999.;
+  double P_beam = evt.true_beam_endP * 1000.;
+  double m_beam = evt.true_beam_mass;
+  double E_beam = sqrt(P_beam * P_beam + m_beam * m_beam);
+
+  // KE init and end using true_beam_traj_KE
+  double KE_last_traj = -999999.;
+  int start_idx = -1;
+  for (int i=0; i<evt.true_beam_traj_Z->size(); i++){
+    if (hadana.true_trklen_accum[i] > 0.){
+      start_idx = i;
+      break;
+    }
+  }
+  if (start_idx > 0) {
+    int traj_max = evt.true_beam_traj_Z -> size() - 1;
+    int temp = traj_max;
+    if ((*evt.true_beam_traj_KE)[traj_max] != 0) {
+      KE_last_traj = (*evt.true_beam_traj_KE)[traj_max];
+    }
+    else{
+      temp = traj_max-1;
+      while ((*evt.true_beam_traj_KE)[temp] == 0) temp--;
+      KE_last_traj = (*evt.true_beam_traj_KE)[temp] - 2.1 * ((hadana.true_trklen_accum)[traj_max]-(hadana.true_trklen_accum)[temp]); 
+    }
+ 
+    if (start_idx == traj_max) true_KE_ff = (*evt.true_beam_traj_KE)[temp];
+    else true_KE_ff = (*evt.true_beam_traj_KE)[start_idx];
+ }
+
+  //KE_end = hadana.map_BB[211] -> MomentumtoKE(P_beam);
+  KE_end = KE_last_traj;
+
+  int bin_init = true_KE_ff / 50;
+  int bin_end = KE_end / 50;
+  if(true_KE_ff > 10000.) return;
+  if(bin_init == bin_end){
+    cout << "true_KE_ff : " << true_KE_ff << ", KE_end : " << KE_end << endl;
+    return;
+  }
+  //double true_beam_end_Z = evt.true_beam_endZ;
+  //if(true_beam_end_Z < 0.) cout << "[PionXsec::Fill_Eslice_Study] true_beam_end_Z : " << true_beam_end_Z << endl;
+  //Hist.JSFillHist(suffix, "hdaughter_KE_pion_init_" + suffix + "_" + pitype_str, true_KE_ff, weight, 150., 0., 1500.);
+  //Hist.JSFillHist(suffix, "hdaughter_KE_pion_end_" + suffix + "_" + pitype_str, KE_end, weight, 150., 0., 1500.);
+
+  // == E slice with 50 MeV binning
+  double init_KE_center = 50. * (bin_init + 0.) + 25.;
+  double end_KE_center = 50. * (bin_end + 0.) + 25.;
+  Hist.JSFillHist(suffix, "hdaughter_KE_pion_init_" + suffix + "_" + pitype_str, init_KE_center - 50., weight, 30., 0., 1500.);
+  if(pitype_str != "0") Hist.JSFillHist(suffix, "hdaughter_KE_pion_init_" + suffix + "_" + true_beam_PDG_str, init_KE_center - 50., weight, 30., 0., 1500.);
+  if(bin_init - 1 == bin_end){
+    Hist.JSFillHist(suffix, "hdaughter_KE_pion_end_at_next_slice_" + suffix + "_" + pitype_str, end_KE_center, weight, 30., 0., 1500.);
+  }
+  Hist.JSFillHist(suffix, "hdaughter_KE_pion_end_" + suffix + "_" + pitype_str, end_KE_center, weight, 30., 0., 1500.);
+ 
+  for(int i = bin_end; i < bin_init; i++){
+    double this_KE_center = 50. * (i + 0.) + 25.;
+    Hist.JSFillHist(suffix, "hdaughter_KE_pion_inc_" + suffix + "_" + pitype_str, this_KE_center, weight, 30., 0., 1500.);
+    if(pitype_str != "0") Hist.JSFillHist(suffix, "hdaughter_KE_pion_inc_" + suffix + "_" + true_beam_PDG_str, this_KE_center, weight, 30., 0., 1500.);
+  }
+
+  //if(abs(evt.true_beam_PDG) == 211 && pitype_str != "1" && pitype_str != "2") cout << "true_KE_ff : " << true_KE_ff << endl;
+  
+}
+
 void PionXsec::FillHistQE_MCstudy(const vector<RecoDaughter> daughters, const anavar & evt, double weight, TString suffix){
 
   TString pitype_str = Form("%d", hadana.pitype);
@@ -532,22 +649,27 @@ void PionXsec::FillHistQE_MCstudy(const vector<RecoDaughter> daughters, const an
     }
   }
 
-
   bool is_QE = false;
   double EQEmE = -9999.;
+  double true_KE_ff = hadana.true_ffKE;
+  double KE_end = -9999.;
   // == Use thinslie method to measrue truth level QE cross section
+  double P_beam = evt.true_beam_endP * 1000.;
+  double m_beam = evt.true_beam_mass;
+  double E_beam = sqrt(P_beam * P_beam + m_beam * m_beam);
+  KE_end = hadana.map_BB[211] -> MomentumtoKE(P_beam);
+  double KE_last_traj = (*evt.true_beam_traj_KE)[evt.true_beam_traj_KE->size() - 1];
+  //if(pitype_str == "2") 
+  cout << pitype_str << ", KE_end : " << KE_end << ", KE_last_traj : " << KE_last_traj << ", KE_last-1_traj : " << (*evt.true_beam_traj_KE)[evt.true_beam_traj_KE->size() - 2]
+       << "Z last : " << (*evt.true_beam_traj_KE)[evt.true_beam_traj_KE->size() - 1] << ", Z last - 1 : " << (*evt.true_beam_traj_KE)[evt.true_beam_traj_KE->size() - 2] << endl;
+
+  TVector3 unit_beam(evt.true_beam_endPx, evt.true_beam_endPy, evt.true_beam_endPz);
+  unit_beam = (1. / unit_beam.Mag() ) * unit_beam;
   for(unsigned int i = 0; i < (*evt.true_beam_daughter_ID).size(); i++){
     if((*evt.true_beam_daughter_PDG).at(i) == 211){ // == Only pion+
       TVector3 unit_daughter((*evt.true_beam_daughter_startPx).at(i), (*evt.true_beam_daughter_startPy).at(i), (*evt.true_beam_daughter_startPz).at(i) );
       unit_daughter = (1./ unit_daughter.Mag() ) * unit_daughter;
-
-      TVector3 unit_beam(evt.true_beam_endPx, evt.true_beam_endPy, evt.true_beam_endPz);
-      unit_beam = (1. / unit_beam.Mag() ) * unit_beam;
-
       double cos_theta = cos(unit_beam.Angle(unit_daughter));
-      double P_beam = evt.true_beam_endP * 1000.;
-      double m_beam = evt.true_beam_mass;
-      double E_beam = sqrt(P_beam * P_beam + m_beam * m_beam);
       double P_daughter = (*evt.true_beam_daughter_startP).at(i) * 1000.;
       double EQE_NC_4 = Get_EQE_NC_Pion(P_daughter, cos_theta, 4., -1.);
       double this_EQEmE = EQE_NC_4 - E_beam;
@@ -557,20 +679,26 @@ void PionXsec::FillHistQE_MCstudy(const vector<RecoDaughter> daughters, const an
       }
     }
   }
-  int slice_id = -1.;
-  unsigned int slice_size = evt.true_beam_slices -> size();
-  if(slice_size > 0){
-    slice_id = (*evt.true_beam_slices).at(slice_size - 1) / 20.;
-    //if(hadana.pitype == 1) cout << "slice_id : " << slice_id << ", true_beam_endZ : " << evt.true_beam_endZ << ", ratio : " << evt.true_beam_endZ / (slice_id + 0.) << endl;
-    if(slice_id > 3){
-      if(is_QE) Hist.JSFillHist(suffix, "hdaughter_slice_id_pion_QE_int_" + suffix + "_" + pitype_str, slice_id, weight, 30., -0.5, 29.5);
-      Hist.JSFillHist(suffix, "hdaughter_slice_id_pion_int_" + suffix + "_" + pitype_str, slice_id, weight, 30., -0.5, 29.5);
-      for(int i = 0; i < slice_id + 1; i++){
-	if(is_QE) Hist.JSFillHist(suffix, "hdaughter_slice_id_pion_QE_incident_" + suffix + "_" + pitype_str, i, weight, 30., -0.5, 29.5);
-	Hist.JSFillHist(suffix, "hdaughter_slice_id_pion_incident_" + suffix + "_" + pitype_str, i, weight, 30., -0.5, 29.5);
-      }
-    }
+
+  if(true_KE_ff > 10000.) return;
+  if(is_QE) Hist.JSFillHist(suffix, "hdaughter_KE_pion_QE_int_" + suffix + "_" + pitype_str, KE_end, weight, 150., 0., 1500.);
+  Hist.JSFillHist(suffix, "hdaughter_KE_pion_init_" + suffix + "_" + pitype_str, true_KE_ff, weight, 150., 0., 1500.);
+  Hist.JSFillHist(suffix, "hdaughter_KE_pion_end_" + suffix + "_" + pitype_str, KE_end, weight, 150., 0., 1500.);
+
+  // == E inc with 50 MeV binning
+  int bin_init = true_KE_ff / 50;
+  int bin_end = KE_end / 50;
+  for(int i = bin_end; i < bin_init + 1; i++){
+    double this_KE_center = 50. * (i + 0.) + 25.;
+    Hist.JSFillHist(suffix, "hdaughter_KE_pion_inc_" + suffix + "_" + pitype_str, this_KE_center, weight, 30., 0., 1500.);
   }
+
+
+  /*
+  int slice_ID_init = (1000. - ;
+  int slice_ID_end = ;
+  int slice_ID_int = ;
+  */
 }
 
 void PionXsec::FillHistQE_Reco(const vector<RecoDaughter> daughters, const anavar & evt, double weight, TString suffix){
@@ -755,6 +883,8 @@ void PionXsec::SaveHistograms(){
 void PionXsec::Run(anavar & evt, Long64_t nentries=-1){
 
   BookHistograms();
+
+  // == Beam Momentum Setting
   TString beam_P_str = "1.0";
   double beam_P_inst_cut_upper = 9999.;
   double beam_P_inst_cut_lower = 0.;
@@ -777,12 +907,10 @@ void PionXsec::Run(anavar & evt, Long64_t nentries=-1){
   cout << "[PionXsec::Run] Beam Momentum is " << beam_P_str << " GeV" << endl;
 
 
-  //Long64_t nentries = evt.fChain->GetEntriesFast();
+  // == Run
   if (nentries == -1) nentries = evt.fChain->GetEntries();
-
   Long64_t nbytes = 0, nb = 0;
   for (Long64_t jentry=0; jentry<nentries;jentry++) {
-    //if (jentry%100000==0) std::cout<<jentry<<"/"<<nentries<<std::endl;
     if (jentry%1000==0) std::cout<<jentry<<"/"<<nentries<<std::endl;
     Long64_t ientry = evt.LoadTree(jentry);
     if (ientry < 0) break;
@@ -794,6 +922,7 @@ void PionXsec::Run(anavar & evt, Long64_t nentries=-1){
     if (!hadana.isSelectedPart(evt)) continue;
     Hist.FillHist("Cutflow", 0.5, 1., 10., 0., 10.);
     ProcessEvent(evt);
+    Fill_Eslice_Study(evt, 1., "nocut_noweight");
 
     double weight = 1.;
     double weight_piOnly = 1.;
@@ -838,24 +967,24 @@ void PionXsec::Run(anavar & evt, Long64_t nentries=-1){
       }
     }
     FillHistBeam(evt, 1., "precut_noweight");
-    FillHistBeam(evt, weight, "precut_Preweight");
+    //FillHistBeam(evt, weight, "precut_Preweight");
     FillHistBeam(evt, weight_piOnly, "precut_Preweight_piOnly");
-
+    
     if (!hadana.PassPiCuts(evt)) continue;
     FillHistBeam(evt, 1., "noweight");
-    FillHistBeam(evt, weight, "Preweight");
+    //FillHistBeam(evt, weight, "Preweight");
     FillHistBeam(evt, weight_piOnly, "Preweight_piOnly");
 
     double beamP = evt.beam_inst_P*1000. * beamP_scale;
     if(beamP < beam_P_inst_cut_lower || beamP > beam_P_inst_cut_upper) continue;
     FillHistBeam(evt, 1., "beam_window_noweight");
-    FillHistBeam(evt, weight, "beam_window_Preweight");
+    //FillHistBeam(evt, weight, "beam_window_Preweight");
     FillHistBeam(evt, weight_piOnly, "beam_window_Preweight_piOnly");
 
     //cout << evt.run << ":" << evt.event << endl;
     vector<RecoDaughter> RecoDaughters_all = GetAllRecoDaughters(evt);
     //cout << "Before continue" << endl;
-    if(RecoDaughters_all.size() < 1) continue;
+    //if(RecoDaughters_all.size() < 1) continue; // == FIXME : commented out to study E-slice method
 
     vector<RecoDaughter> pions = GetPions(RecoDaughters_all);
     vector<RecoDaughter> protons = GetProtons(RecoDaughters_all);

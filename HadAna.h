@@ -19,8 +19,8 @@ class HadAna{
 
   std::map< int, BetheBloch* > map_BB;
 
+  void Init();
   void InitPi();
-
   void InitP();
 
   void AddTruePDG(int pdg);

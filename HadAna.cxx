@@ -23,6 +23,11 @@ HadAna::HadAna(){
   
 }
 
+void HadAna::Init(){
+  SetPandoraSlicePDG(13);
+  SetBeamQualityCuts();
+}
+
 void HadAna::InitPi(){
 
   AddTruePDG(-13);
@@ -264,9 +269,9 @@ bool HadAna::PassPiCuts(const anavar& evt) const{
   return PassPandoraSliceCut(evt)&&
     PassCaloSizeCut(evt)&&
     PassBeamQualityCut()&&
-    //PassBeamXYCut(evt) &&
+    //PassBeamXYCut(evt) && // == Heng-Ye's beam scraper cut
     PassAPA3Cut(evt)&&
-    //PassMichelScoreCut()&& // == FIXME, commented out for Hypfit study
+    PassMichelScoreCut()&& // == FIXME, commented out for Hypfit study
     PassProtonCut();
 }
 
@@ -507,7 +512,7 @@ double HadAna::Fit_dEdx_Residual_Length(const anavar& evt, const vector<double> 
   double best_additional_res_length = -0.1;
   double best_chi2 = 99999.;
   double min_additional_res_length = 0.; // == [cm]
-  double max_additional_res_length = 450.; // == [cm]
+  double max_additional_res_length = 200.; // == [cm]
   double res_length_step = 1.0; // == [cm]
   int N_skip = 3;
   int this_N_calo = dEdx.size();

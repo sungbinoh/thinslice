@@ -37,6 +37,7 @@ class PionXsec {
   void FillHistBeam(const anavar & evt, double weight, TString suffix);
   void FillHistDaughterTrue(const vector<RecoDaughter> daughters, const anavar & evt, double weight, TString suffix);
   void FillHistDaughterPurity(const vector<RecoDaughter> daughters, const anavar & evt, double weight, TString suffix);
+  void Fill_Eslice_Study(const anavar & evt, double weight, TString suffix);
   void FillHistQE_MCstudy(const vector<RecoDaughter> daughters, const anavar & evt, double weight, TString suffix);
   void FillHistQE_Reco(const vector<RecoDaughter> daughters, const anavar & evt, double weight, TString suffix);
   void SaveHistograms();
