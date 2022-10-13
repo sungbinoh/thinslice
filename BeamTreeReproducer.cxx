@@ -1,15 +1,15 @@
-#include "BeamSampleAna.h"
+#include "BeamTreeReproducer.h"
 #include "BeamNtuple.h"
 #include "BeamVirtualDetector.h"
 
 using namespace std;
 
-BeamSampleAna::BeamSampleAna(){
+BeamTreeReproducer::BeamTreeReproducer(){
   //hadana.InitPi();
 }
 
-void BeamSampleAna::BookHistograms(){
-  //cout << "[BeamSampleAna::BookHistograms] Start" << endl;
+void BeamTreeReproducer::BookHistograms(){
+  //cout << "[BeamTreeReproducer::BookHistograms] Start" << endl;
   Hist.outfile = TFile::Open(fOutputFileName.c_str(), "recreate");
 
   // == Histograms for normalization
@@ -17,11 +17,11 @@ void BeamSampleAna::BookHistograms(){
 
 }
 
-void BeamSampleAna::ProcessEvent(const BeamNtuple & evt){
+void BeamTreeReproducer::ProcessEvent(const BeamNtuple & evt){
 }
 
-void BeamSampleAna::FillHistograms(const BeamNtuple & evt){
-  //cout << "[BeamSampleAna::FillHistograms] Start" <<endl;
+void BeamTreeReproducer::FillHistograms(const BeamNtuple & evt){
+  //cout << "[BeamTreeReproducer::FillHistograms] Start" <<endl;
 
   // == PIDs
   int PID_AfterTarget = evt.AfterTarget_PDGid;
@@ -122,7 +122,7 @@ void BeamSampleAna::FillHistograms(const BeamNtuple & evt){
 
 }
 
-void BeamSampleAna::FillHistograms(const BeamVirtualDetector & evt, TString detector_str){
+void BeamTreeReproducer::FillHistograms(const BeamVirtualDetector & evt, TString detector_str){
 
   int PID = evt.PDGid;
   TString PID_str = Form("%d", PID);
@@ -130,16 +130,16 @@ void BeamSampleAna::FillHistograms(const BeamVirtualDetector & evt, TString dete
   double P = sqrt(pow(evt.Px, 2) + pow(evt.Py, 2) + pow(evt.Pz, 2));
   double InitKE = evt.InitKE;
   double z_in_meter = (evt.z - 681526.937500) / 1000.;
-  //cout << "[BeamSampleAna::FillHistograms] " << detector_str << Form(", (x, y, z) =  (%f, %f, %f", evt.x, evt.y, evt.z - 681526.937500) << endl;
+  //cout << "[BeamTreeReproducer::FillHistograms] " << detector_str << Form(", (x, y, z) =  (%f, %f, %f", evt.x, evt.y, evt.z - 681526.937500) << endl;
   /*  
   if(PID = -13){
-    cout << "[BeamSampleAna::FillHistograms] " << endl;
-    cout << "[BeamSampleAna::FillHistograms] " << detector_str << Form(" (PolX, PolY, PolZ) =  (%f, %f, %f", evt.PolX, evt.PolY, evt.PolZ) << endl;
-    cout << "[BeamSampleAna::FillHistograms] " << detector_str << Form(" (Bx, By, Bz) =  (%f, %f, %f", evt.Bx, evt.By, evt.Bz) << endl;
-    cout << "[BeamSampleAna::FillHistograms] " << detector_str << Form(" (Ex, Ey, Ez) =  (%f, %f, %f", evt.Ex, evt.Ey, evt.Ez) << endl;
-    cout << "[BeamSampleAna::FillHistograms] " << detector_str << Form(", (x, y, z) =  (%f, %f, %f", evt.x, evt.y, evt.z) << endl;
-    cout << "[BeamSampleAna::FillHistograms] " << detector_str << Form(" (InitX, InitY, InitZ) =  (%f, %f, %f", evt.InitX, evt.InitY, evt.InitZ) << endl;
-    cout << "[BeamSampleAna::FillHistograms] " << detector_str << "PID : " << PID << ", InitKE : " << evt.InitKE << ", P : " << P << endl;
+    cout << "[BeamTreeReproducer::FillHistograms] " << endl;
+    cout << "[BeamTreeReproducer::FillHistograms] " << detector_str << Form(" (PolX, PolY, PolZ) =  (%f, %f, %f", evt.PolX, evt.PolY, evt.PolZ) << endl;
+    cout << "[BeamTreeReproducer::FillHistograms] " << detector_str << Form(" (Bx, By, Bz) =  (%f, %f, %f", evt.Bx, evt.By, evt.Bz) << endl;
+    cout << "[BeamTreeReproducer::FillHistograms] " << detector_str << Form(" (Ex, Ey, Ez) =  (%f, %f, %f", evt.Ex, evt.Ey, evt.Ez) << endl;
+    cout << "[BeamTreeReproducer::FillHistograms] " << detector_str << Form(", (x, y, z) =  (%f, %f, %f", evt.x, evt.y, evt.z) << endl;
+    cout << "[BeamTreeReproducer::FillHistograms] " << detector_str << Form(" (InitX, InitY, InitZ) =  (%f, %f, %f", evt.InitX, evt.InitY, evt.InitZ) << endl;
+    cout << "[BeamTreeReproducer::FillHistograms] " << detector_str << "PID : " << PID << ", InitKE : " << evt.InitKE << ", P : " << P << endl;
   }
   */
   double m_muon = 105.658;
@@ -161,13 +161,13 @@ void BeamSampleAna::FillHistograms(const BeamVirtualDetector & evt, TString dete
   Hist.FillHist("VirtualDetector_P_vs_xy_"  + detector_str + "_" + PID_str, P, xy, 1., 1500., 0., 1500., 200., 0., 200.);
 }
 
-void BeamSampleAna::SaveHistograms(){
+void BeamTreeReproducer::SaveHistograms(){
   Hist.WriteHist();
   //Hist.outfile->cd();
   //outputFile->Write();
 }
 
-void BeamSampleAna::Run(BeamNtuple & evt, Long64_t nentries=-1){
+void BeamTreeReproducer::Run(BeamNtuple & evt, Long64_t nentries=-1){
 
   BookHistograms();
 
@@ -190,7 +190,7 @@ void BeamSampleAna::Run(BeamNtuple & evt, Long64_t nentries=-1){
   SaveHistograms();
 }
 
-void BeamSampleAna::Run(BeamVirtualDetector & evt, Long64_t nentries=-1, TString detector_str = ""){
+void BeamTreeReproducer::Run(BeamVirtualDetector & evt, Long64_t nentries=-1, TString detector_str = ""){
 
   BookHistograms();
   if (nentries == -1) nentries = evt.fChain->GetEntries();
