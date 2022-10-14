@@ -37,16 +37,11 @@ int main(int argc, char ** argv){
   file >> root;
   cout<<root<<endl;
   //cout<<root["mcfile"].asString()<<endl;
-
-  TChain *mcchain = new TChain();
-  mcchain->Add(Form("%s/NTuples/GoodParticle", root["mcfile"].asString().c_str()));
-  
-  BeamNtuple mcevt(mcchain);
-
   BeamTreeReproducer mcpe;
   mcpe.SetOutputFileName(root["mcoutfile"].asString());
-  mcpe.Run(mcevt, root["nevents"].asInt());
+  vector<TString> branch_name_vector;
 
+  /*
   TChain *Chain_VirtualDetector_AfterTarget = new TChain();
   Chain_VirtualDetector_AfterTarget -> Add(Form("%s/VirtualDetector/AfterTarget", root["mcfile"].asString().c_str()));
   BeamVirtualDetector evt_AfterTarget(Chain_VirtualDetector_AfterTarget);
@@ -56,31 +51,53 @@ int main(int argc, char ** argv){
   Chain_VirtualDetector_COLL1 -> Add(Form("%s/VirtualDetector/COLL1", root["mcfile"].asString().c_str()));
   BeamVirtualDetector evt_COLL1(Chain_VirtualDetector_COLL1);
   mcpe.Run(evt_COLL1, root["nevents"].asInt(), "COLL1");
+  */
 
   TChain *Chain_VirtualDetector_BPROF1 = new TChain();
   Chain_VirtualDetector_BPROF1 -> Add(Form("%s/VirtualDetector/BPROF1", root["mcfile"].asString().c_str()));
   BeamVirtualDetector evt_BPROF1(Chain_VirtualDetector_BPROF1);
-  mcpe.Run(evt_BPROF1, root["nevents"].asInt(), "BPROF1");
+  //branch_vector.push_back(evt_BPROF1);
+  branch_name_vector.push_back("BPROF1");
+
+  TChain *Chain_VirtualDetector_BPROF2 = new TChain();
+  Chain_VirtualDetector_BPROF2 -> Add(Form("%s/VirtualDetector/BPROF2", root["mcfile"].asString().c_str()));
+  BeamVirtualDetector evt_BPROF2(Chain_VirtualDetector_BPROF2);
+  //branch_vector.push_back(evt_BPROF2);
+  branch_name_vector.push_back("BPROF2");
 
   TChain *Chain_VirtualDetector_BPROF3 = new TChain();
   Chain_VirtualDetector_BPROF3 -> Add(Form("%s/VirtualDetector/BPROF3", root["mcfile"].asString().c_str()));
   BeamVirtualDetector evt_BPROF3(Chain_VirtualDetector_BPROF3);
-  mcpe.Run(evt_BPROF3, root["nevents"].asInt(), "BPROF3");
+  //branch_vector.push_back(evt_BPROF3);
+  branch_name_vector.push_back("BPROF3");
 
   TChain *Chain_VirtualDetector_TRIG1 = new TChain();
   Chain_VirtualDetector_TRIG1 -> Add(Form("%s/VirtualDetector/TRIG1", root["mcfile"].asString().c_str()));
   BeamVirtualDetector evt_TRIG1(Chain_VirtualDetector_TRIG1);
-  mcpe.Run(evt_TRIG1, root["nevents"].asInt(), "TRIG1");
+  //branch_vector.push_back(evt_TRIG1);
+  branch_name_vector.push_back("TRIG1");
+
+  TChain *Chain_VirtualDetector_BPROFEXT = new TChain();
+  Chain_VirtualDetector_BPROFEXT -> Add(Form("%s/VirtualDetector/BPROFEXT", root["mcfile"].asString().c_str()));
+  BeamVirtualDetector evt_BPROFEXT(Chain_VirtualDetector_BPROFEXT);
+  //branch_vector.push_back(evt_BPROFEXT);
+  branch_name_vector.push_back("BPROFEXT");
 
   TChain *Chain_VirtualDetector_BPROF4 = new TChain();
   Chain_VirtualDetector_BPROF4 -> Add(Form("%s/VirtualDetector/BPROF4", root["mcfile"].asString().c_str()));
   BeamVirtualDetector evt_BPROF4(Chain_VirtualDetector_BPROF4);
-  mcpe.Run(evt_BPROF4, root["nevents"].asInt(), "BPROF4");
+  //branch_vector.push_back(evt_BPROF4);
+  branch_name_vector.push_back("BPROF4");
 
   TChain *Chain_VirtualDetector_TRIG2 = new TChain();
   Chain_VirtualDetector_TRIG2 -> Add(Form("%s/VirtualDetector/TRIG2", root["mcfile"].asString().c_str()));
   BeamVirtualDetector evt_TRIG2(Chain_VirtualDetector_TRIG2);
-  mcpe.Run(evt_TRIG2, root["nevents"].asInt(), "TRIG2");
+  //branch_vector.push_back(evt_TRIG2);
+  branch_name_vector.push_back("TRIG2");
+
+  mcpe.Run(evt_BPROF1, evt_BPROF2, evt_BPROF3, evt_TRIG1, evt_BPROFEXT, evt_BPROF4, evt_TRIG2, branch_name_vector, root["nevents"].asInt());
+
+  branch_name_vector.clear();
 
   return 0;
 }

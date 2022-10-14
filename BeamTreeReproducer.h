@@ -31,8 +31,12 @@ class BeamTreeReproducer {
   void FillHistograms(const BeamVirtualDetector & evt, TString detector_str);
   void SaveHistograms();
   void ProcessEvent(const BeamNtuple & evt);
-  void Run(BeamNtuple & evt, Long64_t nentries);
-  void Run(BeamVirtualDetector & evt, Long64_t nentries, TString detector_str);
+  //void Run(vector<BeamVirtualDetector> & branch_vector, const vector<TString> branch_name_vector, Long64_t nentries);
+  void Find_Matched_Event(BeamVirtualDetector & detector_tree, int Evt_ID, int Trk_ID, int PDG_ID, TString detector_str);
+  void Run(BeamVirtualDetector & evt_BPROF1, BeamVirtualDetector & evt_BPROF2, BeamVirtualDetector & evt_BPROF3, BeamVirtualDetector & evt_TRIG1,
+	   BeamVirtualDetector & evt_BPROFEXT, BeamVirtualDetector & evt_BPROF4, BeamVirtualDetector & evt_TRIG2,
+	   const vector<TString> branch_name_vector, Long64_t nentries);
+  
 
  private:
   

@@ -5,7 +5,6 @@
 using namespace std;
 
 BeamTreeReproducer::BeamTreeReproducer(){
-  //hadana.InitPi();
 }
 
 void BeamTreeReproducer::BookHistograms(){
@@ -14,7 +13,6 @@ void BeamTreeReproducer::BookHistograms(){
 
   // == Histograms for normalization
   h_cutflow = new TH1D("Cutflow", "Cutflow", 20, 0., 20.);
-
 }
 
 void BeamTreeReproducer::ProcessEvent(const BeamNtuple & evt){
@@ -131,7 +129,7 @@ void BeamTreeReproducer::FillHistograms(const BeamVirtualDetector & evt, TString
   double InitKE = evt.InitKE;
   double z_in_meter = (evt.z - 681526.937500) / 1000.;
   //cout << "[BeamTreeReproducer::FillHistograms] " << detector_str << Form(", (x, y, z) =  (%f, %f, %f", evt.x, evt.y, evt.z - 681526.937500) << endl;
-  /*  
+  /*
   if(PID = -13){
     cout << "[BeamTreeReproducer::FillHistograms] " << endl;
     cout << "[BeamTreeReproducer::FillHistograms] " << detector_str << Form(" (PolX, PolY, PolZ) =  (%f, %f, %f", evt.PolX, evt.PolY, evt.PolZ) << endl;
@@ -167,42 +165,104 @@ void BeamTreeReproducer::SaveHistograms(){
   //outputFile->Write();
 }
 
-void BeamTreeReproducer::Run(BeamNtuple & evt, Long64_t nentries=-1){
+void BeamTreeReproducer::Find_Matched_Event(BeamVirtualDetector & detector_tree, int Evt_ID, int Trk_ID, int PDG_ID, TString detector_str){
 
-  BookHistograms();
-
-  //Long64_t nentries = evt.fChain->GetEntriesFast();
-  if (nentries == -1) nentries = evt.fChain->GetEntries();
-  
-  Long64_t nbytes = 0, nb = 0;
-  
-  //for (Long64_t jentry=0; jentry<nentries;jentry++) {
-  for (Long64_t jentry=0; jentry<1;jentry++) { 
-   //if (jentry%100000==0) std::cout<<jentry<<"/"<<nentries<<std::endl;
-    if (jentry%1000==0) std::cout<<"[GoodParticle] " <<jentry<<"/"<<nentries<<std::endl;
-    Long64_t ientry = evt.LoadTree(jentry);
+  Long64_t this_nentries = detector_tree.fChain->GetEntries();
+ 
+  int N_match_Evt = 0;
+  int N_match_Evt_Trk = 0;
+  int PDG_ID_match_Evt = 0;
+  int PDG_ID_match_Evt_Trk = 0;
+  for(Long64_t kentry = 0; kentry < this_nentries; kentry++){
+    if (kentry%10000==0) cout << "[" << detector_str << "] " << kentry << "/" << this_nentries << endl;
+    Long64_t ientry = detector_tree.LoadTree(kentry);
     if (ientry < 0) break;
-    nb = evt.fChain->GetEntry(jentry);   nbytes += nb;
-    h_cutflow -> Fill(0.5);
-    ProcessEvent(evt);
-    //FillHistograms(evt);
+    detector_tree.fChain->GetEntry(kentry);
+    int this_Evt_ID = detector_tree.EventID;
+    int this_Trk_ID = detector_tree.TrackID;
+    int this_PDG_ID = detector_tree.PDGid;
+    if(Evt_ID == this_Evt_ID){
+      N_match_Evt++;
+      PDG_ID_match_Evt = this_PDG_ID;
+    }
+    if(Evt_ID == this_Evt_ID && Trk_ID == this_Trk_ID){
+      N_match_Evt_Trk++;
+      PDG_ID_match_Evt_Trk = this_PDG_ID;
+    }
   }
-  SaveHistograms();
+  TString out = Form("N_match_Evt\t%d (%d)\tN_match_Evt_Trk\t%d (%d)", N_match_Evt, PDG_ID_match_Evt, N_match_Evt_Trk, PDG_ID_match_Evt_Trk);
+  cout << "[" << detector_str << "]\t" << out << endl;
+
+  return;
 }
 
-void BeamTreeReproducer::Run(BeamVirtualDetector & evt, Long64_t nentries=-1, TString detector_str = ""){
+//void BeamTreeReproducer::Run(vector<BeamVirtualDetector> & branch_vector, vector<TString> branch_name_vector, Long64_t nentries = -1){
+void BeamTreeReproducer::Run(BeamVirtualDetector & evt_BPROF1, BeamVirtualDetector & evt_BPROF2, BeamVirtualDetector & evt_BPROF3, BeamVirtualDetector & evt_TRIG1,
+			     BeamVirtualDetector & evt_BPROFEXT, BeamVirtualDetector & evt_BPROF4, BeamVirtualDetector & evt_TRIG2,
+			     const vector<TString> branch_name_vector, Long64_t nentries = -1){
 
   BookHistograms();
-  if (nentries == -1) nentries = evt.fChain->GetEntries();
+  int nentries_BPROF1 = evt_BPROF1.fChain->GetEntries();
+
+  if (nentries == -1) nentries = evt_TRIG2.fChain->GetEntries();
+  cout << "evt_BPROF1 nentries : " << evt_BPROF1.fChain->GetEntries() << endl;
   Long64_t nbytes = 0, nb = 0;
   for (Long64_t jentry=0; jentry<nentries;jentry++) {
-    if (jentry%1000==0) std::cout<<"[" << detector_str << "] " << jentry<<"/"<<nentries << " from total : " << evt.fChain->GetEntries() << std::endl;
-    Long64_t ientry = evt.LoadTree(jentry);
+    if (jentry%1000==0) std::cout<<"[evt_TRIG2] " << jentry<<"/"<< nentries << " from total : " << evt_TRIG2.fChain->GetEntries() << std::endl;
+    Long64_t ientry = evt_TRIG2.LoadTree(jentry);
     if (ientry < 0) break;
-    nb = evt.fChain->GetEntry(jentry);   nbytes += nb;
+    
+    nb = evt_TRIG2.fChain->GetEntry(jentry); nbytes += nb;
+    int Evt_ID = evt_TRIG2.EventID;
+    int Trk_ID = evt_TRIG2.TrackID;
+    int PDG_ID = evt_TRIG2.PDGid;
+    cout << "--------------------" << endl;
+    cout << "[TRIG2] " << jentry << "\tEvt_ID : " << Evt_ID << ", Trk_ID : " << Trk_ID << ", PDG_ID : " << PDG_ID << endl;
+    
+    // == Loop for upstream detectors
+    Find_Matched_Event(evt_BPROF1, Evt_ID, Trk_ID, PDG_ID, "BPROF1");
+    Find_Matched_Event(evt_BPROF1, Evt_ID, Trk_ID, PDG_ID, "BPROF1");
+    Find_Matched_Event(evt_BPROF1, Evt_ID, Trk_ID, PDG_ID, "BPROF1");
+    Find_Matched_Event(evt_BPROF1, Evt_ID, Trk_ID, PDG_ID, "BPROF1");
+    Find_Matched_Event(evt_BPROF1, Evt_ID, Trk_ID, PDG_ID, "BPROF1");
+    Find_Matched_Event(evt_BPROF1, Evt_ID, Trk_ID, PDG_ID, "BPROF1");
+    Find_Matched_Event(evt_BPROF1, Evt_ID, Trk_ID, PDG_ID, "BPROF1");
+
+
+    Find_Matched_Event(evt_BPROF1, Evt_ID, Trk_ID, PDG_ID, "BPROF1"); 
+    Find_Matched_Event(evt_BPROF2, Evt_ID, Trk_ID, PDG_ID, "BPROF2");
+    Find_Matched_Event(evt_BPROF3, Evt_ID, Trk_ID, PDG_ID, "BPROF3");
+
+    /*
+    int N_match_Evt = 0;
+    int N_match_Evt_Trk = 0;
+    int PDG_ID_match_Evt = 0;
+    int PDG_ID_match_Evt_Trk = 0;
+    for(Long64_t kentry = 0; kentry < nentries_BPROF1; kentry++){
+      //if (kentry%10000==0) cout << "[" << detector_str << "] " << kentry << "/" << this_nentries << endl;                                                                                  
+      Long64_t ientry = evt_BPROF1.LoadTree(kentry);
+      if (ientry < 0) break;
+      evt_BPROF1.fChain->GetEntry(kentry);
+      int this_Evt_ID = evt_BPROF1.EventID;
+      int this_Trk_ID = evt_BPROF1.TrackID;
+      int this_PDG_ID = evt_BPROF1.PDGid;
+      if(Evt_ID == this_Evt_ID){
+	N_match_Evt++;
+	PDG_ID_match_Evt = this_PDG_ID;
+      }
+      if(Evt_ID == this_Evt_ID && Trk_ID == this_Trk_ID){
+	N_match_Evt_Trk++;
+	PDG_ID_match_Evt_Trk = this_PDG_ID;
+      }
+    }
+    TString out = Form("N_match_Evt\t%d (%d)\tN_match_Evt_Trk\t%d (%d)", N_match_Evt, PDG_ID_match_Evt, N_match_Evt_Trk, PDG_ID_match_Evt_Trk);
+    cout << "[BPROF1]\t" << out << endl;
+    */
+
     h_cutflow -> Fill(0.5);
-    FillHistograms(evt, detector_str);
+    FillHistograms(evt_TRIG2, "TRIG2");
   }
 
+  // == Save
   SaveHistograms();
 }

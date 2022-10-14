@@ -200,6 +200,15 @@ void BeamSampleAna::Run(BeamVirtualDetector & evt, Long64_t nentries=-1, TString
     Long64_t ientry = evt.LoadTree(jentry);
     if (ientry < 0) break;
     nb = evt.fChain->GetEntry(jentry);   nbytes += nb;
+    //cout << jentry << "\tnb\t" << nb << endl;
+    
+    int Evt_ID = evt.EventID;
+    int Trk_ID = evt.TrackID;
+    double Px = evt.Px;
+    double Py = evt.Py;
+    double Pz = evt.Pz;
+    //cout << "Evt_ID : " << Evt_ID << ", Trk_ID : " << Trk_ID << ", Px : " << Px << ", Py : " << Py << ", Pz : " << Pz << endl;
+
     h_cutflow -> Fill(0.5);
     FillHistograms(evt, detector_str);
   }
