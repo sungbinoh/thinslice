@@ -49,7 +49,7 @@ void Beam_Study::BookHistograms(){
 bool Beam_Study::Pass_Beam_PID(const anavar & evt, int PID){
 
   // == Study only proton and pion/muon beams
-  if(PID != 2212 && PID != 211) return false;
+  if(PID != 2212 && PID != 211 && abs(PID) != 13) return false;
 
   vector<int> PDGID_candiate_vec;
   PDGID_candiate_vec.clear();
@@ -57,7 +57,7 @@ bool Beam_Study::Pass_Beam_PID(const anavar & evt, int PID){
     PDGID_candiate_vec.push_back(2212);
   }
 
-  if(PID == 211){
+  if(PID == 211 || PID == 13){
     PDGID_candiate_vec.push_back(211);
     PDGID_candiate_vec.push_back(13);
     PDGID_candiate_vec.push_back(-13);
@@ -292,16 +292,17 @@ void Beam_Study::FillHistBeam(const anavar & evt, double weight, TString suffix,
   double P_beam_inst = evt.beam_inst_P * 1000. * P_beam_inst_scale;
   double mass_beam = 139.57;
   if(suffix.Contains("proton")) mass_beam = 938.272;
+  if(suffix.Contains("muon")) mass_beam = 105.658;
   double KE_beam_inst = sqrt(pow(P_beam_inst, 2) + pow(mass_beam, 2)) - mass_beam;
 
   // == Various KE_ff reco values
-  double KE_ff_reco_ElasTrue = Convert_KE_Spectrometer_to_KE_ff(evt, KE_beam_inst, suffix, "ElasTrue");
-  double KE_ff_reco_AllTrue = Convert_KE_Spectrometer_to_KE_ff(evt, KE_beam_inst, suffix, "AllTrue");
-  double KE_ff_reco_ElasFitted = Convert_KE_Spectrometer_to_KE_ff(evt, KE_beam_inst, suffix, "ElasFitted");
-  double KE_ff_reco_AllFitted = Convert_KE_Spectrometer_to_KE_ff(evt, KE_beam_inst, suffix, "AllFitted");
-  double KE_ff_reco_Data = Convert_KE_Spectrometer_to_KE_ff(evt, KE_beam_inst, suffix, "Data");
+  double KE_ff_reco_ElasTrue = Convert_KE_Spectrometer_to_KE_ff(evt, KE_beam_inst, suffix, "ElasTrue", 0);
+  double KE_ff_reco_AllTrue = Convert_KE_Spectrometer_to_KE_ff(evt, KE_beam_inst, suffix, "AllTrue", 0);
+  double KE_ff_reco_ElasFitted = Convert_KE_Spectrometer_to_KE_ff(evt, KE_beam_inst, suffix, "ElasFitted", 0);
+  double KE_ff_reco_AllFitted = Convert_KE_Spectrometer_to_KE_ff(evt, KE_beam_inst, suffix, "AllFitted", 0);
+  double KE_ff_reco_Data = Convert_KE_Spectrometer_to_KE_ff(evt, KE_beam_inst, suffix, "Data", 0);
   double KE_ff_reco = 0.;
-  if(evt.MC) KE_ff_reco = KE_ff_reco_AllTrue;
+  if(evt.MC) KE_ff_reco = KE_ff_reco_AllFitted;
   else KE_ff_reco = KE_ff_reco_Data;
 
   TString particle_type_str = Form("%d", hadana.pitype);
@@ -311,6 +312,82 @@ void Beam_Study::FillHistBeam(const anavar & evt, double weight, TString suffix,
   // == Reco
   Hist.JSFillHist(suffix, "htrack_P_beam_inst_" + suffix + "_" + particle_type_str, P_beam_inst, weight, 5000., 0., 5000.);
   Hist.JSFillHist(suffix, "htrack_KE_ff_reco_" + suffix + "_" + particle_type_str, KE_ff_reco, weight, 5000., 0., 5000.);
+  Hist.JSFillHist(suffix, "htrack_PandoraSlice_" + suffix + "_" + particle_type_str, hadana.PassPandoraSliceCut(evt), weight, 2., 0., 2.);
+  Hist.JSFillHist(suffix, "htrack_CaloSize_" + suffix + "_" + particle_type_str, hadana.PassCaloSizeCut(evt),weight, 2., 0.,2.);
+  Hist.JSFillHist(suffix, "htrack_beam_dx_" + suffix + "_" + particle_type_str, hadana.beam_dx, weight, 200., -10., 10.);
+  Hist.JSFillHist(suffix, "htrack_beam_dy_" + suffix + "_" + particle_type_str, hadana.beam_dy, weight, 200., -10.,10.);
+  Hist.JSFillHist(suffix, "htrack_beam_dz_" + suffix + "_" + particle_type_str, hadana.beam_dz, weight, 200., -10.,10.);
+  Hist.JSFillHist(suffix, "htrack_beam_dxy_" + suffix + "_" + particle_type_str, hadana.beam_dxy, weight, 200., -10.,10.);
+  Hist.JSFillHist(suffix, "htrack_beam_costh_" + suffix + "_" + particle_type_str, hadana.beam_costh, weight, 200., -1.,1.);
+  Hist.JSFillHist(suffix, "htrack_daughter_michel_score_" + suffix + "_" + particle_type_str, hadana.daughter_michel_score, weight, 100., 0.,1.);
+  Hist.JSFillHist(suffix, "htrack_chi2_proton_" + suffix + "_" + particle_type_str, hadana.chi2_proton, weight, 1000., 0., 100.);
+  Hist.JSFillHist(suffix, "htrack_beam_alt_len_" + suffix + "_" + particle_type_str, evt.reco_beam_alt_len, weight, 600., 0., 600.);
+  Hist.JSFillHist(suffix, "htrack_beam_inst_XY_" + suffix + "_" + particle_type_str, evt.beam_inst_X, evt.beam_inst_Y, weight, 80., -50., -10., 80., 400., 440.);
+  Hist.JSFillHist(suffix, "htrack_beam_start_XY_" + suffix + "_" + particle_type_str, evt.reco_beam_startX, evt.reco_beam_startY, weight, 80., -50., -10., 80., 400., 440.);
+  Hist.JSFillHist(suffix, "htrack_beam_start_Z_" + suffix + "_" + particle_type_str, evt.reco_beam_startZ, weight, 1000., -100., 900.);
+  Hist.JSFillHist(suffix, "htrack_beam_end_Z_" + suffix + "_" + particle_type_str, evt.reco_beam_endZ, weight, 1000., -100., 900.);
+
+  int hundered_low = KE_beam_inst / 100.;
+  int KE_beam_inst_50bin = KE_beam_inst / 50.;
+  TString KE_range_str_50MeV = Form("KE_beam_inst%dto%dMeV_", 50 * KE_beam_inst_50bin, 50 * (KE_beam_inst_50bin  + 1));
+  TString KE_range_str = Form("KE_beam_inst%dto%dMeV_", 100 * hundered_low, 100 * (hundered_low + 1));
+
+  Hist.JSFillHist(suffix, "htrack_beam_inst_XY_" + KE_range_str + suffix + "_" + particle_type_str, evt.beam_inst_X, evt.beam_inst_Y, weight, 80., -50., -10., 80., 400., 440.);
+
+  // == Truth
+  if(evt.MC){
+    double P_beam_true = evt.true_beam_startP * 1000.;
+    double KE_beam_true = sqrt(pow(P_beam_true, 2) + pow(mass_beam, 2)) - mass_beam;
+    double true_KE_ff = hadana.true_ffKE;
+    double true_P_ff = hadana.map_BB[abs(evt.true_beam_PDG)] -> KEtoMomentum(true_KE_ff);
+
+    double KE_diff_RecoBeam_TrueFF = KE_beam_inst - true_KE_ff;
+    double KE_diff_TrueBeam_TrueFF = KE_beam_true - true_KE_ff;
+    double KE_diff_RecoBeam_TrueBeam = KE_beam_inst - KE_beam_true;
+
+    double KE_diff = KE_beam_inst - true_KE_ff;
+    double KE_diff_true = KE_beam_true - true_KE_ff;
+    double KE_diff_beam_true = KE_beam_inst - KE_beam_true;
+    TString true_beam_PDG_str = Form("%d", abs(evt.true_beam_PDG));
+    double P_beam_res = (P_beam_true - P_beam_inst) / P_beam_true;
+
+    double diff_KE_ff_reco_ElasTrue_KE_ff_true = KE_ff_reco_ElasTrue - true_KE_ff;
+    double diff_KE_ff_reco_AllTrue_KE_ff_true = KE_ff_reco_AllTrue - true_KE_ff;
+    double diff_KE_ff_reco_ElasFitted_KE_ff_true = KE_ff_reco_ElasFitted - true_KE_ff;
+    double diff_KE_ff_reco_AllFitted_KE_ff_true = KE_ff_reco_AllFitted - true_KE_ff;
+
+    Hist.JSFillHist(suffix, "htrack_diff_KE_ff_reco_ElasTrue_KE_ff_true_" + suffix + "_" + particle_type_str, diff_KE_ff_reco_ElasTrue_KE_ff_true, weight, 200., -100., 100.);
+    Hist.JSFillHist(suffix, "htrack_diff_KE_ff_reco_AllTrue_KE_ff_true_" + suffix + "_" + particle_type_str, diff_KE_ff_reco_AllTrue_KE_ff_true, weight, 200., -100.,100.);
+    Hist.JSFillHist(suffix, "htrack_diff_KE_ff_reco_ElasFitted_KE_ff_true_" + suffix + "_" + particle_type_str, diff_KE_ff_reco_ElasFitted_KE_ff_true, weight, 200., -100.,100.);
+    Hist.JSFillHist(suffix, "htrack_diff_KE_ff_reco_AllFitted_KE_ff_true_" + suffix + "_" + particle_type_str, diff_KE_ff_reco_AllFitted_KE_ff_true, weight, 200., -100.,100.);
+
+    Hist.JSFillHist(suffix, "htrack_diff_KE_ff_reco_ElasTrue_KE_ff_true_" + KE_range_str + suffix + "_" + particle_type_str, diff_KE_ff_reco_ElasTrue_KE_ff_true, weight, 200., -100., 100.);
+    Hist.JSFillHist(suffix, "htrack_diff_KE_ff_reco_AllTrue_KE_ff_true_" + KE_range_str + suffix + "_" + particle_type_str, diff_KE_ff_reco_AllTrue_KE_ff_true, weight, 200., -100.,100.);
+    Hist.JSFillHist(suffix, "htrack_diff_KE_ff_reco_ElasFitted_KE_ff_true_" + KE_range_str + suffix + "_" + particle_type_str, diff_KE_ff_reco_ElasFitted_KE_ff_true, weight, 200., -100.,100.);
+    Hist.JSFillHist(suffix, "htrack_diff_KE_ff_reco_AllFitted_KE_ff_true_" + KE_range_str + suffix + "_" + particle_type_str, diff_KE_ff_reco_AllFitted_KE_ff_true, weight, 200., -100.,100.);
+
+    Hist.JSFillHist(suffix, "htrack_diff_KE_ff_reco_ElasTrue_KE_ff_true_" + KE_range_str_50MeV + suffix + "_" + particle_type_str, diff_KE_ff_reco_ElasTrue_KE_ff_true, weight, 200., -100., 100.);
+    Hist.JSFillHist(suffix, "htrack_diff_KE_ff_reco_AllTrue_KE_ff_true_" + KE_range_str_50MeV + suffix + "_" + particle_type_str, diff_KE_ff_reco_AllTrue_KE_ff_true, weight, 200., -100.,100.);
+    Hist.JSFillHist(suffix, "htrack_diff_KE_ff_reco_ElasFitted_KE_ff_true_" + KE_range_str_50MeV + suffix + "_" + particle_type_str, diff_KE_ff_reco_ElasFitted_KE_ff_true, weight, 200., -100.,100.);
+    Hist.JSFillHist(suffix, "htrack_diff_KE_ff_reco_AllFitted_KE_ff_true_" + KE_range_str_50MeV + suffix + "_" + particle_type_str, diff_KE_ff_reco_AllFitted_KE_ff_true, weight, 200., -100.,100.);   
+  }
+
+}
+
+void Beam_Study::FillHistBeam_Study_BeamScraper(const anavar & evt, double weight, TString suffix, double KE_fit_gaussian){
+
+  double P_beam_inst = evt.beam_inst_P * 1000. * P_beam_inst_scale;
+  double mass_beam = 139.57;
+  if(suffix.Contains("proton")) mass_beam = 938.272;
+  if(suffix.Contains("muon")) mass_beam = 105.658;
+  double KE_beam_inst = sqrt(pow(P_beam_inst, 2) + pow(mass_beam, 2)) - mass_beam;
+
+  TString particle_type_str = Form("%d", hadana.pitype);
+  if(suffix.Contains("proton")) particle_type_str = Form("%d", hadana.ptype);
+
+  // ==== Beam
+  // == Reco
+  Hist.JSFillHist(suffix, "htrack_P_beam_inst_" + suffix + "_" + particle_type_str, P_beam_inst, weight, 5000., 0., 5000.);
   Hist.JSFillHist(suffix, "htrack_PandoraSlice_" + suffix + "_" + particle_type_str, hadana.PassPandoraSliceCut(evt), weight, 2., 0., 2.);
   Hist.JSFillHist(suffix, "htrack_CaloSize_" + suffix + "_" + particle_type_str, hadana.PassCaloSizeCut(evt),weight, 2., 0.,2.);
   Hist.JSFillHist(suffix, "htrack_beam_dx_" + suffix + "_" + particle_type_str, hadana.beam_dx, weight, 200., -10., 10.);
@@ -349,11 +426,6 @@ void Beam_Study::FillHistBeam(const anavar & evt, double weight, TString suffix,
     double KE_diff_beam_true = KE_beam_inst - KE_beam_true;
     TString true_beam_PDG_str = Form("%d", abs(evt.true_beam_PDG));
     double P_beam_res = (P_beam_true - P_beam_inst) / P_beam_true;
-
-    double diff_KE_ff_reco_ElasTrue_KE_ff_true = KE_ff_reco_ElasTrue - true_KE_ff;
-    double diff_KE_ff_reco_AllTrue_KE_ff_true = KE_ff_reco_AllTrue - true_KE_ff;
-    double diff_KE_ff_reco_ElasFitted_KE_ff_true = KE_ff_reco_ElasFitted - true_KE_ff;
-    double diff_KE_ff_reco_AllFitted_KE_ff_true = KE_ff_reco_AllFitted - true_KE_ff;
 
     Hist.JSFillHist(suffix, "htrack_P_beam_Res_" + suffix + "_" + particle_type_str, P_beam_res, weight, 4000, -2, 2);
     Hist.JSFillHist(suffix, "htrack_P_beam_true_" + suffix + "_" + particle_type_str, P_beam_true, weight, 5000, 0, 5000);
@@ -452,8 +524,34 @@ void Beam_Study::FillHistBeam(const anavar & evt, double weight, TString suffix,
       }
     }
   }
-}
 
+  if(suffix.Contains("muon")){
+    double KE_ff_range = hadana.map_BB[13] -> KEFromRangeSpline(evt.reco_beam_alt_len);
+    double KE_diff_RecoBeam_RangeFF = KE_beam_inst - KE_ff_range;
+ 
+    bool pass_beam_scraper_cut;
+    if(evt.MC) pass_beam_scraper_cut = Pass_Beam_Scraper_Cut(evt.beam_inst_X, evt.beam_inst_Y, suffix, "mc");
+    else pass_beam_scraper_cut = Pass_Beam_Scraper_Cut(evt.beam_inst_X, evt.beam_inst_Y, suffix, "data");
+
+    if(pass_beam_scraper_cut){
+      Hist.JSFillHist(suffix, "htrack_KE_diff_RecoBeam_RangeFF_" + KE_range_str       + suffix + "_"    + particle_type_str, KE_diff_RecoBeam_RangeFF, weight, 500., -500., 500.);
+      Hist.JSFillHist(suffix, "htrack_KE_diff_RecoBeam_RangeFF_" + KE_range_str_50MeV + suffix + "_"    + particle_type_str, KE_diff_RecoBeam_RangeFF, weight, 500., -500., 500.);
+      
+      if(evt.MC){
+	TString true_beam_PDG_str = Form("%d", abs(evt.true_beam_PDG));
+
+	double P_beam_true = evt.true_beam_startP * 1000.;
+	double KE_beam_true = sqrt(pow(P_beam_true, 2) + pow(mass_beam, 2)) - mass_beam;
+	double true_KE_ff = hadana.true_ffKE;
+	double KE_diff_TrueFF_RangeFF = true_KE_ff - KE_ff_range;
+
+	Hist.JSFillHist(suffix, "htrack_KE_diff_TrueFF_RangeFF_" + KE_range_str       + suffix + "_"    + particle_type_str, KE_diff_TrueFF_RangeFF, weight, 500., -500., 500.);
+	Hist.JSFillHist(suffix, "htrack_KE_diff_TrueFF_RangeFF_" + KE_range_str_50MeV + suffix + "_"    + particle_type_str, KE_diff_TrueFF_RangeFF, weight, 500., -500., 500.);
+	Hist.JSFillHist(suffix, "htrack_KE_diff_TrueFF_RangeFF_" + KE_range_str       + suffix + "_PID" + true_beam_PDG_str, KE_diff_TrueFF_RangeFF, weight, 500., -500., 500.);
+      }
+    }
+  }
+}
 
 void Beam_Study::Run_Beam(const anavar & evt, double weight, TString suffix, int beam_PID){
   
@@ -461,7 +559,8 @@ void Beam_Study::Run_Beam(const anavar & evt, double weight, TString suffix, int
 
   TString beam_particle_str = "";
   if(beam_PID == 2212) beam_particle_str = "proton";
-  else if(beam_PID = 211) beam_particle_str = "pion";
+  else if(beam_PID == 211) beam_particle_str = "pion";
+  else if(beam_PID == 13) beam_particle_str = "muon";
   else return;
 
   if(!hadana.PassPandoraSliceCut(evt)) return;
@@ -508,11 +607,29 @@ void Beam_Study::Run_Beam(const anavar & evt, double weight, TString suffix, int
     if(!hadana.PassProtonCut()) return;
     FillHistBeam(evt, weight, beam_particle_str + "_ProtonVeto_" + suffix, KE_fit_gaussian);
   }
+  if(abs(beam_PID) == 13){
+    // == APA3 cut
+    if(!hadana.PassAPA3Cut(evt)) return;
+    FillHistBeam(evt, weight, beam_particle_str + "_APA3_" + suffix, KE_fit_gaussian);
+
+    // == Michel score cut
+    if(hadana.daughter_michel_score < 0.70) return;
+    FillHistBeam(evt, weight, beam_particle_str + "_MichelScore_" + suffix, KE_fit_gaussian);
+
+    // == Proton veto cut
+    if(!hadana.PassProtonCut()) return;
+    FillHistBeam(evt, weight, beam_particle_str + "_ProtonVeto_" + suffix, KE_fit_gaussian);
+  }
 
   // == Beam window cut
   double P_beam_inst = evt.beam_inst_P * 1000. * P_beam_inst_scale;
   if(P_beam_inst < P_beam_inst_cut_lower || P_beam_inst > P_beam_inst_cut_upper) return;
   FillHistBeam(evt, weight, beam_particle_str + "_BeamWindow_" + suffix, KE_fit_gaussian);
+  FillHistBeam_Study_BeamScraper(evt, weight, beam_particle_str + "_BeamWindow_" + suffix, KE_fit_gaussian);
+
+  // == Beam Scraper cut
+  if(!hadana.PassBeamScraperCut(evt)) return;
+  FillHistBeam(evt, weight, beam_particle_str + "_BeamScraper_" + suffix, KE_fit_gaussian);
 
   // == End of selection
   return;
@@ -570,8 +687,9 @@ void Beam_Study::Run(anavar & evt, Long64_t nentries=-1){
       if(P_beam_str == "0.5") P_beam_inst_scale = 0.5;
     }
 
-    Run_Beam(evt, 1., "noweight", 2212);
-    Run_Beam(evt, 1., "noweight", 211);
+    //Run_Beam(evt, 1., "noweight", 2212);
+    //Run_Beam(evt, 1., "noweight", 211);
+    Run_Beam(evt, 1., "noweight", 13);
   }
 
   SaveHistograms();

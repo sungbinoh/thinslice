@@ -240,8 +240,34 @@ bool HadAna::PassBeamXYCut(const anavar& evt) const{
   }
 }
 
+bool HadAna::PassBeamScraperCut(const anavar& evt) const{
+
+  // == Define beam plug circle in [cm] unit
+  double center_x = 0.;
+  double center_y = 0.;
+  double radious = 0.;
+  double N_sigma = 0.;
+  if(evt.MC){
+    center_x = -29.6;
+    center_y = 422.;
+    radious = 4.8;
+    N_sigma = 1.4;
+  }
+  else{
+    center_x = -32.16;
+    center_y = 422.7;
+    radious = 4.8;
+    N_sigma = 1.2;
+  }
+
+  double this_distance = sqrt( pow(evt.beam_inst_X - center_x , 2.) + pow(evt.beam_inst_Y - center_y, 2.) );
+  bool out = this_distance < radious * N_sigma;
+
+  return out;
+}
+
 bool HadAna::PassAPA3Cut(const anavar& evt) const{ // only use track in the first TPC
-  return true;
+  //return true;
   double cutAPA3_Z = 220.;
   
   if (fAllTrackCheck) return evt.reco_beam_calo_endZ_allTrack < cutAPA3_Z;
@@ -513,7 +539,7 @@ double HadAna::Fit_dEdx_Residual_Length(const anavar& evt, const vector<double> 
   double best_chi2 = 99999.;
   double min_additional_res_length = 0.; // == [cm]
   double max_additional_res_length = 200.; // == [cm]
-  double res_length_step = 1.0; // == [cm]
+  double res_length_step = 0.2; // == [cm]
   int N_skip = 3;
   int this_N_calo = dEdx.size();
   if(this_N_calo <= 15){

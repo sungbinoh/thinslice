@@ -28,13 +28,14 @@ class Beam_Study {
   // == Draw Histograms
   void BookHistograms();
   void FillHistBeam(const anavar & evt, double weight, TString suffix, double KE_fit_gaussian);
+  void FillHistBeam_Study_BeamScraper(const anavar & evt, double weight, TString suffix, double KE_fit_gaussian);
   void SaveHistograms();
 
   // == Run
   bool Pass_Beam_PID(const anavar & evt, int PID);
   bool Pass_KE_diff_3sigma_Cut(double KE_RecoBeam, double KE_diff_RecoBeam_TrueFF, TString suffix, TString key);
   bool Pass_Beam_Scraper_Cut(double x, double y, TString suffix, TString key);
-  double Convert_KE_Spectrometer_to_KE_ff(const anavar & evt, double KE_RecoBeam, TString suffix, TString key);
+  double Convert_KE_Spectrometer_to_KE_ff(const anavar & evt, double KE_RecoBeam, TString suffix, TString key, int syst);
   void ProcessEvent(const anavar & evt);
   void Run_Beam(const anavar & evt, double weight, TString suffix, int beam_PID);
   void Run(anavar & evt, Long64_t nentries);
