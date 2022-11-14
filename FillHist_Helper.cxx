@@ -69,7 +69,7 @@ void FillHist_Helper::FillHist(TString histname, double value, double weight, in
 
 }
 
-void FillHist_Helper::FillHist(TString histname, double value, double weight, int n_bin, double *xbins){
+void FillHist_Helper::FillHist(TString histname, double value, double weight, int n_bin, const double *xbins){
 
   TH1D *this_hist = GetHist1D(histname);
   if( !this_hist ){
@@ -178,6 +178,20 @@ void FillHist_Helper::JSFillHist(TString suffix, TString histname, double value,
   if( !this_hist ){
 
     this_hist = new TH1D(histname, "", n_bin, x_min, x_max);
+    (JSmaphist_TH1D[suffix])[histname] = this_hist;
+
+  }
+
+  this_hist->Fill(value, weight);
+
+}
+
+void FillHist_Helper::JSFillHist(TString suffix, TString histname, double value, double weight, int n_bin, const double *xbins){
+
+  TH1D *this_hist = JSGetHist1D(suffix, histname);
+  if( !this_hist ){
+
+    this_hist = new TH1D(histname, "", n_bin, xbins);
     (JSmaphist_TH1D[suffix])[histname] = this_hist;
 
   }

@@ -11,7 +11,7 @@ HadAna::HadAna(){
   map_BB[2212] = new BetheBloch(2212);
 
   if (fProtonCSDACheck) {
-    TFile *file_mom2csda = TFile::Open("root://fndca1.fnal.gov:1094/pnfs/fnal.gov/usr/dune/archive/sam_managed_users/tjyang/data/3/a/7/a/51075a8b-cc10-4d2d-b4c6-8e4c4d2817d7-proton_mom_csda_converter.root");
+    TFile *file_mom2csda = TFile::Open("root://fndcadoor.fnal.gov/pnfs/fnal.gov/usr/dune/archive/sam_managed_users/tjyang/data/3/a/7/a/51075a8b-cc10-4d2d-b4c6-8e4c4d2817d7-proton_mom_csda_converter.root");
     csda_range_vs_mom_sm = (TGraph *)file_mom2csda->Get("csda_range_vs_mom_sm");
   }
 
@@ -539,7 +539,7 @@ double HadAna::Fit_dEdx_Residual_Length(const anavar& evt, const vector<double> 
   double best_chi2 = 99999.;
   double min_additional_res_length = 0.; // == [cm]
   double max_additional_res_length = 200.; // == [cm]
-  double res_length_step = 0.2; // == [cm]
+  double res_length_step = 1.0; // == [cm]
   int N_skip = 3;
   int this_N_calo = dEdx.size();
   if(this_N_calo <= 15){
@@ -552,6 +552,7 @@ double HadAna::Fit_dEdx_Residual_Length(const anavar& evt, const vector<double> 
   if(PID == 2212){
     max_additional_res_length = 120.;
     dEdx_truncate_upper = 20.;
+    res_length_step = 0.2;
   }
   int res_length_trial = (max_additional_res_length - min_additional_res_length) / res_length_step;
   int this_N_hits = this_N_calo;
@@ -675,6 +676,7 @@ double HadAna::Fit_Residual_Length_Likelihood(const anavar& evt, const vector<do
   if(PID == 2212){
     max_additional_res_length = 120.;
     dEdx_truncate_upper = 20.;
+    res_length_step = 0.2;
   }
   
   vector<double> m2lnL_vector;

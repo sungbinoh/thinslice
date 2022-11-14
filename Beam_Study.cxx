@@ -112,7 +112,7 @@ bool Beam_Study::Pass_KE_diff_3sigma_Cut(double KE_RecoBeam, double KE_diff, TSt
     if(KE_RecoBeam > 300. && KE_RecoBeam < 400 && KE_diff > 71.8) is_scraper = true;
     if(KE_RecoBeam > 400. && KE_RecoBeam < 500 && KE_diff > 84.9) is_scraper = true;
     if(KE_RecoBeam > 500. && KE_RecoBeam < 600 && KE_diff > 99.5) is_scraper = true;
-
+ 
 
     // == Based on distributions of elastic and misID:p
     /*
@@ -482,6 +482,10 @@ void Beam_Study::FillHistBeam_Study_BeamScraper(const anavar & evt, double weigh
       Hist.JSFillHist(suffix, "htrack_P_diff_TrueBeam_TrueFF_nonscraper_"   + P_range_str_50MeV + suffix + "_" + particle_type_str, P_diff_TrueBeam_TrueFF,   weight, 2000., -100., 100.);
       Hist.JSFillHist(suffix, "htrack_P_diff_RecoBeam_TrueBeam_nonscraper_" + P_range_str       + suffix + "_" + particle_type_str, P_diff_RecoBeam_TrueBeam, weight, 500., -500., 500.);
       Hist.JSFillHist(suffix, "htrack_P_diff_RecoBeam_TrueBeam_nonscraper_" + P_range_str_50MeV + suffix + "_" + particle_type_str, P_diff_RecoBeam_TrueBeam, weight, 500., -500., 500.);
+
+      // == 2D Histograms
+      Hist.JSFillHist(suffix, "htrack_KE_diff_RecoBeam_TrueFF_nonscraper_" + suffix + "_" + particle_type_str, KE_beam_inst, KE_diff_RecoBeam_TrueFF, weight, 1400., 0., 1400., 200., -100., 100.);
+      Hist.JSFillHist(suffix, "htrack_P_diff_RecoBeam_TrueFF_nonscraper_" + suffix + "_" + particle_type_str, P_beam_inst, P_diff_RecoBeam_TrueFF, weight, 600., 700., 1300., 200., -100., 100.);
     }
   }
 
@@ -543,12 +547,12 @@ void Beam_Study::FillHistBeam_Study_BeamScraper(const anavar & evt, double weigh
   // == Use range based KEff for muons
   if(suffix.Contains("muon")){
     double KE_ff_range = hadana.map_BB[13] -> KEFromRangeSpline(evt.reco_beam_alt_len);
-    double P_ff_range = hadana.map_BB[abs(evt.true_beam_PDG)] -> KEtoMomentum(KE_ff_range);
+    double P_ff_range = hadana.map_BB[13] -> KEtoMomentum(KE_ff_range);
     double KE_diff_RecoBeam_RangeFF = KE_beam_inst - KE_ff_range;
     double P_diff_RecoBeam_RangeFF = P_beam_inst - P_ff_range;
 
     //cout << "[Beam_Study::FillHistBeam_Study_BeamScraper] KE_beam_inst : " << KE_beam_inst << ", range : " << evt.reco_beam_alt_len << ", KE_ff_range : " << KE_ff_range << endl;
- 
+
     bool pass_beam_scraper_cut;
     if(evt.MC) pass_beam_scraper_cut = Pass_Beam_Scraper_Cut(evt.beam_inst_X, evt.beam_inst_Y, suffix, "mc");
     else pass_beam_scraper_cut = Pass_Beam_Scraper_Cut(evt.beam_inst_X, evt.beam_inst_Y, suffix, "data");
@@ -709,7 +713,7 @@ void Beam_Study::Run(anavar & evt, Long64_t nentries=-1){
 
     // if (Cut(ientry) < 0) continue;
     //std::cout<<evt.run<<" "<<evt.event<<" "<<evt.MC<<" "<<evt.reco_beam_true_byE_matched<<" "<<evt.true_beam_PDG<<" "<<(*evt.true_beam_endProcess)<<std::endl;
-    //std::cout<<GetParType(ana)<<std::endl;
+     //std::cout<<GetParType(ana)<<std::endl;
     Hist.FillHist("Cutflow", 0.5, 1., 10., 0., 10.);
     ProcessEvent(evt);
     if(evt.MC){
@@ -719,7 +723,7 @@ void Beam_Study::Run(anavar & evt, Long64_t nentries=-1){
       if(P_beam_str == "0.5") P_beam_inst_scale = 0.5;
     }
 
-    //Run_Beam(evt, 1., "noweight", 2212);
+    Run_Beam(evt, 1., "noweight", 2212);
     Run_Beam(evt, 1., "noweight", 211);
     Run_Beam(evt, 1., "noweight", 13);
   }

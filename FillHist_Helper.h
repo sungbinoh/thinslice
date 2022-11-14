@@ -42,7 +42,7 @@ class FillHist_Helper {
   TH3D* GetHist3D(TString histname);
 
   void FillHist(TString histname, double value, double weight, int n_bin, double x_min, double x_max);
-  void FillHist(TString histname, double value, double weight, int n_bin, double *xbins);
+  void FillHist(TString histname, double value, double weight, int n_bin, const double *xbins);
   void FillHist(TString histname,
                 double value_x, double value_y,
                 double weight,
@@ -69,6 +69,8 @@ class FillHist_Helper {
   std::map< TString, std::map<TString, TH1D*> > JSmaphist_TH1D;
   TH1D* JSGetHist1D(TString suffix, TString histname);
   void JSFillHist(TString suffix, TString histname, double value, double weight, int n_bin, double x_min, double x_max);
+  void JSFillHist(TString suffix, TString histname, double value, double weight, int n_bin, const double *xbins);
+
   //==== JSFillHist : 2D
   std::map< TString, std::map<TString, TH2D*> > JSmaphist_TH2D;
   TH2D* JSGetHist2D(TString suffix, TString histname);

@@ -46,7 +46,7 @@ int main(int argc, char ** argv){
   Beam_Study mcpe;
   mcpe.SetOutputFileName(root["mcoutfile"].asString());
   mcpe.Run(mcevt, root["nevents"].asInt());
- 
+
   TChain *datachain = new TChain();
   datachain->Add(Form("%s/pduneana/beamana", root["datafile"].asString().c_str()));
 
