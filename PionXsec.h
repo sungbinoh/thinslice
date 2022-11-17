@@ -72,6 +72,7 @@ class PionXsec {
   // == Event Topology
   double Get_EQE(double P_pion, double cos_theta);
   double Get_EQE_NC_Pion(double P_pion, double cos_theta, double E_binding, int which_sol);
+  bool Is_EQE(const anavar & evt, double window);
 
   // == Binnings for cross sections
   int N_binning_100MeV = 10;
