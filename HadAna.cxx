@@ -245,23 +245,23 @@ bool HadAna::PassBeamScraperCut(const anavar& evt) const{
   // == Define beam plug circle in [cm] unit
   double center_x = 0.;
   double center_y = 0.;
-  double radious = 0.;
+  double radius = 0.;
   double N_sigma = 0.;
   if(evt.MC){
     center_x = -29.6;
     center_y = 422.;
-    radious = 4.8;
+    radius = 4.8;
     N_sigma = 1.4;
   }
   else{
     center_x = -32.16;
     center_y = 422.7;
-    radious = 4.8;
+    radius = 4.8;
     N_sigma = 1.2;
   }
 
   double this_distance = sqrt( pow(evt.beam_inst_X - center_x , 2.) + pow(evt.beam_inst_Y - center_y, 2.) );
-  bool out = this_distance < radious * N_sigma;
+  bool out = this_distance < radius * N_sigma;
 
   return out;
 }
@@ -356,7 +356,7 @@ double HadAna::Particle_chi2(const vector<double> & dEdx, const vector<double> &
   double this_chi2 = 0.;
   int npt = 0;
   for(int j = N_skip; j < this_N_hits - N_skip; j++){
-    
+
     double dEdx_measured = dEdx.at(j);
     if(dEdx_measured < dEdx_truncate_bellow || dEdx_measured > dEdx_truncate_upper) continue; // == Truncate
 
@@ -377,7 +377,6 @@ double HadAna::Particle_chi2(const vector<double> & dEdx, const vector<double> &
       dedx_res *= dEdx_measured; 
 
       this_chi2 += ( pow( (dEdx_measured - template_dedx), 2 ) / ( pow(template_dedx_err, 2) + pow(dedx_res, 2) ) ); 
- 
 
       double this_KE = map_BB[PID]->KEFromRangeSpline(this_res_length);
       double dEdx_theory = map_BB[PID]->meandEdx(this_KE);
@@ -392,7 +391,6 @@ double HadAna::Particle_chi2(const vector<double> & dEdx, const vector<double> &
   }
   if(npt == 0) return 77777.;
 
-  
   return this_chi2 / npt;
 }
 

@@ -12,5 +12,5 @@
     //"datafile" : "root://fndcadoor.fnal.gov/pnfs/fnal.gov/usr/dune/tape_backed/dunepro/protodune-sp/root-tuple/2022/detector/physics/PDSPProd4/00/00/52/19/PDSPProd4_data_1GeV_reco2_ntuple_v09_41_00_04.root",
     "dataoutfile" : "data_Beam_Study_1.0GeV_muon.root",
     "nevents" : -1
-    //"nevents" : 50000
+    //"nevents" : 10000
 }

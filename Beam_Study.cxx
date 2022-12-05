@@ -492,12 +492,19 @@ void Beam_Study::FillHistBeam_Study_BeamScraper(const anavar & evt, double weigh
   // == Utilize Hypothetical Track Length Fitting Method
   if(suffix.Contains("proton") && KE_fit_gaussian > 0.){
     double KE_diff_RecoBeam_FittedFF = KE_beam_inst - KE_fit_gaussian;
+    double Fitted_P_ff = hadana.map_BB[2212] -> KEtoMomentum(KE_fit_gaussian);
+    double P_diff_RecoBeam_FittedFF = P_beam_inst - Fitted_P_ff;
+
     Hist.JSFillHist(suffix, "htrack_KE_diff_RecoBeam_FittedFF_" + KE_range_str       + suffix + "_" + particle_type_str, KE_diff_RecoBeam_FittedFF, weight, 500., -500., 500.);
     Hist.JSFillHist(suffix, "htrack_KE_diff_RecoBeam_FittedFF_" + KE_range_str_50MeV + suffix + "_" + particle_type_str, KE_diff_RecoBeam_FittedFF, weight, 500., -500., 500.);
+    Hist.JSFillHist(suffix, "htrack_P_diff_RecoBeam_FittedFF_" + P_range_str       + suffix + "_" + particle_type_str, P_diff_RecoBeam_FittedFF, weight, 500., -500., 500.);
+    Hist.JSFillHist(suffix, "htrack_P_diff_RecoBeam_FittedFF_" + P_range_str_50MeV + suffix + "_" + particle_type_str, P_diff_RecoBeam_FittedFF, weight, 500., -500., 500.);
     bool pass_beam_scraper_cut = Pass_Beam_Scraper_Cut(evt.beam_inst_X, evt.beam_inst_Y, suffix, "data");
     if(pass_beam_scraper_cut){
       Hist.JSFillHist(suffix, "htrack_KE_diff_RecoBeam_FittedFF_nonscraper_" + KE_range_str       + suffix + "_" + particle_type_str, KE_diff_RecoBeam_FittedFF, weight, 500., -500., 500.);
       Hist.JSFillHist(suffix, "htrack_KE_diff_RecoBeam_FittedFF_nonscraper_" + KE_range_str_50MeV + suffix + "_" + particle_type_str, KE_diff_RecoBeam_FittedFF, weight, 500., -500., 500.);      
+      Hist.JSFillHist(suffix, "htrack_P_diff_RecoBeam_FittedFF_nonscraper_" + P_range_str       + suffix + "_" + particle_type_str, P_diff_RecoBeam_FittedFF, weight, 500., -500., 500.);
+      Hist.JSFillHist(suffix, "htrack_P_diff_RecoBeam_FittedFF_nonscraper_" + P_range_str_50MeV + suffix + "_" + particle_type_str, P_diff_RecoBeam_FittedFF, weight, 500., -500., 500.);
     }
 
     bool is_scraper_FittedData = Pass_KE_diff_3sigma_Cut(KE_beam_inst, KE_diff_RecoBeam_FittedFF, suffix, "FittedData");
