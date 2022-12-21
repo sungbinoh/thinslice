@@ -23,6 +23,9 @@ class HadAna{
   void InitPi();
   void InitP();
 
+  // == Momentum reweight
+  double Beam_Mom_Reweight(TString flag, double P_beam_inst);
+
   void AddTruePDG(int pdg);
 
   //Check if the desired particle is selected
@@ -77,7 +80,7 @@ class HadAna{
 
   // == Functions for PID
   double Truncatd_Mean_dEdx(const vector<double> & dEdx, const vector<double> & ResRange);
-  double Particle_chi2(const vector<double> & dEdx, const vector<double> & ResRange, bool this_is_beam, int PID);
+  double Particle_chi2(const vector<double> & dEdx, const vector<double> & ResRange, bool this_is_beam, int PID, double dEdx_res_frac = 1.0);
   double Particle_chi2_with_offset(const vector<double> & dEdx, const vector<double> & ResRange, bool this_is_beam, int PID);
 
   // == Momentum measurement using dE/dx and hit for a short track segment
@@ -104,6 +107,7 @@ class HadAna{
   bool fProtonCSDACheck = true;
   TGraph *csda_range_vs_mom_sm;
   std::map< int, TProfile* > map_profile;  
+  std::map< TString, TH1D* > map_mom_reweight;
 };
 
 #endif

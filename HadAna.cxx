@@ -11,7 +11,7 @@ HadAna::HadAna(){
   map_BB[2212] = new BetheBloch(2212);
 
   if (fProtonCSDACheck) {
-    TFile *file_mom2csda = TFile::Open("root://fndcadoor.fnal.gov/pnfs/fnal.gov/usr/dune/archive/sam_managed_users/tjyang/data/3/a/7/a/51075a8b-cc10-4d2d-b4c6-8e4c4d2817d7-proton_mom_csda_converter.root");
+    TFile *file_mom2csda = TFile::Open("/dune/app/users/sungbino/ProtoDUNE/pion_energy/thinslice/files/51075a8b-cc10-4d2d-b4c6-8e4c4d2817d7-proton_mom_csda_converter.root");
     csda_range_vs_mom_sm = (TGraph *)file_mom2csda->Get("csda_range_vs_mom_sm");
   }
 
@@ -21,6 +21,14 @@ HadAna::HadAna(){
   map_profile[321] = (TProfile *)file_profile -> Get("dedx_range_ka");
   map_profile[2212] = (TProfile *)file_profile -> Get("dedx_range_pro");
   
+  TString mom_reweight_flags[] = {"BeamScraper", "BeamWindow", "APA3", "MichelScore", "ProtonVeto", "TrkLength"};
+  int N_flags = 6;
+  for(int i = 0; i < N_flags; i++){
+    TFile *this_file = TFile::Open("/dune/app/users/sungbino/ProtoDUNE/pion_energy/thinslice/files/reweight/Reweighting_pion_" + mom_reweight_flags[i] + "_noweight.root");
+    map_mom_reweight[mom_reweight_flags[i]] = (TH1D *)this_file -> Get("Reweight");
+    TH1::AddDirectory(kFALSE);
+    this_file -> Close();
+  }
 }
 
 void HadAna::Init(){
@@ -46,6 +54,20 @@ void HadAna::InitP(){
   SetPandoraSlicePDG(13);
 
   SetBeamQualityCuts();
+}
+
+double HadAna::Beam_Mom_Reweight(TString flag, double P_beam_inst){
+
+  double out = 1.;
+  if(P_beam_inst > 800. && P_beam_inst < 1200.){
+    if(map_mom_reweight[flag]){
+      int this_bin_numer = map_mom_reweight[flag] -> FindBin(P_beam_inst);
+      double weight = map_mom_reweight[flag] -> GetBinContent(this_bin_numer);
+      out = weight;
+    }
+  }
+
+  return out;
 }
 
 
@@ -268,7 +290,7 @@ bool HadAna::PassBeamScraperCut(const anavar& evt) const{
 
 bool HadAna::PassAPA3Cut(const anavar& evt) const{ // only use track in the first TPC
   //return true;
-  double cutAPA3_Z = 220.;
+  double cutAPA3_Z = 215.;
   
   if (fAllTrackCheck) return evt.reco_beam_calo_endZ_allTrack < cutAPA3_Z;
   else return evt.reco_beam_calo_endZ < cutAPA3_Z;
@@ -339,7 +361,7 @@ double HadAna::Truncatd_Mean_dEdx(const vector<double> & dEdx, const vector<doub
   return mean_dEdx;
 }
 
-double HadAna::Particle_chi2(const vector<double> & dEdx, const vector<double> & ResRange, bool this_is_beam, int PID){
+double HadAna::Particle_chi2(const vector<double> & dEdx, const vector<double> & ResRange, bool this_is_beam, int PID, double dEdx_res_frac){
 
   //cout << "[HadAna::Particle_chi2] Start" << endl;
   if(PID != 2212 && PID != 13 && PID != 211){
@@ -374,7 +396,7 @@ double HadAna::Particle_chi2(const vector<double> & dEdx, const vector<double> &
       }
 
       double dedx_res = 0.04231 + 0.0001783 * dEdx_measured * dEdx_measured;
-      dedx_res *= dEdx_measured; 
+      dedx_res *= dEdx_measured * dEdx_res_frac; 
 
       this_chi2 += ( pow( (dEdx_measured - template_dedx), 2 ) / ( pow(template_dedx_err, 2) + pow(dedx_res, 2) ) ); 
 
