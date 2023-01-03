@@ -959,7 +959,7 @@ void PionXsec::FillHistQE_Reco(const vector<RecoDaughter> daughters, const anava
 	double P_res = (P_daughter - P_daughter_true) / P_daughter_true;
 	Hist.JSFillHist(suffix, "hdaughter_reco_stop_pion_P_res_" + suffix + "_" + pitype_str + Is_QE_str, P_daughter_true, P_res,weight,1200., 0., 1200., 1000., -5., 5.);
         Hist.JSFillHist(suffix, "hdaughter_reco_stop_pion_PID_" + suffix + "_" + pitype_str + Is_QE_str, pion_true_PID, weight, 10, -2.5, 7.5);
-        Hist.JSFillHist(suffix, "hdaughter_reco_stop_pion_PID_" + KE_daughter_50bin_str + suffix + "_" + pitype_str + Is_QE_str, pion_true_PID, weight, 10, -2.5, 7.5);
+        //Hist.JSFillHist(suffix, "hdaughter_reco_stop_pion_PID_" + KE_daughter_50bin_str + suffix + "_" + pitype_str + Is_QE_str, pion_true_PID, weight, 10, -2.5, 7.5);
 
 	FillHistQE_MCstudy(evt, weight, "true_stop_pion_" + suffix);
       }
@@ -1021,8 +1021,8 @@ void PionXsec::FillHistQE_Reco(const vector<RecoDaughter> daughters, const anava
 	  double P_res = (P_daughter - P_daughter_true) / P_daughter_true;
 	  Hist.JSFillHist(suffix, "hdaughter_reco_gaus_fit_pion_P_res_" + suffix + "_" + true_PDG_str + Is_QE_str, P_daughter_true, P_res, weight, 1200., 0., 1200., 1000., -5., 5.);
 	  Hist.JSFillHist(suffix, "hdaughter_reco_gaus_fit_pion_PID_" + suffix + "_" + pitype_str + Is_QE_str, pion_true_PID, weight, 10, -2.5, 7.5);
-	  Hist.JSFillHist(suffix, "hdaughter_reco_gaus_fit_pion_PID_" + KE_daughter_50bin_str + suffix + "_" + pitype_str + Is_QE_str, pion_true_PID, weight, 10, -2.5, 7.5);
-
+	  //Hist.JSFillHist(suffix, "hdaughter_reco_gaus_fit_pion_PID_" + KE_daughter_50bin_str + suffix + "_" + pitype_str + Is_QE_str, pion_true_PID, weight, 10, -2.5, 7.5);
+	  
           FillHistQE_MCstudy(evt, weight, "true_gaus_fit_pion_" + suffix);
 	}
 
@@ -1059,7 +1059,7 @@ void PionXsec::FillHistQE_Reco(const vector<RecoDaughter> daughters, const anava
 	  double P_res = (P_daughter - P_daughter_true) / P_daughter_true;
           Hist.JSFillHist(suffix, "hdaughter_reco_likelihood_fit_pion_P_res_" + suffix + "_" + true_PDG_str + Is_QE_str, P_daughter_true, P_res, weight, 1200., 0., 1200., 1000., -5., 5.);
 	  Hist.JSFillHist(suffix, "hdaughter_reco_likelihood_fit_pion_PID_" + suffix + "_" + pitype_str + Is_QE_str, pion_true_PID, weight, 10, -2.5, 7.5);
-          Hist.JSFillHist(suffix, "hdaughter_reco_likelihood_fit_pion_PID_" + KE_daughter_50bin_str + suffix + "_" + pitype_str + Is_QE_str, pion_true_PID, weight, 10, -2.5, 7.5);
+          //Hist.JSFillHist(suffix, "hdaughter_reco_likelihood_fit_pion_PID_" + KE_daughter_50bin_str + suffix + "_" + pitype_str + Is_QE_str, pion_true_PID, weight, 10, -2.5, 7.5);
 
           FillHistQE_MCstudy(evt, weight, "true_likelihood_fit_pion_" + suffix);
 	}
@@ -1285,17 +1285,17 @@ void PionXsec::Run(anavar & evt, Long64_t nentries=-1){
       if(P_beam_str == "0.5") P_beam_inst_scale = 0.5;
     }
 
-    Run_Beam(evt, 1., "noweight");
+    //Run_Beam(evt, 1., "noweight");
     double P_beam_inst = evt.beam_inst_P * 1000. * P_beam_inst_scale;
     double momentum_reweight = 1.;
     if(evt.MC) momentum_reweight = hadana.Beam_Mom_Reweight("TrkLength", P_beam_inst);
     //cout << "[PionXsec::Run] P_beam_inst : " << P_beam_inst << ", momentum_reweight : " << momentum_reweight << endl;
-    Run_Beam(evt, momentum_reweight, "P_reweight_TrkLength");
+    //Run_Beam(evt, momentum_reweight, "P_reweight_TrkLength");
 
     vector<RecoDaughter> RecoDaughters_all = GetAllRecoDaughters(evt);
 
     if(RecoDaughters_all.size() == 0) continue;
-    //Run_Daughter(RecoDaughters_all, evt, 1., "noweight");
+    Run_Daughter(RecoDaughters_all, evt, momentum_reweight, "P_reweight_TrkLength");
 
     RecoDaughters_all.clear();
   }
